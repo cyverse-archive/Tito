@@ -33,6 +33,7 @@ public class JSIntegrate implements EntryPoint {
         controller.init(layoutApplication);
 
         RootPanel.get().add(layoutApplication);
+        setBrowserContextMenuEnabled(TitoProperties.getInstance().isContextClickEnabled());
     }
 
     private void setEntryPointTitle() {
@@ -70,7 +71,6 @@ public class JSIntegrate implements EntryPoint {
            @Override
            public void onSuccess(Map<String, String> result) {
                TitoProperties.getInstance().initialize(result);
-               setBrowserContextMenuEnabled(TitoProperties.getInstance().isContextClickEnabled());
                initApp();
            }
        });
