@@ -166,6 +166,7 @@ public class ToolRequestFormPanel extends LayoutContainer {
     private void setDefaultValues() {
         srcUploadOptionField.setValue(true);
         srcLinkField.setVisible(false);
+        srcLinkField.setEnabled(false);
     }
 
     private void addFields() {
@@ -201,8 +202,7 @@ public class ToolRequestFormPanel extends LayoutContainer {
         buildSrcOptionsFields(I18N.DISPLAY.link(), I18N.DISPLAY.upload(),
                 ASTERISK_HTML + I18N.DISPLAY.srcLinkPrompt());
 
-        nameField = buildTextField(I18N.DISPLAY.name(), false, null, NAME, null,
- 100);
+        nameField = buildTextField(I18N.DISPLAY.name(), false, null, NAME, null, 100);
         emailField = buildTextField(I18N.DISPLAY.email(), false, getEmail(), EMAIL,
                 new BasicEmailValidator(), 256);
         phoneField = buildTextField(I18N.DISPLAY.phone(), true, null, PHONE, null, 30);
