@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.iplantc.de.server.UploadServlet;
-import org.iplantc.js.integrate.client.I18N;
 
 /**
  * A class to accept files from the client.
@@ -20,6 +19,7 @@ import org.iplantc.js.integrate.client.I18N;
  * @author sriram
  * 
  */
+@SuppressWarnings("nls")
 public class NewToolRequestServlet extends UploadServlet {
     private static final long serialVersionUID = 1L;
 
@@ -40,24 +40,28 @@ public class NewToolRequestServlet extends UploadServlet {
     public String executeAction(HttpServletRequest request, List<FileItem> fileItems)   {
         super.executeAction(request, fileItems);
 
-        SimpleMessageSender msgSender = new SimpleMessageSender();
-        try {
-            msgSender.send(user, email, jsonInfo.toString(2));
-        } catch (Exception e) {
-            LOG.error("FileUploadServlet::executeAction - Exception while sending email to support about tool request:" //$NON-NLS-1$
-                    + e.getMessage());
-            e.printStackTrace();
-            jsonErrors.put("error", e.getMessage()); //$NON-NLS-1$
-            return jsonErrors.toString();
+        if (!jsonErrors.containsKey("error")) {
+            SimpleMessageSender msgSender = new SimpleMessageSender();
+            try {
+                LOG.debug("executeAction - Attempting to send email.");
+                msgSender.send(user, email, jsonInfo.toString(2));
+
+                jsonErrors.put("success", "Your tool request was successfully submitted.");
+            } catch (Exception e) {
+                LOG.error(
+                        "executeAction - Exception while sending email to support about tool request.",
+                        e);
+                e.printStackTrace();
+                jsonErrors.put("error", e.getMessage());
+            }
         }
 
-        LOG.debug("NewToolRequestServlet::executeAction - Attempted to send email."); //$NON-NLS-1$
-        jsonInfo.put("success", I18N.DISPLAY.toolRequestSucess()); //$NON-NLS-1$
+        LOG.debug("executeAction - JSON returned: " + jsonErrors);
+
         // remove files from session. this avoids duplicate submissions
         removeSessionFileItems(request, false);
 
-        LOG.debug("NewToolRequestServlet::executeAction - JSON returned: " + jsonInfo); //$NON-NLS-1$
-        return jsonInfo.toString();
+        return jsonErrors.toString();
     }
 
 }

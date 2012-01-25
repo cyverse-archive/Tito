@@ -430,13 +430,6 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
     String mustBeNumber();
 
     /**
-     * Localized text indicating a non-number has been entered into an number field.
-     * 
-     * @return string representing the text
-     */
-    String toolRequestSucess();
-
-    /**
      * Localized text indicating the user's home dir was not found.
      * 
      * @return string representing the text
