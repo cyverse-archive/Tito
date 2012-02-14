@@ -362,6 +362,11 @@ public class PropertyEditorPanel extends ContentPanel {
         dataObject.setType(property.getType());
         dataObject.setOrder(property.getOrder());
         dataObject.setVisible(property.isVisible());
+        if(property.getValidator() != null) {
+        	dataObject.setRequired(property.getValidator().isRequired());
+        } else {
+        	dataObject.setRequired(false);
+        }
     }
 
     /**
