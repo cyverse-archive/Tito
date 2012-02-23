@@ -60,7 +60,7 @@ public class PropertyEditorPanel extends ContentPanel {
     private HashMap<String, List<PropertyType>> propertyTypes; // category, property types
 
     private LayoutContainer pnlDefaultValue;
-    private CheckBox ckboxDisplayInGui;
+    private CheckBox cbxDisplayInGui;
     private CheckBox cbxOptionFlag;
     private LayoutContainer pnlToolTip;
     private ComboBox<CategoryListItem> comboPropertyTypeCategory;
@@ -70,6 +70,7 @@ public class PropertyEditorPanel extends ContentPanel {
     private LayoutContainer pnlCommandLineOption;
     private LayoutContainer pnlBottom;
     private CheckBox cbxRequired;
+    private CheckBox cbxImplicitOutput;
   
 
     private static final String DEFAULT_BOOLEAN = "false"; //$NON-NLS-1$
@@ -100,6 +101,7 @@ public class PropertyEditorPanel extends ContentPanel {
         buildGUIEnabledCheckbox();
         buildOptionFlagCheckbox();
         buildRequiredCheckbox();
+        buildImplicitOutputCheckbox();
         buildToolTipPanel();
         buildCommandLineOptionPanel();
         buildBottomPanel();
@@ -398,9 +400,10 @@ public class PropertyEditorPanel extends ContentPanel {
 
         switch (category) {
             case INPUT:
-                ckboxDisplayInGui.setEnabled(false);
+                cbxDisplayInGui.setEnabled(false);
                 cbxOptionFlag.setEnabled(true);
                 cbxRequired.setEnabled(true);
+                cbxImplicitOutput.setVisible(false);
 
                 property.setType(DataObject.INPUT_TYPE);
                 property.setVisible(true);
@@ -411,10 +414,11 @@ public class PropertyEditorPanel extends ContentPanel {
                 break;
 
             case OUTPUT:
-                ckboxDisplayInGui.setEnabled(false);
+                cbxDisplayInGui.setEnabled(false);
                 cbxOptionFlag.setEnabled(false);
                 cbxOptionFlag.setValue(true);
                 cbxRequired.setEnabled(false);
+                cbxImplicitOutput.setVisible(true);
 
                 property.setType(DataObject.OUTPUT_TYPE);
                 property.setVisible(false);
@@ -428,16 +432,18 @@ public class PropertyEditorPanel extends ContentPanel {
                 break;
 
             case BOOLEAN:
-                ckboxDisplayInGui.setEnabled(true);
+                cbxDisplayInGui.setEnabled(true);
                 cbxOptionFlag.setEnabled(false);
                 cbxRequired.setEnabled(false);
+                cbxImplicitOutput.setVisible(false);
                 containerPropertyTypeEditor = pnlWidget;
                 break;
 
             default:
-                ckboxDisplayInGui.setEnabled(true);
+                cbxDisplayInGui.setEnabled(true);
                 cbxOptionFlag.setEnabled(true);
                 cbxRequired.setEnabled(true);
+                cbxImplicitOutput.setVisible(false);
                 containerPropertyTypeEditor = pnlWidget;
                 break;
         }
@@ -447,7 +453,7 @@ public class PropertyEditorPanel extends ContentPanel {
         }
 
         // make sure we start with the GUI widgets in the correct state
-        ckboxDisplayInGui.setValue(property.isVisible());
+        cbxDisplayInGui.setValue(property.isVisible());
         setGuiWidgetsEnabled(property.isVisible());
     }
 
@@ -511,6 +517,26 @@ public class PropertyEditorPanel extends ContentPanel {
             }
         });
         
+    }
+    
+    
+    private void  buildImplicitOutputCheckbox() {
+    	cbxImplicitOutput = new CheckBox();
+    	cbxImplicitOutput.setVisible(false);
+    	cbxImplicitOutput.setBoxLabel(I18N.DISPLAY.implicitOutput());
+    	if(property.getDataObject()!= null) {
+    		cbxImplicitOutput.setValue(property.getDataObject().isImplicit());
+    	}
+    	cbxImplicitOutput.addListener(Events.Change, new Listener<BaseEvent>() {
+
+			@Override
+			public void handleEvent(BaseEvent be) {
+				if(property.getDataObject()!= null) {
+					property.getDataObject().setImplicit(cbxImplicitOutput.getValue());
+				}
+				
+			}
+		});
     }
 
     private void handleOptionaFlagCheckboxChanged(Boolean value) {
@@ -597,15 +623,15 @@ public class PropertyEditorPanel extends ContentPanel {
     }
 
     private void buildGUIEnabledCheckbox() {
-        ckboxDisplayInGui = new CheckBox();
+        cbxDisplayInGui = new CheckBox();
 
-        ckboxDisplayInGui.setBoxLabel(I18N.DISPLAY.displayInGUI());
-        ckboxDisplayInGui.setValue(property.isVisible());
+        cbxDisplayInGui.setBoxLabel(I18N.DISPLAY.displayInGUI());
+        cbxDisplayInGui.setValue(property.isVisible());
 
-        ckboxDisplayInGui.addListener(Events.Change, new Listener<BaseEvent>() {
+        cbxDisplayInGui.addListener(Events.Change, new Listener<BaseEvent>() {
             @Override
             public void handleEvent(final BaseEvent be) {
-                handleUICheckboxChanged(ckboxDisplayInGui.getValue());
+                handleUICheckboxChanged(cbxDisplayInGui.getValue());
             }
         });
     }
@@ -857,9 +883,10 @@ public class PropertyEditorPanel extends ContentPanel {
 
         ret.add(pnlDefaultValue);
 
-        ret.add(ckboxDisplayInGui);
+        ret.add(cbxDisplayInGui);
         ret.add(cbxOptionFlag);
         ret.add(cbxRequired);
+        ret.add(cbxImplicitOutput);
 
         ret.add(pnlToolTip);
 

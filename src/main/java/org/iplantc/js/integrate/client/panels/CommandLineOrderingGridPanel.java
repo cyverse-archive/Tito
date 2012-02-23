@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.iplantc.core.metadata.client.property.DataObject;
 import org.iplantc.core.metadata.client.property.Property;
 import org.iplantc.core.metadata.client.property.PropertyData;
 import org.iplantc.core.uicommons.client.events.EventBus;
@@ -121,7 +122,11 @@ public class CommandLineOrderingGridPanel extends ContentPanel {
             PropertyData propData = new PropertyData(property);
 
             if (propData.getOrder() < 0) {
-                unorderedListStore.add(propData);
+            	Property prop = propData.getProperty();
+	        	if(! prop.getType().equals(NavigationTreePanel.TYPE_STATIC_TEXT) 
+            			&& !dataObjectImplicit(prop.getDataObject())) {
+            		unorderedListStore.add(propData);
+            	}
             } else {
                 listOrderedPropertyData.add(propData);
             }
@@ -140,6 +145,15 @@ public class CommandLineOrderingGridPanel extends ContentPanel {
         // populate the unordered and ordered grids.
         unorderedGrid.reconfigure(unorderedListStore, unorderedGrid.getColumnModel());
         orderedGrid.reconfigure(orderedListStore, orderedGrid.getColumnModel());
+    }
+    
+    private boolean dataObjectImplicit(DataObject dataObj) {
+    	boolean isImplicit = false;
+    	if(dataObj != null) {
+    		isImplicit = dataObj.isImplicit();
+    	}
+    	
+    	return isImplicit;
     }
 
     /**

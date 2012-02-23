@@ -654,4 +654,11 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
      * @return string representing the text
      */
     String unorderedArgumentsInfoMsg();
+
+    /**
+     * Localized text implicit output checkbox
+     * 
+     * @return string representing the text
+     */
+	String implicitOutput();
 }
