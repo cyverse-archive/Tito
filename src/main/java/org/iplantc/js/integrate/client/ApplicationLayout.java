@@ -418,8 +418,8 @@ public class ApplicationLayout extends Viewport {
     private class LogoutSelectionListener implements Listener<BaseEvent> {
         @Override
         public void handleEvent(BaseEvent be) {
-            com.google.gwt.user.client.Window.Location.assign("https://" //$NON-NLS-1$
-                    + com.google.gwt.user.client.Window.Location.getHost()
+            com.google.gwt.user.client.Window.Location.assign(
+                    com.google.gwt.user.client.Window.Location.getPath()
                     + Constants.CLIENT.logoutUrl());
 
         }
