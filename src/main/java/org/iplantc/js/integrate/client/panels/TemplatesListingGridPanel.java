@@ -56,10 +56,11 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
  *
  */
 public class TemplatesListingGridPanel extends ContentPanel {
-    private static final String ID_DELETE = "idDelete"; //$NON-NLS-1$
-    private static final String ID_COPY = "idCopy"; //$NON-NLS-1$
-    private static final String ID_EDIT = "idEdit"; //$NON-NLS-1$
-    private static final String ID_PUBLISH = "idPublish"; //$NON-NLS-1$
+    private static final String ID_BTN_CREATE = "idBtnCreate";
+	private static final String ID_DELETE = "idBtnDelete"; //$NON-NLS-1$
+    private static final String ID_COPY = "idBtnCopy"; //$NON-NLS-1$
+    private static final String ID_EDIT = "idBtnEdit"; //$NON-NLS-1$
+    private static final String ID_PUBLISH = "idBtnPublish"; //$NON-NLS-1$
     private Grid<TemplateSummary> grid;
     private HashMap<String,Button> buttons;
 
@@ -152,6 +153,7 @@ public class TemplatesListingGridPanel extends ContentPanel {
 
     private Button buildAddButton(final Command addButtonCommand) {
         Button btn = new Button(I18N.DISPLAY.newTemplate());
+        btn.setId(ID_BTN_CREATE);
         btn.addListener(Events.OnClick, new Listener<BaseEvent>() {
             @Override
             public void handleEvent(BaseEvent be) {
@@ -227,6 +229,7 @@ public class TemplatesListingGridPanel extends ContentPanel {
                 updatePublishDetails(getTemplateId());
             }
         };
+        button.setId(ID_PUBLISH);
         buttons.put(ID_PUBLISH, button);
         button.setEnabled(false);
         return button;

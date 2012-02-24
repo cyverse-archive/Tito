@@ -20,7 +20,9 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
     protected void addFields() {
         add(new Label(outputFileNameField.getFieldLabel() + ":")); //$NON-NLS-1$
         add(outputFileNameField);
+        add(new Label(multiplicityGroup.getFieldLabel() + ":"));
         add(multiplicityGroup);
+        add(new Label(infoTypeField.getFieldLabel()+":"));
         add(infoTypeField);
     }
 }

@@ -68,7 +68,16 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
  * 
  */
 public class TemplateTabPanel extends ContentPanel {
-    private TabPanel panel;
+    private static final String ID_BTN_NEW_TOOL_BTN = "idBtnNewToolBtn";
+	private static final String ID_BTN_PUB = "idBtnPub";
+	private static final String ID_MU_ITM_JSON_PREV = "idMuItmJsonPrev";
+	private static final String ID_MU_ITM_UI_PREV = "idMuItmUiPrev";
+	private static final String ID_BTN_PREVIEW = "idBtnPreview";
+	private static final String ID_MU_PREVIEW = "idMuPreview";
+	private static final String ID_BTN_CMD_LINE = "idBtnCmdLine";
+	private static final String ID_BTN_SAVE = "idBtnSave";
+	private static final String ID_BACK = "idBtnBack";
+	private TabPanel panel;
     private final ContentPanel pnlContents;
     private TemplateInfoEditorPanel templateInfo;
     private WidgetPanel pnlWidgetsdObj;
@@ -212,7 +221,7 @@ public class TemplateTabPanel extends ContentPanel {
 
     private Button buildBackButton() {
         Button back = new Button(I18N.DISPLAY.back());
-        back.setId("idBack"); //$NON-NLS-1$
+        back.setId(ID_BACK); //$NON-NLS-1$
         back.setIcon(AbstractImagePrototype.create(Resources.ICONS.back()));
         back.addSelectionListener(new SelectionListener<ButtonEvent>() {
 
@@ -228,7 +237,7 @@ public class TemplateTabPanel extends ContentPanel {
 
     private Button buildSaveButton() {
         btnSave = new Button(I18N.DISPLAY.save());
-
+        btnSave.setId(ID_BTN_SAVE);
         btnSave.addSelectionListener(new SaveButtonSelctionListenerImpl());
         btnSave.setIcon(AbstractImagePrototype.create(Resources.ICONS.save()));
         btnSave.setEnabled(false);
@@ -238,6 +247,7 @@ public class TemplateTabPanel extends ContentPanel {
 
     private Button buildCmdLineOrderButton() {
         Button cmdLineOrder = new Button(I18N.DISPLAY.commandLineOrder());
+        cmdLineOrder.setId(ID_BTN_CMD_LINE);
         cmdLineOrder.addSelectionListener(new CmdLineOrderSelectionListenerImpl());
         cmdLineOrder.setIcon(AbstractImagePrototype.create(Resources.ICONS.listItems()));
         return cmdLineOrder;
@@ -245,12 +255,19 @@ public class TemplateTabPanel extends ContentPanel {
 
     private Button buildPreviewMenu() {
         Menu menuPreview = new Menu();
+        menuPreview.setId(ID_MU_PREVIEW);
 
-        menuPreview.add(new MenuItem(I18N.DISPLAY.previewUI(), new PreviewSelectionListener()));
-        menuPreview.add(new MenuItem(I18N.DISPLAY.jsonPreview(), new JSONPreviewSelectionListener()));
+        MenuItem preview_ui = new MenuItem(I18N.DISPLAY.previewUI(), new PreviewSelectionListener());
+        preview_ui.setId(ID_MU_ITM_UI_PREV);
+		menuPreview.add(preview_ui);
+      
+		MenuItem preview_json = new MenuItem(I18N.DISPLAY.jsonPreview(), new JSONPreviewSelectionListener());
+		preview_json.setId(ID_MU_ITM_JSON_PREV);
+		menuPreview.add(preview_json);
 
         Button btnPreview = new Button(I18N.DISPLAY.preview(),
                 AbstractImagePrototype.create(Resources.ICONS.preview()));
+        btnPreview.setId(ID_BTN_PREVIEW);
 
         btnPreview.setMenu(menuPreview);
 
@@ -280,6 +297,7 @@ public class TemplateTabPanel extends ContentPanel {
                 updateTemplateIdentifiers(result);
             }
         };
+        button.setId(ID_BTN_PUB);
         return button;
     }
 
@@ -292,6 +310,7 @@ public class TemplateTabPanel extends ContentPanel {
                 showToolRequestDialog();
             }
         });
+        newToolBtn.setId(ID_BTN_NEW_TOOL_BTN);
         return newToolBtn;
     }
 

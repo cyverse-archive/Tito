@@ -42,7 +42,17 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * 
  */
 public abstract class DataObjectFormPanel extends VerticalPanel {
-    protected final DataObject data;
+    private static final String ID_FLD_OP_NAME = "idFldOpName";
+
+	private static final String ID_INFO_TYPE_CBO = "idInfoTypeCbo";
+
+	private static final String ID_RADIO_MANY = "idRadioMany";
+
+	private static final String ID_RADIO_FOLDER = "idRadioFolder";
+
+	private static final String ID_RADIO_ONE = "idRadioOne";
+
+	protected final DataObject data;
 
     protected RadioGroup multiplicityGroup;
     protected ComboBox<InfoType> infoTypeField;
@@ -133,6 +143,7 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
         };
         one.setBoxLabel(I18N.DISPLAY.multiplicityOne());
         one.setValue(true);
+        one.setId(ID_RADIO_ONE);
 
         Radio many = new Radio() {
             @Override
@@ -143,6 +154,7 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
             }
         };
         many.setBoxLabel(I18N.DISPLAY.multiplicityMany());
+        many.setId(ID_RADIO_MANY);
 
         Radio folder = new Radio() {
             @Override
@@ -153,6 +165,7 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
             }
         };
         folder.setBoxLabel(I18N.DISPLAY.folder());
+        folder.setId(ID_RADIO_FOLDER);
 
         multiplicityGroup.add(one);
         multiplicityGroup.add(many);
@@ -162,6 +175,7 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
 
     private void buildInfoTypeComboBox(String label, List<InfoType> infoTypes) {
         infoTypeField = new ComboBox<InfoType>();
+        infoTypeField.setId(ID_INFO_TYPE_CBO);
         infoTypeField.setWidth(250);
         infoTypeField.setForceSelection(true);
         infoTypeField.setFieldLabel(label);
@@ -198,7 +212,7 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
     protected abstract void addFields();
 
     protected void buildFields() {
-        outputFileNameField = buildTextField(I18N.DISPLAY.outputFileName(), false, null, 100, null,
+        outputFileNameField = buildTextField(ID_FLD_OP_NAME,I18N.DISPLAY.outputFileName(), false, null, 100, null,
                 new OutputFilenameKeyUpCommand());
 
         if (data.getType().equals(DataObject.INPUT_TYPE)) {
@@ -210,11 +224,12 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
         buildInfoTypeComboBox(I18N.DISPLAY.infoTypePrompt(), new ArrayList<InfoType>());
     }
 
-    private TextField<String> buildTextField(String label, boolean allowBlank, String defaultVal,
+    private TextField<String> buildTextField(String id,String label, boolean allowBlank, String defaultVal,
             int maxLength, Validator validator, final KeyUpCommand cmdKeyUp) {
         final TextField<String> field = new BoundedTextField<String>();
 
         field.setFieldLabel(label);
+        field.setId(id);
         field.setAllowBlank(allowBlank);
         field.setMaxLength(maxLength);
         field.setValidateOnBlur(true);

@@ -59,7 +59,15 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  *
  */
 public class TemplateInfoEditorPanel extends ContentPanel {
-    private Template template;
+    private static final String ID_BTN_BROWSE = "idBtnBrowse";
+
+	private static final String ID_FLD_DESC = "idFldDesc";
+
+	private static final String ID_FLD_D_COMP = "idFldDComp";
+
+	private static final String ID_FLD_NAME = "idFldName";
+
+	private Template template;
 
     private FormData formData;
     private FormPanel panel;
@@ -225,6 +233,7 @@ public class TemplateInfoEditorPanel extends ContentPanel {
     private TextField<String> buildNameTextField() {
         TextField<String> field = new BoundedTextField<String>();
         field.setMaxLength(64);
+        field.setId(ID_FLD_NAME);
         field.setFieldLabel(I18N.DISPLAY.templateName());
         field.setEmptyText(I18N.DISPLAY.nameFieldEmptyText());
         field.setAllowBlank(false);
@@ -235,7 +244,7 @@ public class TemplateInfoEditorPanel extends ContentPanel {
 
     private TextField<String> buildComponentTextField() {
         final TextField<String> field = new TextField<String>();
-
+        field.setId(ID_FLD_D_COMP);
         field.setReadOnly(true);
         field.setStyleAttribute("padding-bottom", "5px"); //$NON-NLS-1$ //$NON-NLS-2$
         field.setEmptyText(I18N.DISPLAY.componentFieldEmptyText());
@@ -254,7 +263,7 @@ public class TemplateInfoEditorPanel extends ContentPanel {
 
     private TextArea buildComponentDescriptionField() {
         TextArea field = new BoundedTextArea();
-
+        field.setId(ID_FLD_DESC);
         field.setFieldLabel(I18N.DISPLAY.description());
         field.setAutoValidate(true);
         field.setMaxLength(255);
@@ -463,7 +472,7 @@ public class TemplateInfoEditorPanel extends ContentPanel {
                         showLookUpDialog();
                     }
                 });
-
+        lookup.setId(ID_BTN_BROWSE);
         panel.add(lookup);
         panel.setBorders(true);
 

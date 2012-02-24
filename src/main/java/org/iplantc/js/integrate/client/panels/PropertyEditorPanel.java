@@ -52,7 +52,15 @@ import com.google.gwt.user.client.ui.ListBox;
  * 
  */
 public class PropertyEditorPanel extends ContentPanel {
-    private final Property property;
+    private static final String ID_OPTN_FLAG_CBX = "idOptnFlagCbx";
+	private static final String ID_IMPLICIT_OPT_CBX = "idImplicitOptCbx";
+	private static final String ID_REQ_CBX = "idReqCbx";
+	private static final String ID_DISP_GUI_CBX = "idDispGuiCbx";
+	private static final String ID_TOOL_TIP = "idToolTip";
+	private static final String ID_PROP_LBL = "idPropLbl";
+	private static final String ID_FIELD_NUM = "idFieldNum";
+	private static final String ID_FLD_CMD_L_OPTN = "idFldCmdLOptn";
+	private final Property property;
     private LayoutContainer containerMain;
     private LayoutContainer containerPropertyTypeEditor;
     private VerticalPanel pnlWidget;
@@ -118,7 +126,7 @@ public class PropertyEditorPanel extends ContentPanel {
     private void buildCommandLineOptionPanel() {
         String caption = I18N.DISPLAY.flag();
 
-        TextField<String> field = buildTextField(property.getName(), 128, new FlagEditKeyUpCommand(),
+        TextField<String> field = buildTextField(ID_FLD_CMD_L_OPTN,property.getName(), 128, new FlagEditKeyUpCommand(),
                 true);
         IPlantValidator.setRegexRestrictedCmdLineChars(field, caption);
 
@@ -160,7 +168,7 @@ public class PropertyEditorPanel extends ContentPanel {
     private NumberField buildNumberField(final Number value, int width, final KeyUpCommand cmdKeyUp,
             boolean setFocus, boolean onlyPositiveValues) {
         final NumberField ret = new NumberField();
-
+        ret.setId(ID_FIELD_NUM);
         ret.setWidth(width);
         ret.setSelectOnFocus(setFocus);
 
@@ -202,7 +210,7 @@ public class PropertyEditorPanel extends ContentPanel {
      * @param changeListener a listener to fire when the field's value changes; can be null
      * @return a configured instance of the NumberField GXT widget
      */
-    private LayoutContainer buildNumberField(final String caption, final Number value, int width,
+    private LayoutContainer buildNumberFieldPanel(final String caption, final Number value, int width,
             final KeyUpCommand cmdKeyUp, boolean setFocus) {
         LayoutContainer ret = new LayoutContainer();
         
@@ -212,9 +220,9 @@ public class PropertyEditorPanel extends ContentPanel {
         return ret;
     }
 
-    private TextFieldContainer buildTextField(final String caption, final String value, int width,
+    private TextFieldContainer buildTextField(String id, final String caption, final String value, int width,
             final KeyUpCommand cmdKeyUp) {
-        return buildTextField(caption, buildTextField(value, width, cmdKeyUp, false));
+        return buildTextField(caption, buildTextField(id, value, width, cmdKeyUp, false));
     }
 
     private TextFieldContainer buildTextField(final String caption, TextField<String> field) {
@@ -222,10 +230,10 @@ public class PropertyEditorPanel extends ContentPanel {
         return new TextFieldContainer(label, field);
     }
 
-    private TextField<String> buildTextField(final String value, int width, final KeyUpCommand cmdKeyUp,
+    private TextField<String> buildTextField(String id, final String value, int width, final KeyUpCommand cmdKeyUp,
             boolean setFocus) {
         final TextField<String> ret = new TextField<String>();
-
+        setId(id);
         ret.setWidth(width);
         ret.setSelectOnFocus(true);
         ret.setValue(value);
@@ -436,6 +444,7 @@ public class PropertyEditorPanel extends ContentPanel {
                 cbxOptionFlag.setEnabled(false);
                 cbxRequired.setEnabled(false);
                 cbxImplicitOutput.setVisible(false);
+                cbxDisplayInGui.setValue(true);
                 containerPropertyTypeEditor = pnlWidget;
                 break;
 
@@ -443,6 +452,7 @@ public class PropertyEditorPanel extends ContentPanel {
                 cbxDisplayInGui.setEnabled(true);
                 cbxOptionFlag.setEnabled(true);
                 cbxRequired.setEnabled(true);
+                cbxDisplayInGui.setValue(true);
                 cbxImplicitOutput.setVisible(false);
                 containerPropertyTypeEditor = pnlWidget;
                 break;
@@ -504,7 +514,7 @@ public class PropertyEditorPanel extends ContentPanel {
     
     private void buildOptionFlagCheckbox() {
         cbxOptionFlag = new CheckBox();
-
+        cbxOptionFlag.setId(ID_OPTN_FLAG_CBX);
         cbxOptionFlag.setBoxLabel(I18N.DISPLAY.passFlag());
 
         cbxOptionFlag.setValue(property.isOmit_if_blank());
@@ -522,6 +532,7 @@ public class PropertyEditorPanel extends ContentPanel {
     
     private void  buildImplicitOutputCheckbox() {
     	cbxImplicitOutput = new CheckBox();
+    	cbxImplicitOutput.setId(ID_IMPLICIT_OPT_CBX);
     	cbxImplicitOutput.setVisible(false);
     	cbxImplicitOutput.setBoxLabel(I18N.DISPLAY.implicitOutput());
     	if(property.getDataObject()!= null) {
@@ -546,7 +557,7 @@ public class PropertyEditorPanel extends ContentPanel {
     
     private void buildRequiredCheckbox() {
         cbxRequired = new CheckBox();
-
+        cbxRequired.setId(ID_REQ_CBX);
         cbxRequired.setBoxLabel(I18N.DISPLAY.userInputRequired());
 
         // set our initial value
@@ -624,7 +635,7 @@ public class PropertyEditorPanel extends ContentPanel {
 
     private void buildGUIEnabledCheckbox() {
         cbxDisplayInGui = new CheckBox();
-
+        cbxDisplayInGui.setId(ID_DISP_GUI_CBX);
         cbxDisplayInGui.setBoxLabel(I18N.DISPLAY.displayInGUI());
         cbxDisplayInGui.setValue(property.isVisible());
 
@@ -637,7 +648,7 @@ public class PropertyEditorPanel extends ContentPanel {
     }
 
     private void buildToolTipPanel() {
-        pnlToolTip = buildTextField(I18N.DISPLAY.toolTipText(), property.getDescription(), 480,
+        pnlToolTip = buildTextField(ID_TOOL_TIP, I18N.DISPLAY.toolTipText(), property.getDescription(), 480,
                 new DescriptionEditKeyUpCommand());
     }
 
@@ -817,7 +828,7 @@ public class PropertyEditorPanel extends ContentPanel {
     }
 
     private void buildPropertyLabel() {
-        pnlPropertyLabel = buildTextField(I18N.DISPLAY.label(), property.getLabel(), 255,
+        pnlPropertyLabel = buildTextField( ID_PROP_LBL, I18N.DISPLAY.label(), property.getLabel(), 255,
                 new LabelEditKeyUpCommand());
     }
 
@@ -833,6 +844,7 @@ public class PropertyEditorPanel extends ContentPanel {
         if (isSelectionWidget) {
             pnlBottom.add(new ListboxEditorPanel(category.toString(), property));
         } else {
+        	pnlValidation.enable();
             pnlBottom.add(pnlValidation);
         }
 
@@ -1048,11 +1060,13 @@ public class PropertyEditorPanel extends ContentPanel {
     }
 
     private class StringDefaultValuePanel extends VerticalPanel {
-        public StringDefaultValuePanel(final String value) {
+        private static final String ID_FLD_DEF_STR_VAL = "idFldDefStrVal";
+
+		public StringDefaultValuePanel(final String value) {
             String caption = I18N.DISPLAY.defaultValueLabel();
 
-            TextField<String> field = buildTextField(value, 255, new ValueEditKeyUpCommand(), false);
-
+            TextField<String> field = buildTextField(ID_FLD_DEF_STR_VAL,value, 255, new ValueEditKeyUpCommand(), false);
+            
             IPlantValidator.setRegexRestrictedArgValueChars(field, caption);
 
             add(buildTextField(caption, field));
@@ -1099,7 +1113,7 @@ public class PropertyEditorPanel extends ContentPanel {
      */
     private class NumberDefaultValuePanel extends VerticalPanel {
         public NumberDefaultValuePanel(String value) {
-            add(buildNumberField(I18N.DISPLAY.defaultValue(), parseNumberFromString(value), 64,
+            add(buildNumberFieldPanel(I18N.DISPLAY.defaultValue(), parseNumberFromString(value), 64,
                     new NumberValueEditKeyUpCommand(), false));
         }
 
@@ -1163,10 +1177,12 @@ public class PropertyEditorPanel extends ContentPanel {
      * 
      */
     private static class TextFieldContainer extends LayoutContainer {
-        TextField<String> field;
+        private static final String ID_TEXT_FLD = "idTextFld";
+		TextField<String> field;
 
         private TextFieldContainer(Label label, TextField<String> field) {
             this.field = field;
+            field.setId(ID_TEXT_FLD);
 
             add(label);
             add(field);
