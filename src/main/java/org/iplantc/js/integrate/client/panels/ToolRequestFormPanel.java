@@ -3,6 +3,7 @@ package org.iplantc.js.integrate.client.panels;
 import org.iplantc.core.client.widgets.BoundedTextArea;
 import org.iplantc.core.client.widgets.BoundedTextField;
 import org.iplantc.core.client.widgets.validator.BasicEmailValidator;
+import org.iplantc.core.jsonutil.JsonUtil;
 import org.iplantc.core.uicommons.client.ErrorHandler;
 import org.iplantc.core.uicommons.client.events.EventBus;
 import org.iplantc.core.uicommons.client.models.UserInfo;
@@ -42,7 +43,6 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.extjs.gxt.ui.client.widget.layout.FormLayout;
 import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONParser;
 
 /**
  * 
@@ -151,10 +151,11 @@ public class ToolRequestFormPanel extends LayoutContainer {
             }
 
             private void processResults(String resultHtml) {
-                JSONObject obj = JSONParser.parseStrict(resultHtml).isObject();
+                JSONObject obj = JsonUtil.getObject(resultHtml);
 
-                if (obj.containsKey("error")) { //$NON-NLS-1$
-                    ErrorHandler.post(I18N.DISPLAY.newToolRequestError());
+                if (obj != null && obj.containsKey("error")) { //$NON-NLS-1$
+                    String error = JsonUtil.getString(JsonUtil.getObject(resultHtml), "error"); //$NON-NLS-1$
+                    ErrorHandler.post(I18N.DISPLAY.newToolRequestError(), new Exception(error));
                 } else {
                     MessageBox.info(I18N.DISPLAY.success(), I18N.DISPLAY.requestConfirmMsg(), null);
                 }
