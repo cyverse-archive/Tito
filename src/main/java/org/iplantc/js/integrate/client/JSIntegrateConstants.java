@@ -51,11 +51,4 @@ public interface JSIntegrateConstants extends CommonUiConstants {
      * @return a string representing the URL.
      */
     String iplantAboutImage();
-
-    /**
-     * Link from Tito to the DE
-     * 
-     * @return a string representing the URL.
-     */
-    String deUrl();
 }
