@@ -78,7 +78,7 @@ public class TemplatesListingGridPanel extends ContentPanel {
         setHeading(I18N.DISPLAY.templateList());
         setBorders(false);
         setLayout(new FitLayout());
-        setSize(800, 600);
+        setSize(800, 575);
         buttons = new HashMap<String,Button>();
 
         GridSelectionModel<TemplateSummary> checkBoxModel = buildSelectionModel();
