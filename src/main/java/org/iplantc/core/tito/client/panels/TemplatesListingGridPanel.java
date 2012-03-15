@@ -37,6 +37,7 @@ import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
 import com.extjs.gxt.ui.client.widget.grid.GridSelectionModel;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.tips.QuickTip;
 import com.extjs.gxt.ui.client.widget.toolbar.FillToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
@@ -75,9 +76,9 @@ public class TemplatesListingGridPanel extends ContentPanel {
 
     private void init(Command addButtonCommand) {
         setHeading(I18N.DISPLAY.templateList());
-        setBorders(true);
-        setWidth(650);
-
+        setBorders(false);
+        setLayout(new FitLayout());
+        setSize(800, 600);
         buttons = new HashMap<String,Button>();
 
         GridSelectionModel<TemplateSummary> checkBoxModel = buildSelectionModel();
@@ -89,7 +90,6 @@ public class TemplatesListingGridPanel extends ContentPanel {
 
         Button addBtn = buildAddButton(addButtonCommand);
         compose(addBtn);
-        grid.setHeight(400);
     }
 
     private GridSelectionModel<TemplateSummary> buildSelectionModel() {
@@ -147,7 +147,7 @@ public class TemplatesListingGridPanel extends ContentPanel {
         toolBar.add(new FillToolItem());
         toolBar.add(buildDeleteButton());
         
-        add(toolBar);
+        setTopComponent(toolBar);
         add(grid);
     }
 
@@ -355,12 +355,12 @@ public class TemplatesListingGridPanel extends ContentPanel {
     }
 
     private ColumnModel buildColumnModel() {
-        ColumnConfig name = new ColumnConfig(TemplateSummary.NAME, I18N.DISPLAY.name(), 225);
+        ColumnConfig name = new ColumnConfig(TemplateSummary.NAME, I18N.DISPLAY.name(), 200);
         ColumnConfig status = new ColumnConfig(TemplateSummary.STATUS, I18N.DISPLAY.status(), 100);
         ColumnConfig last_edited = new ColumnConfig(TemplateSummary.LAST_EDITED_DATE,
-                I18N.DISPLAY.lastEdited(), 160);
+                I18N.DISPLAY.lastEdited(), 150);
         ColumnConfig published_date = new ColumnConfig(TemplateSummary.PUBLISHED_DATE,
-                I18N.DISPLAY.publishToWorkspaceOn(), 160);
+                I18N.DISPLAY.publishToWorkspaceOn(), 150);
 
         name.setRenderer(new TemplateNameCellRenderer());
 

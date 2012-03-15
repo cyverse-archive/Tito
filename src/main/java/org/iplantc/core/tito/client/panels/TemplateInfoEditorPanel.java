@@ -157,7 +157,7 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         setStyleAttribute("padding-bottom", "10px"); //$NON-NLS-1$ //$NON-NLS-2$
 
         panel = new FormPanel();
-        panel.setSize(800, 440);
+        panel.setSize(800, 600);
         panel.setScrollMode(Scroll.AUTOY);
         panel.setBodyBorder(false);
         panel.setFrame(true);

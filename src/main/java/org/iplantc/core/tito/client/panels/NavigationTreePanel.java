@@ -386,7 +386,7 @@ public class NavigationTreePanel extends ContentPanel {
     }
 
     private void compose() {
-        setSize(200, 400);
+        setSize(200, 500);
         setScrollMode(Scroll.AUTO);
         add(tree);
     }

@@ -49,7 +49,6 @@ import com.extjs.gxt.ui.client.widget.TabItem;
 import com.extjs.gxt.ui.client.widget.TabPanel;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.layout.CenterLayout;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
@@ -103,7 +102,9 @@ public class TemplateTabPanel extends ContentPanel {
         init();
 
         pnlContents = new ContentPanel();
-        pnlContents.setSize(800, 500);
+        setSize(800, 600);
+        pnlContents.setSize(800, 600);
+        pnlContents.setLayout(new FitLayout());
         pnlContents.setHeaderVisible(true);
         pnlContents.setBodyBorder(false);
 
@@ -123,10 +124,7 @@ public class TemplateTabPanel extends ContentPanel {
     private void init() {
         setBodyBorder(false);
         setHeaderVisible(false);
-        setBodyStyleName("iplantc_portal_component"); //$NON-NLS-1$
-        CenterLayout layoutHorizontalCenter = new CenterLayout();
-        layoutHorizontalCenter.setExtraStyle("iplantc_center_layout_horizontal"); //$NON-NLS-1$
-        setLayout(layoutHorizontalCenter);
+        setLayout(new FitLayout());
 
     }
 
@@ -159,8 +157,6 @@ public class TemplateTabPanel extends ContentPanel {
 
     private void addToTabs() {
         panel = new TabPanel();
-        panel.setSize(800, 452);
-
         final TabItem templateItem = new TabItem(I18N.DISPLAY.template());
         templateItem.add(templateInfo);
 
