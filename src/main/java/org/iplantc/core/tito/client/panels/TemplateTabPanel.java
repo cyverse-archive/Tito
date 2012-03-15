@@ -74,7 +74,6 @@ public class TemplateTabPanel extends ContentPanel {
 	private static final String ID_BTN_PREVIEW = "idBtnPreview";
 	private static final String ID_MU_PREVIEW = "idMuPreview";
 	private static final String ID_BTN_CMD_LINE = "idBtnCmdLine";
-	private static final String ID_BTN_SAVE = "idBtnSave";
 	private static final String ID_BACK = "idBtnBack";
 	private TabPanel panel;
     private final ContentPanel pnlContents;
@@ -82,7 +81,6 @@ public class TemplateTabPanel extends ContentPanel {
     private WidgetPanel pnlWidgetsdObj;
     private Window newToolRequestWin;
 
-    private Button btnSave;
     private PublishButton btnPublish;
 
     private byte[] hash;
@@ -205,11 +203,10 @@ public class TemplateTabPanel extends ContentPanel {
     private void buildToolBar() {
         ToolBar tool = new ToolBar();
 
-        tool.add(buildSaveButton());
+        tool.add(buildPublishButton());
         tool.add(buildNewToolRequestButton());
         tool.add(buildCmdLineOrderButton());
         tool.add(buildPreviewMenu());
-        tool.add(btnPublish = buildPublishButton());
         tool.add(buildBackButton());
 
         pnlContents.setTopComponent(tool);
@@ -231,14 +228,33 @@ public class TemplateTabPanel extends ContentPanel {
         return back;
     }
 
-    private Button buildSaveButton() {
-        btnSave = new Button(I18N.DISPLAY.save());
-        btnSave.setId(ID_BTN_SAVE);
-        btnSave.addSelectionListener(new SaveButtonSelctionListenerImpl());
-        btnSave.setIcon(AbstractImagePrototype.create(Resources.ICONS.save()));
-        btnSave.setEnabled(false);
+    private Button buildPublishButton() {
+        btnPublish = new PublishButton() {
+            @Override
+            protected void unorderedNoPublish() {
+                // the user does not want to publish yet, display the ordering grid.
+                showOrderingGrid();
+            }
 
-        return btnSave;
+            @Override
+            protected boolean isOrdered() {
+                for (Property param : pnlWidgetsdObj.getProperties()) {
+                    if (param.getOrder() < 1) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            @Override
+            protected void afterPublishSucess(String result) {
+                updateTemplateIdentifiers(result);
+            }
+        };
+
+        btnPublish.setId(ID_BTN_PUB);
+
+        return btnPublish;
     }
 
     private Button buildCmdLineOrderButton() {
@@ -268,33 +284,6 @@ public class TemplateTabPanel extends ContentPanel {
         btnPreview.setMenu(menuPreview);
 
         return btnPreview;
-    }
-
-    private PublishButton buildPublishButton() {
-        PublishButton button = new PublishButton() {
-            @Override
-            protected void unorderedNoPublish() {
-                // the user does not want to publish yet, display the ordering grid.
-                showOrderingGrid();
-            }
-
-            @Override
-            protected boolean isOrdered() {
-                for (Property param : pnlWidgetsdObj.getProperties()) {
-                    if (param.getOrder() < 1) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-
-            @Override
-            protected void afterPublishSucess(String result) {
-                updateTemplateIdentifiers(result);
-            }
-        };
-        button.setId(ID_BTN_PUB);
-        return button;
     }
 
     private Button buildNewToolRequestButton() {
@@ -390,7 +379,6 @@ public class TemplateTabPanel extends ContentPanel {
                     && !templateInfo.getComponent().isEmpty();
 
             btnPublish.setEnabled(templateHasName && templateHasInfo && validateProperties());
-            btnSave.setEnabled(templateHasName);
         }
 
     }
@@ -451,16 +439,6 @@ public class TemplateTabPanel extends ContentPanel {
             }
         }
         return retval;
-    }
-
-    private class SaveButtonSelctionListenerImpl extends SelectionListener<ButtonEvent> {
-
-        @Override
-        public void componentSelected(ButtonEvent ce) {
-            TemplateSaveEvent event = new TemplateSaveEvent();
-            EventBus.getInstance().fireEvent(event);
-        }
-
     }
 
     private void save() {

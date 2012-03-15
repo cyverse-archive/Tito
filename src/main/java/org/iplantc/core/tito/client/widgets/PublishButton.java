@@ -5,9 +5,11 @@ import java.util.Date;
 import org.iplantc.core.jsonutil.JsonUtil;
 import org.iplantc.core.tito.client.I18N;
 import org.iplantc.core.tito.client.events.AfterTemplateLoadEvent;
+import org.iplantc.core.tito.client.events.TemplateSaveEvent;
 import org.iplantc.core.tito.client.images.Resources;
 import org.iplantc.core.tito.client.models.Template;
 import org.iplantc.core.tito.client.services.EnumerationServices;
+import org.iplantc.core.uiapplications.client.events.AnalysisSelectEvent;
 import org.iplantc.core.uicommons.client.ErrorHandler;
 import org.iplantc.core.uicommons.client.events.EventBus;
 
@@ -28,7 +30,7 @@ public abstract class PublishButton extends Button {
     private String templateId;
 
     public PublishButton() {
-        super(I18N.DISPLAY.publish(), AbstractImagePrototype.create(Resources.ICONS.publish()));
+        super(I18N.DISPLAY.save(), AbstractImagePrototype.create(Resources.ICONS.save()));
         addSelectionListener(new PublishPrivateSelectionListener());
 
         setEnabled(false);
@@ -118,6 +120,7 @@ public abstract class PublishButton extends Button {
 
         String timestamp = String.valueOf(new Date().getTime());
         template.setDatePublished(timestamp);
+        template.setDateEdited(timestamp);
 
         JSONObject json = template.toJsonExtended();
 
@@ -152,16 +155,9 @@ public abstract class PublishButton extends Button {
         public void onSuccess(String result) {
             afterPublishSucess(result);
 
-            // build html from "success" message and a link to the DE
-            String msg = I18N.DISPLAY.publishSuccess();
-            // TODO a link to the DE is now obsolete... fire AnalysisSelectEvent instead?
-            // Format.substitute(
-//                    "{0}<p/><a href=\"{1}?{2}={3}\" target=\"_blank\">{4}</a>", //$NON-NLS-1$
-//                    I18N.DISPLAY.publishSuccess(), TitoProperties.getInstance().getDeUrl(),
-//                    Constants.CLIENT.appIdParam(), template.getTitoId(),
-//                    I18N.DISPLAY.publishedAppLinkText());
-
-            MessageBox.info(I18N.DISPLAY.publish(), msg, null);
+            EventBus.getInstance().fireEvent(
+                    new AnalysisSelectEvent("de_catalog", null, template.getTitoId()));
+            EventBus.getInstance().fireEvent(new TemplateSaveEvent());
         }
 
         @Override

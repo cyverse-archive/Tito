@@ -283,17 +283,6 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
 
     String publish();
 
-    String publishSuccess();
-    
-    String publishedAppLinkText();
-
-    /**
-     * Label for a button to publish to a user's private workspace
-     * 
-     * @return
-     */
-    String publishPrivate();
-
     String selectedTool();
 
     String componentFieldEmptyText();
