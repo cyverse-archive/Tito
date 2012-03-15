@@ -67,14 +67,14 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
  * 
  */
 public class TemplateTabPanel extends ContentPanel {
-    private static final String ID_BTN_NEW_TOOL_BTN = "idBtnNewToolBtn";
-	private static final String ID_BTN_PUB = "idBtnPub";
-	private static final String ID_MU_ITM_JSON_PREV = "idMuItmJsonPrev";
-	private static final String ID_MU_ITM_UI_PREV = "idMuItmUiPrev";
-	private static final String ID_BTN_PREVIEW = "idBtnPreview";
-	private static final String ID_MU_PREVIEW = "idMuPreview";
-	private static final String ID_BTN_CMD_LINE = "idBtnCmdLine";
-	private static final String ID_BACK = "idBtnBack";
+    private static final String ID_BTN_NEW_TOOL_BTN = "idBtnNewToolBtn"; //$NON-NLS-1$
+    private static final String ID_BTN_PUB = "idBtnPub"; //$NON-NLS-1$
+    private static final String ID_MU_ITM_JSON_PREV = "idMuItmJsonPrev"; //$NON-NLS-1$
+    private static final String ID_MU_ITM_UI_PREV = "idMuItmUiPrev"; //$NON-NLS-1$
+    private static final String ID_BTN_PREVIEW = "idBtnPreview"; //$NON-NLS-1$
+    private static final String ID_MU_PREVIEW = "idMuPreview"; //$NON-NLS-1$
+    private static final String ID_BTN_CMD_LINE = "idBtnCmdLine"; //$NON-NLS-1$
+    private static final String ID_BACK = "idBtnBack"; //$NON-NLS-1$
 	private TabPanel panel;
     private final ContentPanel pnlContents;
     private TemplateInfoEditorPanel templateInfo;
@@ -214,7 +214,7 @@ public class TemplateTabPanel extends ContentPanel {
 
     private Button buildBackButton() {
         Button back = new Button(I18N.DISPLAY.back());
-        back.setId(ID_BACK); //$NON-NLS-1$
+        back.setId(ID_BACK);
         back.setIcon(AbstractImagePrototype.create(Resources.ICONS.back()));
         back.addSelectionListener(new SelectionListener<ButtonEvent>() {
 
