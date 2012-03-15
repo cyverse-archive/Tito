@@ -82,7 +82,7 @@ public class WidgetPanel extends ContentPanel {
     private void compose() {
         add(buildCmdLinePanel());
         parameterPanel = new LayoutContainer(new BorderLayout());
-        parameterPanel.setHeight(400);
+        parameterPanel.setHeight(325);
         add(parameterPanel);
     }
     
