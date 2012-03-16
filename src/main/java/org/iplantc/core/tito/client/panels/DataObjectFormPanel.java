@@ -181,10 +181,14 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
         infoTypeField.setFieldLabel(label);
         infoTypeField.setDisplayField("description"); //$NON-NLS-1$
         infoTypeField.setTriggerAction(TriggerAction.ALL);
-        infoTypeField.setEditable(false);
         infoTypeField.setFireChangeEventOnSetValue(true);
         infoTypeField.setAllowBlank(false);
         infoTypeField.setStyleAttribute("padding-bottom", "5px"); //$NON-NLS-1$ //$NON-NLS-2$
+
+        // enable auto-complete
+        infoTypeField.setEditable(true);
+        infoTypeField.setTypeAhead(true);
+        infoTypeField.setQueryDelay(0);
 
         ListStore<InfoType> store = new ListStore<InfoType>();
         store.add(infoTypes);
