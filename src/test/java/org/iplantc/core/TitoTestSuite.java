@@ -1,4 +1,4 @@
-package org.iplantc.core.tito;
+package org.iplantc.core;
 
 import junit.framework.Test;
 
