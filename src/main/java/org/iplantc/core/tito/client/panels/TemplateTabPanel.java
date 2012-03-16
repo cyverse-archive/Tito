@@ -2,6 +2,7 @@ package org.iplantc.core.tito.client.panels;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -53,6 +54,7 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.json.client.JSONBoolean;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
@@ -75,7 +77,9 @@ public class TemplateTabPanel extends ContentPanel {
     private static final String ID_MU_PREVIEW = "idMuPreview"; //$NON-NLS-1$
     private static final String ID_BTN_CMD_LINE = "idBtnCmdLine"; //$NON-NLS-1$
     private static final String ID_BACK = "idBtnBack"; //$NON-NLS-1$
-	private TabPanel panel;
+
+    private ArrayList<HandlerRegistration> handlers;
+    private TabPanel panel;
     private final ContentPanel pnlContents;
     private TemplateInfoEditorPanel templateInfo;
     private WidgetPanel pnlWidgetsdObj;
@@ -190,14 +194,20 @@ public class TemplateTabPanel extends ContentPanel {
 
     private void addHandlers() {
         EventBus bus = EventBus.getInstance();
-        bus.addHandler(TemplateSaveEvent.TYPE, new TemplateSaveEventHandlerImpl());
-        bus.addHandler(TemplateNameChangeEvent.TYPE, new TemplateNameChangeEventHandlerImpl());
-        bus.addHandler(ExecutableChangeEvent.TYPE, new ExecutableChangeEventHandlerImpl());
-        bus.addHandler(NavigateEvent.TYPE, new NavigateEventHandlerImpl());
-        bus.addHandler(ToolSelectedEvent.TYPE, new ToolSelectedEventHandlerImpl());
-        bus.addHandler(NewToolRequestSubmitEvent.TYPE, new NewToolRequestSubmitEventHandlerImpl());
-        bus.addHandler(CommandLineArgumentChangeEvent.TYPE, new CommandLineArgumentChangeEventHandlerImpl());
-        bus.addHandler(NavigationTreeDeleteEvent.TYPE, new NavigationTreeDeleteEventHandlerImpl());
+        handlers = new ArrayList<HandlerRegistration>();
+
+        handlers.add(bus.addHandler(TemplateSaveEvent.TYPE, new TemplateSaveEventHandlerImpl()));
+        handlers.add(bus.addHandler(TemplateNameChangeEvent.TYPE,
+                new TemplateNameChangeEventHandlerImpl()));
+        handlers.add(bus.addHandler(ExecutableChangeEvent.TYPE, new ExecutableChangeEventHandlerImpl()));
+        handlers.add(bus.addHandler(NavigateEvent.TYPE, new NavigateEventHandlerImpl()));
+        handlers.add(bus.addHandler(ToolSelectedEvent.TYPE, new ToolSelectedEventHandlerImpl()));
+        handlers.add(bus.addHandler(NewToolRequestSubmitEvent.TYPE,
+                new NewToolRequestSubmitEventHandlerImpl()));
+        handlers.add(bus.addHandler(CommandLineArgumentChangeEvent.TYPE,
+                new CommandLineArgumentChangeEventHandlerImpl()));
+        handlers.add(bus.addHandler(NavigationTreeDeleteEvent.TYPE,
+                new NavigationTreeDeleteEventHandlerImpl()));
     }
 
     private void buildToolBar() {
@@ -560,12 +570,10 @@ public class TemplateTabPanel extends ContentPanel {
     }
 
     public void cleanup() {
-        EventBus instance = EventBus.getInstance();
-        instance.removeHandlers(TemplateSaveEvent.TYPE);
-        instance.removeHandlers(TemplateNameChangeEvent.TYPE);
-        instance.removeHandlers(NavigateEvent.TYPE);
-        instance.removeHandlers(ToolSelectedEvent.TYPE);
-        instance.removeHandlers(NavigationTreeDeleteEvent.TYPE);
+        for (HandlerRegistration hanlder : handlers) {
+            hanlder.removeHandler();
+        }
+
         pnlWidgetsdObj.cleanup();
     }
 
