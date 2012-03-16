@@ -258,7 +258,11 @@ public class PropertyEditorPanel extends ContentPanel {
     private void buildPropertyTypeCategoryList() {
         comboPropertyTypeCategory = new ComboBox<CategoryListItem>();
         comboPropertyTypeCategory.setWidth("140px"); //$NON-NLS-1$
-        comboPropertyTypeCategory.setEditable(false);
+
+        // enable auto-complete
+        comboPropertyTypeCategory.setEditable(true);
+        comboPropertyTypeCategory.setTypeAhead(true);
+        comboPropertyTypeCategory.setQueryDelay(0);
 
         comboPropertyTypeCategory.setFireChangeEventOnSetValue(true);
         comboPropertyTypeCategory.setForceSelection(true);
