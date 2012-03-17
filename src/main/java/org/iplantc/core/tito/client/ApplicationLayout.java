@@ -3,6 +3,7 @@ package org.iplantc.core.tito.client;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.iplantc.core.jsonutil.JsonUtil;
 import org.iplantc.core.tito.client.events.AfterTemplateLoadEvent;
 import org.iplantc.core.tito.client.events.AfterTemplateLoadEventHandler;
 import org.iplantc.core.tito.client.events.NavigateToHomeEvent;
@@ -10,7 +11,10 @@ import org.iplantc.core.tito.client.events.NavigateToHomeEventHandler;
 import org.iplantc.core.tito.client.events.NewProjectEvent;
 import org.iplantc.core.tito.client.events.TemplateLoadEvent;
 import org.iplantc.core.tito.client.events.TemplateLoadEvent.MODE;
+import org.iplantc.core.tito.client.panels.TemplateTabPanel;
 import org.iplantc.core.tito.client.panels.TemplatesListingGridPanel;
+import org.iplantc.core.tito.client.services.EnumerationServices;
+import org.iplantc.core.uicommons.client.ErrorHandler;
 import org.iplantc.core.uicommons.client.events.EventBus;
 
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
@@ -26,9 +30,13 @@ import com.extjs.gxt.ui.client.widget.Viewport;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONString;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window.Location;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * Defines the overall layout for the root panel of the web application.
@@ -36,6 +44,7 @@ import com.google.gwt.user.client.Window.Location;
  * @author sriram
  */
 public class ApplicationLayout extends Viewport {
+    private TemplateTabPanel pnlAppTemplate;
     private Component center;
 
     private final FlowLayout layout;
@@ -56,7 +65,6 @@ public class ApplicationLayout extends Viewport {
         });
 
         setLayout(layout);
-       // setStyleName("iplantc_background"); //$NON-NLS-1$
 
         addListeners();
     }
@@ -76,8 +84,6 @@ public class ApplicationLayout extends Viewport {
         Command addButtonCommand = new NewTemplateSelectionListenerImpl();
         replaceCenterPanel(new TemplatesListingGridPanel(addButtonCommand));
     }
-
-
 
     /**
      * Replace the contents of the center panel.
@@ -132,16 +138,19 @@ public class ApplicationLayout extends Viewport {
                 fireNewProjectEvent();
             } else {
                 loadTool(toolId);
-    
+
                 // if AfterTemplateLoadEvent says "failed", addListOfTools().
-                // regList is a list whose only element is reg; this avoids having to make reg an instance variable
+                // regList is a list whose only element is reg; this avoids having to make reg an
+                // instance variable
                 final List<HandlerRegistration> regList = new ArrayList<HandlerRegistration>();
                 HandlerRegistration reg = EventBus.getInstance().addHandler(AfterTemplateLoadEvent.TYPE,
                         new AfterTemplateLoadEventHandler() {
                             @Override
                             public void onLoad(AfterTemplateLoadEvent event) {
                                 if (!event.isSuccessful()) {
-                                    MessageBox.alert(org.iplantc.core.uicommons.client.I18N.ERROR.error(), I18N.DISPLAY.cantLoadTemplate(), null);
+                                    MessageBox.alert(
+                                            org.iplantc.core.uicommons.client.I18N.ERROR.error(),
+                                            I18N.DISPLAY.cantLoadTemplate(), null);
                                     addListOfTools();
                                 }
                                 regList.get(0).removeHandler();
@@ -179,7 +188,6 @@ public class ApplicationLayout extends Viewport {
         EventBus.getInstance().fireEvent(new TemplateLoadEvent(id, MODE.EDIT));
     }
 
-   
     private class NewTemplateSelectionListenerImpl extends SelectionListener<MenuEvent> implements
             Command {
         @Override
@@ -191,5 +199,74 @@ public class ApplicationLayout extends Viewport {
         public void execute() {
             fireNewProjectEvent();
         }
+    }
+
+    public void newTool() {
+        pnlAppTemplate = new TemplateTabPanel();
+        replaceCenterPanel(pnlAppTemplate);
+    }
+
+    public void newInterface() {
+        reset();
+    }
+
+    public void newWorkflow() {
+        reset();
+    }
+
+    public void load(final String id) {
+        EnumerationServices services = new EnumerationServices();
+        services.getIntegrationById(id, new AsyncCallback<String>() {
+
+            @Override
+            public void onSuccess(String result) {
+                JSONArray jsonObjects = JsonUtil.getArray(JsonUtil.getObject(result), "objects"); //$NON-NLS-1$
+                if (jsonObjects != null && jsonObjects.size() > 0) {
+                    pnlAppTemplate = new TemplateTabPanel(jsonObjects.get(0).isObject(), false);
+                    replaceCenterPanel(pnlAppTemplate);
+                    EventBus.getInstance().fireEvent(new AfterTemplateLoadEvent(id, true));
+                } else {
+                    EventBus.getInstance().fireEvent(new AfterTemplateLoadEvent(id, false));
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable caught) {
+                EventBus.getInstance().fireEvent(new AfterTemplateLoadEvent(id, false));
+                ErrorHandler.post(I18N.DISPLAY.cantLoadTemplate(), caught);
+            }
+        });
+    }
+
+    public void copy(final String id) {
+        EnumerationServices services = new EnumerationServices();
+        services.getIntegrationById(id, new AsyncCallback<String>() {
+
+            @Override
+            public void onSuccess(String result) {
+                JSONArray arr = JsonUtil.getArray(JsonUtil.getObject(result), "objects"); //$NON-NLS-1$
+                if (arr != null && arr.size() > 0) {
+                    JSONObject obj = arr.get(0).isObject();
+                    String temp_name = JsonUtil.getString(obj, "name"); //$NON-NLS-1$
+                    if (temp_name != null && !temp_name.isEmpty()) {
+                        temp_name = I18N.DISPLAY.copyOfAppName(temp_name);
+                    }
+
+                    // change and remove tito id
+                    obj.put("name", new JSONString(temp_name)); //$NON-NLS-1$
+                    obj.put("tito", new JSONString("")); //$NON-NLS-1$ //$NON-NLS-2$
+
+                    pnlAppTemplate = new TemplateTabPanel(obj, true);
+                    replaceCenterPanel(pnlAppTemplate);
+                    EventBus.getInstance().fireEvent(new AfterTemplateLoadEvent(id, true));
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable caught) {
+                EventBus.getInstance().fireEvent(new AfterTemplateLoadEvent(id, false));
+                ErrorHandler.post(I18N.DISPLAY.cantLoadTemplate(), caught);
+            }
+        });
     }
 }
