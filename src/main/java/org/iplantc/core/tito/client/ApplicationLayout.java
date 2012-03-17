@@ -44,6 +44,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * @author sriram
  */
 public class ApplicationLayout extends Viewport {
+    private ArrayList<HandlerRegistration> handlers;
     private TemplateTabPanel pnlAppTemplate;
     private Component center;
 
@@ -70,14 +71,30 @@ public class ApplicationLayout extends Viewport {
     }
 
     private void addListeners() {
-        EventBus instance = EventBus.getInstance();
-        instance.addHandler(NavigateToHomeEvent.TYPE, new NavigateToHomeEventHandler() {
+        EventBus eventbus = EventBus.getInstance();
+        handlers = new ArrayList<HandlerRegistration>();
+
+        handlers.add(eventbus.addHandler(NavigateToHomeEvent.TYPE, new NavigateToHomeEventHandler() {
             @Override
             public void onHome() {
+                cleanupTemplateTabPanel();
                 addListOfTools();
             }
+        }));
+    }
 
-        });
+    public void cleanup() {
+        cleanupTemplateTabPanel();
+
+        for (HandlerRegistration hanlder : handlers) {
+            hanlder.removeHandler();
+        }
+    }
+
+    private void cleanupTemplateTabPanel() {
+        if (pnlAppTemplate != null) {
+            pnlAppTemplate.cleanup();
+        }
     }
 
     private void addListOfTools() {
