@@ -217,26 +217,10 @@ public class TemplateTabPanel extends ContentPanel {
         tool.add(buildNewToolRequestButton());
         tool.add(buildCmdLineOrderButton());
         tool.add(buildPreviewMenu());
-        tool.add(buildBackButton());
 
         pnlContents.setTopComponent(tool);
     }
 
-    private Button buildBackButton() {
-        Button back = new Button(I18N.DISPLAY.back());
-        back.setId(ID_BACK);
-        back.setIcon(AbstractImagePrototype.create(Resources.ICONS.back()));
-        back.addSelectionListener(new SelectionListener<ButtonEvent>() {
-
-            @Override
-            public void componentSelected(ButtonEvent ce) {
-                NavigateEvent event = new NavigateEvent();
-                EventBus.getInstance().fireEvent(event);
-
-            }
-        });
-        return back;
-    }
 
     private Button buildPublishButton() {
         btnPublish = new PublishButton() {
