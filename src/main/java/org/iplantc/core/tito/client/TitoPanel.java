@@ -1,11 +1,7 @@
 package org.iplantc.core.tito.client;
 
-import java.util.ArrayList;
-
 import org.iplantc.core.jsonutil.JsonUtil;
 import org.iplantc.core.tito.client.events.AfterTemplateLoadEvent;
-import org.iplantc.core.tito.client.events.NavigateToHomeEvent;
-import org.iplantc.core.tito.client.events.NavigateToHomeEventHandler;
 import org.iplantc.core.tito.client.panels.TemplateTabPanel;
 import org.iplantc.core.tito.client.services.EnumerationServices;
 import org.iplantc.core.uicommons.client.ErrorHandler;
@@ -17,10 +13,9 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.Component;
-import com.extjs.gxt.ui.client.widget.Viewport;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
@@ -31,17 +26,15 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * 
  * @author sriram
  */
-public class ApplicationLayout extends Viewport {
-    private ArrayList<HandlerRegistration> handlers;
+public class TitoPanel extends LayoutContainer {
     private TemplateTabPanel pnlAppTemplate;
-    private Component center;
-
+    private Component content;
     private final FlowLayout layout;
 
     /**
      * Default constructor.
      */
-    public ApplicationLayout() {
+    public TitoPanel() {
         // build top level layout
         layout = new FlowLayout(0);
 
@@ -54,29 +47,10 @@ public class ApplicationLayout extends Viewport {
         });
 
         setLayout(layout);
-
-        addListeners();
-    }
-
-    private void addListeners() {
-        EventBus eventbus = EventBus.getInstance();
-        handlers = new ArrayList<HandlerRegistration>();
-
-        handlers.add(eventbus.addHandler(NavigateToHomeEvent.TYPE, new NavigateToHomeEventHandler() {
-            @Override
-            public void onHome() {
-                cleanupTemplateTabPanel();
-            //    addListOfTools();
-            }
-        }));
     }
 
     public void cleanup() {
         cleanupTemplateTabPanel();
-
-        for (HandlerRegistration hanlder : handlers) {
-            hanlder.removeHandler();
-        }
     }
 
     private void cleanupTemplateTabPanel() {
@@ -90,18 +64,18 @@ public class ApplicationLayout extends Viewport {
      * 
      * @param view a new component to set in the center of the BorderLayout.
      */
-    public void replaceCenterPanel(Component view) {
-        if (center != null) {
-            remove(center);
+    public void replaceContent(Component view) {
+        if (content != null) {
+            remove(content);
         }
 
-        center = view;
+        content = view;
 
         BorderLayoutData data = new BorderLayoutData(LayoutRegion.CENTER);
         data.setMargins(new Margins(0));
 
-        if (center != null) {
-            add(center, data);
+        if (content != null) {
+            add(content, data);
         }
 
         if (isRendered()) {
@@ -111,16 +85,16 @@ public class ApplicationLayout extends Viewport {
 
     public void reset() {
         // clear our center
-        if (center != null) {
-            remove(center);
+        if (content != null) {
+            remove(content);
         }
 
-        center = null;
+        content = null;
     }
 
     public void newTool() {
     	pnlAppTemplate = new TemplateTabPanel();
-    	replaceCenterPanel(pnlAppTemplate);
+    	replaceContent(pnlAppTemplate);
     }
 
     public void newInterface() {
@@ -129,6 +103,10 @@ public class ApplicationLayout extends Viewport {
 
     public void newWorkflow() {
         reset();
+    }
+    
+    public boolean isDirty() {
+    	return pnlAppTemplate.templateChanged();
     }
 
     public void load(final String id) {
@@ -140,7 +118,7 @@ public class ApplicationLayout extends Viewport {
                 JSONArray jsonObjects = JsonUtil.getArray(JsonUtil.getObject(result), "objects"); //$NON-NLS-1$
                 if (jsonObjects != null && jsonObjects.size() > 0) {
                     pnlAppTemplate = new TemplateTabPanel(jsonObjects.get(0).isObject(), false);
-                    replaceCenterPanel(pnlAppTemplate);
+                    replaceContent(pnlAppTemplate);
                     EventBus.getInstance().fireEvent(new AfterTemplateLoadEvent(id, true));
                 } else {
                     EventBus.getInstance().fireEvent(new AfterTemplateLoadEvent(id, false));
@@ -174,7 +152,7 @@ public class ApplicationLayout extends Viewport {
                     obj.put("tito", new JSONString("")); //$NON-NLS-1$ //$NON-NLS-2$
 
                     pnlAppTemplate = new TemplateTabPanel(obj, true);
-                    replaceCenterPanel(pnlAppTemplate);
+                    replaceContent(pnlAppTemplate);
                     EventBus.getInstance().fireEvent(new AfterTemplateLoadEvent(id, true));
                 }
             }

@@ -18,9 +18,6 @@ import org.iplantc.core.tito.client.events.CommandLineArgumentChangeEvent;
 import org.iplantc.core.tito.client.events.CommandLineArgumentChangeEventHandler;
 import org.iplantc.core.tito.client.events.ExecutableChangeEvent;
 import org.iplantc.core.tito.client.events.ExecutableChangeEventHandler;
-import org.iplantc.core.tito.client.events.NavigateEvent;
-import org.iplantc.core.tito.client.events.NavigateEventHandler;
-import org.iplantc.core.tito.client.events.NavigateToHomeEvent;
 import org.iplantc.core.tito.client.events.NavigationTreeDeleteEvent;
 import org.iplantc.core.tito.client.events.NavigationTreeDeleteEventHandler;
 import org.iplantc.core.tito.client.events.NewToolRequestSubmitEvent;
@@ -39,9 +36,7 @@ import org.iplantc.core.uicommons.client.ErrorHandler;
 import org.iplantc.core.uicommons.client.events.EventBus;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
-import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
-import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Dialog;
@@ -200,7 +195,6 @@ public class TemplateTabPanel extends ContentPanel {
         handlers.add(bus.addHandler(TemplateNameChangeEvent.TYPE,
                 new TemplateNameChangeEventHandlerImpl()));
         handlers.add(bus.addHandler(ExecutableChangeEvent.TYPE, new ExecutableChangeEventHandlerImpl()));
-        handlers.add(bus.addHandler(NavigateEvent.TYPE, new NavigateEventHandlerImpl()));
         handlers.add(bus.addHandler(ToolSelectedEvent.TYPE, new ToolSelectedEventHandlerImpl()));
         handlers.add(bus.addHandler(NewToolRequestSubmitEvent.TYPE,
                 new NewToolRequestSubmitEventHandlerImpl()));
@@ -417,7 +411,7 @@ public class TemplateTabPanel extends ContentPanel {
 
     }
 
-    private boolean templateChanged() {
+    public boolean templateChanged() {
         return !arraysEqual(hash, generateHash(toJson().toString()));
     }
 
@@ -644,36 +638,6 @@ public class TemplateTabPanel extends ContentPanel {
         return (templateHasName && templateHasInfo);
     }
     
-    private class NavigateEventHandlerImpl implements NavigateEventHandler {
-        @Override
-        public void onHome() {
-            if (templateChanged()) {
-                MessageBox.confirm(I18N.DISPLAY.confirm(), I18N.DISPLAY.navigateWarning(),
-                        new WarningMsgBoxListener());
-            } else {
-                fireNavigateToHomeEvent();
-            }
-        }
-
-        private void fireNavigateToHomeEvent() {
-            NavigateToHomeEvent event = new NavigateToHomeEvent();
-            EventBus.getInstance().fireEvent(event);
-        }
-
-        private class WarningMsgBoxListener implements Listener<MessageBoxEvent> {
-            @Override
-            public void handleEvent(MessageBoxEvent be) {
-                if (be.getButtonClicked().getText().equals("Yes")) { //$NON-NLS-1$
-                    fireNavigateToHomeEvent();
-                }
-
-                MessageBox box = be.getMessageBox();
-                box.close();
-
-            }
-
-        }
-    }
 
     private class NewToolSelectionListenerImpl extends SelectionListener<ButtonEvent> {
         private final ToolRequestFormPanel requestForm;

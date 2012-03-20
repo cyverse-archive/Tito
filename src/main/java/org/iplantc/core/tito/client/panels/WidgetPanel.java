@@ -38,6 +38,7 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.Element;
 
@@ -55,6 +56,7 @@ public class WidgetPanel extends ContentPanel {
     private ContentPanel center;
     private TextArea txtCmdLinePreview;
     private String executableName;
+    private ArrayList<HandlerRegistration> handlers;
 
     public WidgetPanel(PropertyGroupContainer container) {
         this.container = container;
@@ -115,17 +117,22 @@ public class WidgetPanel extends ContentPanel {
 
     private void initListeners() {
         EventBus eventbus = EventBus.getInstance();
+        handlers = new ArrayList<HandlerRegistration>();
 
-        eventbus.addHandler(NavigationTreeBeforeSelectionEvent.TYPE,
-                new NavigationTreeBeforeSelectionEventHandlerImpl());
-        eventbus.addHandler(NavigationTreeSelectionChangeEvent.TYPE,
-                new NavigationTreeSelectionChangeEventHandlerImpl());
-        eventbus.addHandler(NavigationTreeAddEvent.TYPE,
-                new NavigationTreeMenuSelectionEventHandlerImpl());
-        eventbus.addHandler(TemplateNameChangeEvent.TYPE, new TemplateNameChangeEventHandlerImpl());
-        eventbus.addHandler(NavigationTreeDeleteEvent.TYPE, new NavigationTreeDeleteEventHandlerImpl());
-        eventbus.addHandler(CommandLineArgumentChangeEvent.TYPE, new CommandLineArgumentChangeEventHandlerImpl());
-        eventbus.addHandler(ExecutableChangeEvent.TYPE, new ExecutableChangeEventHandlerImpl());
+        handlers.add(eventbus.addHandler(NavigationTreeBeforeSelectionEvent.TYPE,
+                new NavigationTreeBeforeSelectionEventHandlerImpl()));
+        handlers.add(eventbus.addHandler(NavigationTreeSelectionChangeEvent.TYPE,
+                new NavigationTreeSelectionChangeEventHandlerImpl()));
+        handlers.add(eventbus.addHandler(NavigationTreeAddEvent.TYPE,
+                new NavigationTreeMenuSelectionEventHandlerImpl()));
+        handlers.add(eventbus.addHandler(TemplateNameChangeEvent.TYPE, 
+        		new TemplateNameChangeEventHandlerImpl()));
+        handlers.add(eventbus.addHandler(NavigationTreeDeleteEvent.TYPE, 
+        		new NavigationTreeDeleteEventHandlerImpl()));
+        handlers.add(eventbus.addHandler(CommandLineArgumentChangeEvent.TYPE, 
+        		new CommandLineArgumentChangeEventHandlerImpl()));
+        handlers.add(eventbus.addHandler(ExecutableChangeEvent.TYPE, 
+        		new ExecutableChangeEventHandlerImpl()));
     }
 
     /**
@@ -347,11 +354,9 @@ public class WidgetPanel extends ContentPanel {
      * clean up all the event handlers
      */
     public void cleanup() {
-        EventBus e = EventBus.getInstance();
-        e.removeHandlers(NavigationTreeSelectionChangeEvent.TYPE);
-        e.removeHandlers(NavigationTreeAddEvent.TYPE);
-        e.removeHandlers(NavigationTreeDeleteEvent.TYPE);
-        e.removeHandlers(TemplateNameChangeEvent.TYPE);
+    	for (HandlerRegistration hanlder : handlers) {
+            hanlder.removeHandler();
+        }
     }
 
     /**
