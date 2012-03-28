@@ -74,10 +74,13 @@
 		<servlet-name>logoutSuccessServlet</servlet-name>
 		<servlet-class>org.iplantc.de.server.CasLogoutServlet</servlet-class>
 	</servlet>
-
 	<servlet>
 		<servlet-name>sessionManagementServlet</servlet-name>
 		<servlet-class>org.iplantc.de.server.SessionManagementServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>emptyResponseServlet</servlet-name>
+		<servlet-class>org.iplantc.de.server.EmptyResponseServlet</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
@@ -111,6 +114,10 @@
 	<servlet-mapping>
 		<servlet-name>aboutAppServlet</servlet-name>
 		<url-pattern>/jsintegrate/about</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>emptyResponseServlet</servlet-name>
+		<url-pattern>/jsintegrate/empty</url-pattern>
 	</servlet-mapping>
 
 	<session-config>
