@@ -130,7 +130,7 @@
 
     <!-- Default page to serve -->
 	<welcome-file-list>
-		<welcome-file>JSIntegrate.html</welcome-file>
+		<welcome-file>JSIntegrate.jsp</welcome-file>
 	</welcome-file-list>
 
 </web-app>
