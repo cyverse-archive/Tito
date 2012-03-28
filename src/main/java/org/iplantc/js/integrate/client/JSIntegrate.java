@@ -13,6 +13,7 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
+import org.iplantc.core.uicommons.client.requests.KeepaliveTimer;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -34,6 +35,10 @@ public class JSIntegrate implements EntryPoint {
 
         RootPanel.get().add(layoutApplication);
         setBrowserContextMenuEnabled(TitoProperties.getInstance().isContextClickEnabled());
+
+        String keepaliveTarget = TitoProperties.getInstance().getKeepaliveTarget();
+        int keepaliveInterval = TitoProperties.getInstance().getKeepaliveInterval();
+        KeepaliveTimer.getInstance().start(keepaliveTarget, keepaliveInterval);
     }
 
     private void setEntryPointTitle() {
