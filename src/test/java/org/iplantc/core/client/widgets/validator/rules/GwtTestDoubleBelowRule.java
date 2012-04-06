@@ -26,6 +26,6 @@ public class GwtTestDoubleBelowRule extends GWTTestCase {
 
     @Override
     public String getModuleName() {
-        return "org.iplantc.js.integrate.JSIntegrate"; //$NON-NLS-1$
+        return "org.iplantc.core.tito"; //$NON-NLS-1$
     }
 }

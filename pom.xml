@@ -1,13 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.iplantc.js.integrate</groupId>
+	<groupId>org.iplantc.core</groupId>
 	<artifactId>tito</artifactId>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<version>dev-SNAPSHOT</version>
 	<name>Tito</name>
 	<url>http://maven.apache.org</url>
 	<properties>
+        <gwt.module>org.iplantc.core.tito</gwt.module>
 		<!-- Target Java Version -->
 		<jdk.version>1.6</jdk.version>
 		<!-- Current GWT Version -->
@@ -73,17 +74,16 @@
 			<artifactId>jsonutil</artifactId>
 			<version>dev-SNAPSHOT</version>
 		</dependency>
-		<dependency>
-			<groupId>org.iplantc.core</groupId>
-			<artifactId>ui-commons</artifactId>
-			<version>dev-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet.jsp</groupId>
-			<artifactId>javax.servlet.jsp-api</artifactId>
-			<version>2.2.1</version>
-			<scope>provided</scope>
-		</dependency>
+        <dependency>
+                <groupId>org.iplantc.core</groupId>
+                <artifactId>ui-commons</artifactId>
+                <version>dev-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.iplantc.core</groupId>
+            <artifactId>applications</artifactId>
+            <version>dev-SNAPSHOT</version>
+        </dependency>
 		<!-- Other dependencies -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -125,60 +125,69 @@
 	<build>
 		<finalName>tito</finalName>
 		<outputDirectory>${basedir}/war/WEB-INF/classes</outputDirectory>
-		<plugins>
-			<plugin>
-				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
-					<webappDirectory>${basedir}/war</webappDirectory>
-					<manifest>
-						<addDefaultImplementationEntries>true
-						</addDefaultImplementationEntries>
-					</manifest>
-					<archive>
-						<manifestEntries>
-							<Build-Version>${BUILD_TAG}</Build-Version>
-						</manifestEntries>
-					</archive>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>gwt-maven-plugin</artifactId>
-				<version>2.4.0</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>compile</goal>
-							<goal>test</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<extraJvmArgs>-Xmx512M -Xms512M -Xss1024k</extraJvmArgs>
-					<webappDirectory>${basedir}/war</webappDirectory>
-					<mode>htmlunit</mode>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>${jdk.version}</source>
-					<target>${jdk.version}</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-clean-plugin</artifactId>
-				<configuration>
-					<filesets>
-						<fileset>
-							<directory>${basedir}/war</directory>
-						</fileset>
-					</filesets>
-				</configuration>
-			</plugin>
-		</plugins>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>gwt-maven-plugin</artifactId>
+                <version>2.4.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <module>${gwt.module}</module>
+		                    <mode>htmlunit</mode>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                    </archive>
+                    <configuration>
+                        <useDefaultManifestFile>true</useDefaultManifestFile>
+                    </configuration>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>${basedir}/bin</directory>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/client/**</include>
+                    <include>**/shared/**</include>
+                    <!-- only include the GWT Module definition -->
+                    <include>**/*.gwt.xml</include>
+                </includes>
+            </resource>
+        </resources>
 	</build>
 	<repositories>
 		<repository>

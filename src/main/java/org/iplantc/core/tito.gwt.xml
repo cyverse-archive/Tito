@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+	<!-- Inherit the core Web Toolkit stuff. -->
+	<inherits name='com.google.gwt.user.User' />
+	<inherits name='com.google.gwt.junit.JUnit'/>
+	 <inherits name="com.google.gwt.http.HTTP"/>
+
+	<!-- Other module inherits -->
+
+	<inherits name="com.google.gwt.i18n.I18N" />
+	<inherits name="com.google.gwt.resources.Resources" />
+	<inherits name='com.extjs.gxt.ui.GXT' />
+	<inherits name="gwtupload.GWTUpload" />
+
+	<!-- iPlant module inherits -->
+	<inherits name="org.iplantc.core.JsonUtil" />
+	<inherits name='org.iplantc.de.DiscoveryEnvironmentCommon' />
+	<inherits name="org.iplantc.core.ui-commons" />
+	<inherits name="org.iplantc.core.applications" />
+	<inherits name="org.iplantc.core.Metadata" />
+	<inherits name="org.iplantc.core.Widgets" />
+
+	<script src="/scripts/json2.js" />
+
+	<!-- Specify the paths for translatable code -->
+	<source path='client' />
+	<source path='tito' />
+
+</module>
