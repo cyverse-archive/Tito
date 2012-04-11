@@ -13,14 +13,4 @@ public interface NewProjectEventHandler extends EventHandler {
      * Fired when a user wants to integrate a new tool.
      */
     void newTool();
-
-    /**
-     * Fired when a user wants a new interface to an existing tool.
-     */
-    void newInterface();
-
-    /**
-     * Fired when a user wants to compose a new workflow.
-     */
-    void newWorkflow();
 }

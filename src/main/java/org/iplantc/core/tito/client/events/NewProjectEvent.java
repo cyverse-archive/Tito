@@ -16,7 +16,7 @@ public class NewProjectEvent extends GwtEvent<NewProjectEventHandler> {
     public static final GwtEvent.Type<NewProjectEventHandler> TYPE = new GwtEvent.Type<NewProjectEventHandler>();
 
     public enum ProjectType {
-        Tool, Interface, Workflow
+        Tool
     }
 
     private ProjectType typeProject;
@@ -38,14 +38,6 @@ public class NewProjectEvent extends GwtEvent<NewProjectEventHandler> {
         switch (typeProject) {
             case Tool:
                 handler.newTool();
-                break;
-
-            case Interface:
-                handler.newInterface();
-                break;
-
-            case Workflow:
-                handler.newWorkflow();
                 break;
 
             default:

@@ -30,7 +30,7 @@ public class TitoPanel extends LayoutContainer {
     private TemplateTabPanel pnlAppTemplate;
     private Component content;
     private final FlowLayout layout;
-
+ 
     /**
      * Default constructor.
      */
@@ -48,7 +48,7 @@ public class TitoPanel extends LayoutContainer {
 
         setLayout(layout);
     }
-
+    
     public void cleanup() {
         cleanupTemplateTabPanel();
     }
@@ -96,15 +96,12 @@ public class TitoPanel extends LayoutContainer {
     	pnlAppTemplate = new TemplateTabPanel();
     	replaceContent(pnlAppTemplate);
     }
-
-    public void newInterface() {
-        reset();
-    }
-
-    public void newWorkflow() {
-        reset();
-    }
     
+    public void loadFromJson(JSONObject obj) {
+    	 pnlAppTemplate = new TemplateTabPanel(obj, true);
+    	 replaceContent(pnlAppTemplate);
+    }
+
     public boolean isDirty() {
     	return pnlAppTemplate.templateChanged();
     }
@@ -163,5 +160,18 @@ public class TitoPanel extends LayoutContainer {
                 ErrorHandler.post(I18N.DISPLAY.cantLoadTemplate(), caught);
             }
         });
+    }
+   
+    /**
+     * 
+     * get current tito config for state management
+     * 
+     * @return
+     */
+    public JSONObject getTitoConfig() {
+    	if(pnlAppTemplate != null) {
+    		return pnlAppTemplate.toJson();
+    	}
+    	return null;
     }
 }

@@ -537,6 +537,11 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         idtito.setValue(tito);
     }
 
+    public String getTitoId() {
+    	return idtito.getValue();
+    }
+    
+    
     public void setTemplateId(String id) {
         idField.setValue(id);
     }

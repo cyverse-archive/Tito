@@ -81,7 +81,7 @@ public class TemplateTabPanel extends ContentPanel {
     private Window newToolRequestWin;
 
     private PublishButton btnPublish;
-
+  
     private byte[] hash;
 
     private final String UNTITLED = I18N.DISPLAY.untitled();
@@ -116,6 +116,10 @@ public class TemplateTabPanel extends ContentPanel {
         buildToolBar();
         initTabs(json, forceSave);
         btnPublish.setTemplate(templateInfo.getTemplate());
+    }
+    
+    public String getTitoId() {
+    	return templateInfo.getTitoId();
     }
 
     private void init() {
@@ -536,7 +540,12 @@ public class TemplateTabPanel extends ContentPanel {
 		return $wnd.JSON.stringify($wnd.JSON.parse(json), replacer, space);
     }-*/;
 
-    private JSONObject toJson() {
+    /**
+     * get json representation of the current template
+     * 
+     * @return JSONobject json representation of the current template
+     */
+    public JSONObject toJson() {
         JSONObject json = templateInfo.getTemplate().toJsonExtended();
         String newTemplateName = templateInfo.getTemplate().getName();
         boolean templateHasName = newTemplateName != null && !newTemplateName.isEmpty();
