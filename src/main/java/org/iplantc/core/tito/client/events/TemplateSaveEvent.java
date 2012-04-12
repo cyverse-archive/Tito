@@ -17,6 +17,13 @@ public class TemplateSaveEvent extends GwtEvent<TemplateSaveEventHandler> {
      */
     public static final GwtEvent.Type<TemplateSaveEventHandler> TYPE = new GwtEvent.Type<TemplateSaveEventHandler>();
 
+    private String titoId;
+    
+    public TemplateSaveEvent(String titoId) {
+    	this.titoId = titoId;
+    }
+    
+    
     @Override
     protected void dispatch(TemplateSaveEventHandler handler) {
         handler.onSave(this);
@@ -26,5 +33,9 @@ public class TemplateSaveEvent extends GwtEvent<TemplateSaveEventHandler> {
     public com.google.gwt.event.shared.GwtEvent.Type<TemplateSaveEventHandler> getAssociatedType() {
         return TYPE;
     }
+
+	public String getTitoId() {
+		return titoId;
+	}
 
 }

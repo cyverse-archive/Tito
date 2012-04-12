@@ -31,12 +31,14 @@ import org.iplantc.core.tito.client.events.ToolSelectedEventHandler;
 import org.iplantc.core.tito.client.images.Resources;
 import org.iplantc.core.tito.client.models.Template;
 import org.iplantc.core.tito.client.services.EnumerationServices;
-import org.iplantc.core.tito.client.widgets.PublishButton;
+import org.iplantc.core.tito.client.utils.SaveUtil;
 import org.iplantc.core.uicommons.client.ErrorHandler;
 import org.iplantc.core.uicommons.client.events.EventBus;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.MenuEvent;
+import com.extjs.gxt.ui.client.event.MessageBoxEvent;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Dialog;
@@ -65,7 +67,7 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
  */
 public class TemplateTabPanel extends ContentPanel {
     private static final String ID_BTN_NEW_TOOL_BTN = "idBtnNewToolBtn"; //$NON-NLS-1$
-    private static final String ID_BTN_PUB = "idBtnPub"; //$NON-NLS-1$
+    private static final String ID_BTN_PUB = "idBtnSavPub"; //$NON-NLS-1$
     private static final String ID_MU_ITM_JSON_PREV = "idMuItmJsonPrev"; //$NON-NLS-1$
     private static final String ID_MU_ITM_UI_PREV = "idMuItmUiPrev"; //$NON-NLS-1$
     private static final String ID_BTN_PREVIEW = "idBtnPreview"; //$NON-NLS-1$
@@ -80,7 +82,9 @@ public class TemplateTabPanel extends ContentPanel {
     private WidgetPanel pnlWidgetsdObj;
     private Window newToolRequestWin;
 
-    private PublishButton btnPublish;
+    private SaveUtil saveUtil;
+    
+    private Button btnSave;
   
     private byte[] hash;
 
@@ -115,7 +119,7 @@ public class TemplateTabPanel extends ContentPanel {
         addHandlers();
         buildToolBar();
         initTabs(json, forceSave);
-        btnPublish.setTemplate(templateInfo.getTemplate());
+        saveUtil = new SaveUtil();
     }
     
     public String getTitoId() {
@@ -221,33 +225,50 @@ public class TemplateTabPanel extends ContentPanel {
 
 
     private Button buildPublishButton() {
-        btnPublish = new PublishButton() {
-            @Override
-            protected void unorderedNoPublish() {
-                // the user does not want to publish yet, display the ordering grid.
-                showOrderingGrid();
-            }
+        btnSave = new Button(I18N.DISPLAY.save(), AbstractImagePrototype.create(Resources.ICONS.save()));
+    	btnSave.setId(ID_BTN_PUB);
+    	btnSave.addSelectionListener(new SelectionListener<ButtonEvent>() {
+    			  /**
+    	         * Displays a confirmation dialog with a warning message if all parameters are unordered. Calls
+    	         * publish otherwise, or if the user confirms the warning.
+    	         */
+    	        @Override
+    	        public void componentSelected(ButtonEvent ce) {
+    	            // check if any parameters are still unordered
+    	            boolean paramsOrdered = isOrdered();
 
-            @Override
-            protected boolean isOrdered() {
-                for (Property param : pnlWidgetsdObj.getProperties()) {
-                    if (param.getOrder() < 1) {
-                        return false;
-                    }
-                }
-                return true;
-            }
+    	            if (paramsOrdered) {
+    	                // the user has already ordered their parameters.
+    	            	save();
+    	            } else {
+    	                // Display a warning to the user before publishing.
+    	                MessageBox.confirm(I18N.DISPLAY.publish(), I18N.DISPLAY.publishOrderingWarning(),
+    	                        new Listener<MessageBoxEvent>() {
+    	                            @Override
+    	                            public void handleEvent(MessageBoxEvent be) {
+    	                                if (be.getButtonClicked().getItemId() == Dialog.YES) {
+    	                                    // the user wishes to publish anyway
+    	                                	save();
+    	                                } else {
+    	                                	saveUtil.showOrderingGrid(pnlWidgetsdObj.getProperties());
+    	                            }
+    	                      }
+    	                });
+    	            }
+    	        }
+			});
 
-            @Override
-            protected void afterPublishSucess(String result) {
-                updateTemplateIdentifiers(result);
-            }
-        };
-
-        btnPublish.setId(ID_BTN_PUB);
-
-        return btnPublish;
+        return btnSave;
     }
+    
+    private boolean isOrdered() {
+     for (Property param : pnlWidgetsdObj.getProperties()) {
+          if (param.getOrder() < 1) {
+              return false;
+          }
+      }
+      return true;
+  }
 
     private Button buildCmdLineOrderButton() {
         Button cmdLineOrder = new Button(I18N.DISPLAY.commandLineOrder());
@@ -354,7 +375,11 @@ public class TemplateTabPanel extends ContentPanel {
 
         @Override
         public void onSave(TemplateSaveEvent event) {
-            save();
+            // new template is saved. now update template / tito id and publish
+        	if(event.getTitoId() != null) {
+        		updateTemplateIdentifiers(event.getTitoId());
+        	}
+        	updateHash();
         }
 
     }
@@ -370,7 +395,7 @@ public class TemplateTabPanel extends ContentPanel {
             boolean templateHasInfo = templateInfo != null && templateInfo.getComponent() != null
                     && !templateInfo.getComponent().isEmpty();
 
-            btnPublish.setEnabled(templateHasName && templateHasInfo && validateProperties());
+            btnSave.setEnabled(templateHasName && templateHasInfo && validateProperties());
         }
 
     }
@@ -380,7 +405,7 @@ public class TemplateTabPanel extends ContentPanel {
         @Override
         public void onChange(ExecutableChangeEvent event) {
             if (templateInfo != null) {
-                btnPublish.setEnabled(templateInfo.validate() & validateProperties());
+                btnSave.setEnabled(templateInfo.validate() & validateProperties());
             }
         }
 
@@ -390,7 +415,7 @@ public class TemplateTabPanel extends ContentPanel {
 
         @Override
         public void componentSelected(ButtonEvent ce) {
-            showOrderingGrid();
+            saveUtil.showOrderingGrid(pnlWidgetsdObj.getProperties());
         }
 
     }
@@ -409,7 +434,7 @@ public class TemplateTabPanel extends ContentPanel {
         @Override
         public void onSelection(ToolSelectedEvent event) {
             String heading = pnlContents.getHeading();
-            btnPublish.setEnabled(event.isSelected() && heading != null && !heading.isEmpty()
+            btnSave.setEnabled(event.isSelected() && heading != null && !heading.isEmpty()
                     && !heading.equals(UNTITLED) & validateProperties());
         }
 
@@ -439,77 +464,14 @@ public class TemplateTabPanel extends ContentPanel {
         }
 
         templateInfo.getTemplate().setDateEdited(String.valueOf(new Date().getTime()));
+        templateInfo.getTemplate().setDatePublished(String.valueOf(new Date().getTime()));
 
         JSONObject json = toJson();
         if (json != null) {
-            if (!JsonUtil.getString(json, "tito").isEmpty()) { //$NON-NLS-1$
-                doSave(json);
-            } else {
-                doNew(json);
-            }
+            saveUtil.publishToWorkspace(json);
         } else {
             ErrorHandler.post(I18N.DISPLAY.saveFailed());
         }
-    }
-
-    private void doNew(final JSONObject json) {
-        EnumerationServices services = new EnumerationServices();
-        services.addIntegration(json, new AsyncCallback<String>() {
-            @Override
-            public void onSuccess(String result) {
-                updateTemplateIdentifiers(result);
-                MessageBox.info(I18N.DISPLAY.saved(), I18N.DISPLAY.templateSaved(), null);
-            }
-
-            @Override
-            public void onFailure(Throwable caught) {
-                ErrorHandler.post(I18N.DISPLAY.saveFailed(), caught);
-            }
-        });
-    }
-
-    private void doSave(final JSONObject json) {
-        EnumerationServices services = new EnumerationServices();
-        services.saveIntegration(json, new AsyncCallback<String>() {
-            @Override
-            public void onSuccess(String result) {
-                updateHash();
-                MessageBox.info(I18N.DISPLAY.saved(), I18N.DISPLAY.templateSaved(), null);
-            }
-
-            @Override
-            public void onFailure(Throwable caught) {
-                ErrorHandler.post(I18N.DISPLAY.saveFailed(), caught);
-            }
-        });
-    }
-
-    /**
-     * Shows the command line ordering grids.
-     */
-    private void showOrderingGrid() {
-        // build the containing dialog window.
-        Dialog dlgSetCmdLineOrder = new Dialog();
-        dlgSetCmdLineOrder.setHeading(I18N.DISPLAY.commandLineOrder());
-        dlgSetCmdLineOrder.setLayout(new FitLayout());
-        dlgSetCmdLineOrder.setSize(640, 480);
-        dlgSetCmdLineOrder.setResizable(false);
-        dlgSetCmdLineOrder.setHideOnButtonClick(true);
-        dlgSetCmdLineOrder.setModal(true);
-
-        // change the default "OK" button text to "Done"
-        Button okButton = (Button)dlgSetCmdLineOrder.getButtonBar().getItemByItemId(Dialog.OK);
-        okButton.setText(I18N.DISPLAY.done());
-
-        // add the cmd line ordering panel to the dialog window.
-        CommandLineOrderingGridPanel pnlCmdLineOrder = new CommandLineOrderingGridPanel(
-                pnlWidgetsdObj.getProperties());
-        pnlCmdLineOrder.setSize(640, 480);
-        dlgSetCmdLineOrder.add(pnlCmdLineOrder);
-
-        // show the dialog
-        dlgSetCmdLineOrder.show();
-        dlgSetCmdLineOrder.layout(true);
     }
 
     private void showJsonPreview(String print) {
@@ -595,7 +557,7 @@ public class TemplateTabPanel extends ContentPanel {
     private boolean validateProperties() {
         List<Property> properties = pnlWidgetsdObj.getProperties();
         if (properties == null || properties.isEmpty())
-            return false;
+            return true;
 
         for (Property property : properties) {
             if (!validate(property)) {
@@ -685,18 +647,18 @@ public class TemplateTabPanel extends ContentPanel {
         public void onChange(CommandLineArgumentChangeEvent event) {
             // check property values
             if (!validateProperties()) {
-                btnPublish.disable();
+                btnSave.disable();
                 return;
             }
             
             // check name/description
             if (!validateToolInfo()) {
-                btnPublish.disable();
+                btnSave.disable();
                 return;
             }
             
             // all valid
-            btnPublish.enable();
+            btnSave.enable();
         }
     }
 
@@ -704,10 +666,10 @@ public class TemplateTabPanel extends ContentPanel {
         @Override
         public void onDelete(NavigationTreeDeleteEvent event) {
             List<Property> properties = event.getTreePanel().getPropertyGroupContainer().getProperties();
-            btnPublish.setEnabled(!properties.isEmpty());
+            btnSave.setEnabled(!properties.isEmpty());
             if (properties.size() == 1
                     && properties.get(0).getId().equals(event.getSelectedItem().getId())) {
-                btnPublish.disable();
+                btnSave.disable();
             }
         }
     }

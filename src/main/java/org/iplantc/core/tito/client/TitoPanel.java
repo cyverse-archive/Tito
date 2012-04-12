@@ -1,11 +1,10 @@
 package org.iplantc.core.tito.client;
 
 import org.iplantc.core.jsonutil.JsonUtil;
-import org.iplantc.core.tito.client.events.AfterTemplateLoadEvent;
 import org.iplantc.core.tito.client.panels.TemplateTabPanel;
 import org.iplantc.core.tito.client.services.EnumerationServices;
+import org.iplantc.core.uiapplications.client.events.AnalysisSelectEvent;
 import org.iplantc.core.uicommons.client.ErrorHandler;
-import org.iplantc.core.uicommons.client.events.EventBus;
 
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
 import com.extjs.gxt.ui.client.event.BorderLayoutEvent;
@@ -18,7 +17,6 @@ import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONString;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -30,11 +28,15 @@ public class TitoPanel extends LayoutContainer {
     private TemplateTabPanel pnlAppTemplate;
     private Component content;
     private final FlowLayout layout;
- 
+    public static String tag;
+
     /**
      * Default constructor.
+     * 
+     * @param tag a window tag for this panel
      */
-    public TitoPanel() {
+    public TitoPanel(String winTag) {
+        tag = winTag;
         // build top level layout
         layout = new FlowLayout(0);
 
@@ -45,7 +47,6 @@ public class TitoPanel extends LayoutContainer {
                 layout();
             }
         });
-
         setLayout(layout);
     }
     
@@ -116,52 +117,18 @@ public class TitoPanel extends LayoutContainer {
                 if (jsonObjects != null && jsonObjects.size() > 0) {
                     pnlAppTemplate = new TemplateTabPanel(jsonObjects.get(0).isObject(), false);
                     replaceContent(pnlAppTemplate);
-                    EventBus.getInstance().fireEvent(new AfterTemplateLoadEvent(id, true));
-                } else {
-                    EventBus.getInstance().fireEvent(new AfterTemplateLoadEvent(id, false));
+                    AnalysisSelectEvent event = new AnalysisSelectEvent(tag, null, id);
+                    org.iplantc.core.uicommons.client.events.EventBus.getInstance().fireEvent(event);
                 }
             }
 
             @Override
             public void onFailure(Throwable caught) {
-                EventBus.getInstance().fireEvent(new AfterTemplateLoadEvent(id, false));
                 ErrorHandler.post(I18N.DISPLAY.cantLoadTemplate(), caught);
             }
         });
     }
 
-    public void copy(final String id) {
-        EnumerationServices services = new EnumerationServices();
-        services.getIntegrationById(id, new AsyncCallback<String>() {
-
-            @Override
-            public void onSuccess(String result) {
-                JSONArray arr = JsonUtil.getArray(JsonUtil.getObject(result), "objects"); //$NON-NLS-1$
-                if (arr != null && arr.size() > 0) {
-                    JSONObject obj = arr.get(0).isObject();
-                    String temp_name = JsonUtil.getString(obj, "name"); //$NON-NLS-1$
-                    if (temp_name != null && !temp_name.isEmpty()) {
-                        temp_name = I18N.DISPLAY.copyOfAppName(temp_name);
-                    }
-
-                    // change and remove tito id
-                    obj.put("name", new JSONString(temp_name)); //$NON-NLS-1$
-                    obj.put("tito", new JSONString("")); //$NON-NLS-1$ //$NON-NLS-2$
-
-                    pnlAppTemplate = new TemplateTabPanel(obj, true);
-                    replaceContent(pnlAppTemplate);
-                    EventBus.getInstance().fireEvent(new AfterTemplateLoadEvent(id, true));
-                }
-            }
-
-            @Override
-            public void onFailure(Throwable caught) {
-                EventBus.getInstance().fireEvent(new AfterTemplateLoadEvent(id, false));
-                ErrorHandler.post(I18N.DISPLAY.cantLoadTemplate(), caught);
-            }
-        });
-    }
-   
     /**
      * 
      * get current tito config for state management
