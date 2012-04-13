@@ -1,7 +1,5 @@
 package org.iplantc.core.tito.client.panels;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -441,7 +439,7 @@ public class TemplateTabPanel extends ContentPanel {
     }
 
     public boolean templateChanged() {
-        return !arraysEqual(hash, generateHash(toJson().toString()));
+        return !arraysEqual(hash, JsonUtil.generateHash(toJson().toString()));
     }
 
     private boolean arraysEqual(byte[] arr1, byte[] arr2) {
@@ -527,21 +525,7 @@ public class TemplateTabPanel extends ContentPanel {
     }
 
     private void updateHash() {
-        hash = generateHash(toJson().toString());
-    }
-
-    private byte[] generateHash(String json) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5"); //$NON-NLS-1$
-            md.reset();
-            md.update(json.getBytes());
-            return md.digest();
-        } catch (NoSuchAlgorithmException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        return null;
+        hash = JsonUtil.generateHash(toJson().toString());
     }
 
     private void updateTemplateIdentifiers(String identifier) {
