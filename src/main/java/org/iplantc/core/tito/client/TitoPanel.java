@@ -129,6 +129,7 @@ public class TitoPanel extends LayoutContainer {
         });
     }
 
+
     /**
      * 
      * get current tito config for state management
@@ -141,4 +142,13 @@ public class TitoPanel extends LayoutContainer {
     	}
     	return null;
     }
+
+    public String getId() {
+        if (pnlAppTemplate != null) {
+            return pnlAppTemplate.getTitoId();
+        }
+
+        return null;
+    }
+
 }
