@@ -55,6 +55,7 @@ import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
+import org.iplantc.core.uicommons.client.util.ByteArrayComparer;
 
 /**
  * 
@@ -439,21 +440,7 @@ public class TemplateTabPanel extends ContentPanel {
     }
 
     public boolean templateChanged() {
-        return !arraysEqual(hash, JsonUtil.generateHash(toJson().toString()));
-    }
-
-    private boolean arraysEqual(byte[] arr1, byte[] arr2) {
-        boolean retval = false;
-        if (arr1 != null && arr2 != null && arr1.length == arr2.length) {
-            retval = true;
-            for (int i = 0; i < arr1.length; i++) {
-                if (arr1[i] != arr2[i]) {
-                    retval = false;
-                    break;
-                }
-            }
-        }
-        return retval;
+        return !ByteArrayComparer.arraysEqual(hash, JsonUtil.generateHash(toJson().toString()));
     }
 
     private void save() {
