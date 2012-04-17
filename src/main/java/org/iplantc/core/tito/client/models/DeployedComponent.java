@@ -11,9 +11,13 @@ import com.extjs.gxt.ui.client.data.BaseModelData;
  */
 public class DeployedComponent extends BaseModelData {
 
+    public static final String ID = "id";
     public static final String NAME = "name"; //$NON-NLS-1$
     public static final String LOCATION = "location"; //$NON-NLS-1$
     public static final String VERSION = "version"; //$NON-NLS-1$
+    public static final String DESC = "description";
+    public static final String TYPE = "type";
+    public static final String ATTRIB = "attribution";
 
     /**
      * create a new instance of DeployedComponent
@@ -34,11 +38,11 @@ public class DeployedComponent extends BaseModelData {
     
     private void init(final String id, final String name, final String type, final String desc,
             final String attribution, final String location, final String version) {
-        set("id", id); //$NON-NLS-1$
+        set(ID, id); //$NON-NLS-1$
         set(NAME, name);
-        set("type", type); //$NON-NLS-1$
-        set("description", desc); //$NON-NLS-1$
-        set("attribution", attribution); //$NON-NLS-1$
+        set(TYPE, type); //$NON-NLS-1$
+        set(DESC, desc); //$NON-NLS-1$
+        set(ATTRIB, attribution); //$NON-NLS-1$
         set(LOCATION, location);
         set(VERSION, version);
     }
@@ -49,7 +53,7 @@ public class DeployedComponent extends BaseModelData {
      * @return id
      */
     public String getId() {
-        return get("id"); //$NON-NLS-1$
+        return get(ID); //$NON-NLS-1$
     }
 
     /**
@@ -67,7 +71,7 @@ public class DeployedComponent extends BaseModelData {
      * @return type
      */
     public String getType() {
-        return get("type"); //$NON-NLS-1$
+        return get(TYPE); //$NON-NLS-1$
     }
 
     /**
@@ -76,7 +80,7 @@ public class DeployedComponent extends BaseModelData {
      * @return description
      */
     public String getDescription() {
-        return get("description"); //$NON-NLS-1$
+        return get(DESC); //$NON-NLS-1$
     }
 
     /**
@@ -94,7 +98,7 @@ public class DeployedComponent extends BaseModelData {
      * @return tool attribution
      */
     public String getAttribution() {
-        return get("attribution"); //$NON-NLS-1$
+        return get(ATTRIB); //$NON-NLS-1$
     }
 
     /**

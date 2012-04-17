@@ -650,4 +650,25 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
      * @return string representing the text
      */
 	String implicitOutput();
+
+    /**
+     * Localized text for path of DC
+     * 
+     * @return string representing the text
+     */
+    String path();
+
+    /**
+     * Localized text for path of DC
+     * 
+     * @return string representing the text
+     */
+    String attribution();
+
+    /**
+     * Localized text for search text
+     * 
+     * @return string representing the text
+     */
+    String search();
 }

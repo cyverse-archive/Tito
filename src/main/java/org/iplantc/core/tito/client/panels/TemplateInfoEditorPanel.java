@@ -1,55 +1,38 @@
 package org.iplantc.core.tito.client.panels;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.iplantc.core.client.widgets.BoundedTextArea;
 import org.iplantc.core.client.widgets.BoundedTextField;
 import org.iplantc.core.client.widgets.utils.FormLabel;
-import org.iplantc.core.jsonutil.JsonUtil;
 import org.iplantc.core.tito.client.I18N;
-import org.iplantc.core.tito.client.events.ExecutableChangeEvent;
+import org.iplantc.core.tito.client.dialogs.DCLookUpDialog;
 import org.iplantc.core.tito.client.events.TemplateNameChangeEvent;
 import org.iplantc.core.tito.client.events.ToolSelectedEvent;
 import org.iplantc.core.tito.client.models.DeployedComponent;
-import org.iplantc.core.tito.client.models.JsDeployedComponent;
 import org.iplantc.core.tito.client.models.Template;
-import org.iplantc.core.tito.client.services.EnumerationServices;
-import org.iplantc.core.tito.client.utils.DeployedComponentSorter;
-import org.iplantc.core.uicommons.client.ErrorHandler;
+import org.iplantc.core.tito.client.utils.DeployedComponentSearchUtil;
 import org.iplantc.core.uicommons.client.events.EventBus;
 
 import com.extjs.gxt.ui.client.Style.Scroll;
-import com.extjs.gxt.ui.client.Style.SelectionMode;
-import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
-import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
 import com.extjs.gxt.ui.client.widget.form.HiddenField;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
-import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
-import com.extjs.gxt.ui.client.widget.grid.Grid;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
-import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
-import com.google.gwt.core.client.JsArray;
-import com.google.gwt.json.client.JSONArray;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * 
@@ -63,8 +46,6 @@ public class TemplateInfoEditorPanel extends ContentPanel {
 
 	private static final String ID_FLD_DESC = "idFldDesc";
 
-	private static final String ID_FLD_D_COMP = "idFldDComp";
-
 	private static final String ID_FLD_NAME = "idFldName";
 
 	private Template template;
@@ -74,13 +55,14 @@ public class TemplateInfoEditorPanel extends ContentPanel {
 
     private TextField<String> nameField;
     private TextField<String> descField;
-    private TextField<String> componentField;
     private MultiTextFieldPanel refPanel;
     private HiddenField<String> idField;
     private HiddenField<String> idComponentField;
     private HiddenField<String> idtito;
+    private DCLookUpDialog dialog;
+    private ComboBox<DeployedComponent> dcCombo;
 
-    private Grid<DeployedComponent> grid;
+
 
     /**
      * Creates a new TemplateInfoEditorPanel
@@ -117,7 +99,7 @@ public class TemplateInfoEditorPanel extends ContentPanel {
 
         String comp = template.getComp();
         if (comp != null) {
-            componentField.setValue(comp);
+            dcCombo.setRawValue(comp);
 
             if (comp.isEmpty()) {
                 fireToolSelectedEvent(false);
@@ -188,7 +170,7 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         buildCompIdField();
         panel.add(idComponentField);
 
-        componentField = buildComponentTextField();
+        initComponentField();
 
         panel.add(buildComponentLabel(), formData);
         panel.add(buildToolLookUpPanel(), formData);
@@ -242,23 +224,29 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         return field;
     }
 
-    private TextField<String> buildComponentTextField() {
-        final TextField<String> field = new TextField<String>();
-        field.setId(ID_FLD_D_COMP);
-        field.setReadOnly(true);
-        field.setStyleAttribute("padding-bottom", "5px"); //$NON-NLS-1$ //$NON-NLS-2$
-        field.setEmptyText(I18N.DISPLAY.componentFieldEmptyText());
+    // private TextField<String> buildComponentTextField() {
+    // final TextField<String> field = new TextField<String>();
+    // field.setId(ID_FLD_D_COMP);
+    // field.setReadOnly(true);
+    //        field.setStyleAttribute("padding-bottom", "5px"); //$NON-NLS-1$ //$NON-NLS-2$
+    // field.setEmptyText(I18N.DISPLAY.componentFieldEmptyText());
+    //
+    // field.setFireChangeEventOnSetValue(true);
+    // field.addListener(Events.Change, new Listener<BaseEvent>() {
+    // @Override
+    // public void handleEvent(BaseEvent be) {
+    // ExecutableChangeEvent event = new ExecutableChangeEvent(field.getValue());
+    // EventBus.getInstance().fireEvent(event);
+    // }
+    // });
+    //
+    // return field;
+    // }
 
-        field.setFireChangeEventOnSetValue(true);
-        field.addListener(Events.Change, new Listener<BaseEvent>() {
-            @Override
-            public void handleEvent(BaseEvent be) {
-                ExecutableChangeEvent event = new ExecutableChangeEvent(field.getValue());
-                EventBus.getInstance().fireEvent(event);
-            }
-        });
-        
-        return field;
+    @SuppressWarnings("unchecked")
+    private void initComponentField() {
+        DeployedComponentSearchUtil util = new DeployedComponentSearchUtil();
+        dcCombo = (ComboBox<DeployedComponent>)util.buildSearchField();
     }
 
     private TextArea buildComponentDescriptionField() {
@@ -283,7 +271,10 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         String name = nameField.getValue();
         String desc = descField.getValue();
         String compId = idComponentField.getValue();
-        String comp = componentField.getValue();
+        String comp = null;
+        if (dcCombo.getValue() != null) {
+            comp = dcCombo.getValue().getName();
+        }
         List<String> references = refPanel.getValues();
         String tito = idtito.getValue();
         String type = ""; //$NON-NLS-1$
@@ -332,123 +323,18 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         return template;
     }
 
-    private void buildcomponentLookupGrid() {
-        ListStore<DeployedComponent> store = new ListStore<DeployedComponent>();
-        grid = new Grid<DeployedComponent>(store, buildColumnModel());
-        grid.setAutoExpandColumn("name"); //$NON-NLS-1$
-        grid.getView().setEmptyText(I18N.DISPLAY.noComponents());
-        grid.setBorders(false);
-        grid.setStripeRows(true);
-        grid.setColumnLines(true);
-        grid.getStore().setStoreSorter(new DeployedComponentSorter());
-    }
 
-    private void initGridSelectionModel(final Button btnOk) {
-        grid.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-
-        grid.getSelectionModel().addListener(Events.SelectionChange, new Listener<BaseEvent>() {
-            @Override
-            public void handleEvent(BaseEvent be) {
-                btnOk.enable();
-            }
-        });
-    }
-
-    private ColumnConfig buildColumnConfig(final String key, final String caption, int width) {
-        ColumnConfig ret = new ColumnConfig(key, caption, width);
-
-        ret.setSortable(true);
-        ret.setMenuDisabled(true);
-
-        return ret;
-    }
-
-    private ColumnModel buildColumnModel() {
-        List<ColumnConfig> configs = new ArrayList<ColumnConfig>();
-
-        ColumnConfig name = buildColumnConfig(DeployedComponent.NAME, I18N.DISPLAY.name(), 250);
-        name.setMenuDisabled(true);
-        ColumnConfig version = buildColumnConfig(DeployedComponent.VERSION,
-                I18N.DISPLAY.versionColumnHeader(), 150);
-        version.setSortable(false);
-        version.setMenuDisabled(true);
-
-        configs.add(name);
-        configs.add(version);
-
-        return new ColumnModel(configs);
-    }
-
-    private void showLookUpDialog() {
-        Dialog dialog = new Dialog();
-        dialog.setTopComponent(buildToolBar());
-        dialog.setButtons(Dialog.OKCANCEL);
-
-        Button bntOk = dialog.getButtonById(Dialog.OK);
-        bntOk.addSelectionListener(new DialogOkBtnSelectionListenerImpl());
-        bntOk.disable();
-
-        dialog.setHideOnButtonClick(true);
-        dialog.setHeading(I18N.DISPLAY.component());
-        dialog.setLayout(new FitLayout());
-        dialog.setSize(460, 500);
-        buildcomponentLookupGrid();
-        initGridSelectionModel(bntOk);
-
-        getDeployedComponents();
-        dialog.add(grid);
-        dialog.setScrollMode(Scroll.AUTOY);
-        dialog.show();
-    }
-
-    private TextField<String> buildFilterField() {
-        final TextField<String> str = new TextField<String>() {
-            @Override
-            public void onKeyUp(FieldEvent fe) {
-                String filter = getValue();
-                if (filter != null && !filter.isEmpty()) {
-                    grid.getStore().filter("name", filter); //$NON-NLS-1$
-                } else {
-                    grid.getStore().clearFilters();
-                }
-
-            }
-        };
-
-        str.setEmptyText(I18N.DISPLAY.filterEmptyText());
-
-        return str;
-    }
-
-    private ToolBar buildToolBar() {
-        ToolBar tool = new ToolBar();
-        tool.add(buildFilterField());
-        return tool;
-    }
-
-    private void setCurrentCompSelection() {
-        List<DeployedComponent> comps = grid.getStore().getModels();
-
-        if (idComponentField.getValue() != null && !idComponentField.getValue().equals("")) { //$NON-NLS-1$
-            for (DeployedComponent dc : comps) {
-                if (dc.getId().equals(idComponentField.getValue())) {
-                    grid.getSelectionModel().select(false, dc);
-                    break;
-                }
-            }
-        }
-    }
 
     private class DialogOkBtnSelectionListenerImpl extends SelectionListener<ButtonEvent> {
         @Override
         public void componentSelected(ButtonEvent ce) {
-            DeployedComponent dc = grid.getSelectionModel().getSelectedItem();
+            DeployedComponent dc = dialog.getSelectedItem();
             if (dc != null) {
-                componentField.setValue(dc.getName());
+                dcCombo.setValue(dc);
                 idComponentField.setValue(dc.getId());
                 fireToolSelectedEvent(true);
             } else {
-                componentField.setValue(""); //$NON-NLS-1$
+                dcCombo.setValue(null); //$NON-NLS-1$
                 idComponentField.setValue(""); //$NON-NLS-1$
                 fireToolSelectedEvent(false);
             }
@@ -462,9 +348,9 @@ public class TemplateInfoEditorPanel extends ContentPanel {
 
     private HorizontalPanel buildToolLookUpPanel() {
         HorizontalPanel panel = new HorizontalPanel();
+
         panel.setSpacing(5);
-        componentField.setWidth(684);
-        panel.add(componentField);
+        panel.add(dcCombo);
         Button lookup = new Button(I18N.DISPLAY.browse(),
                 new SelectionListener<ButtonEvent>() {
                     @Override
@@ -479,44 +365,12 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         return panel;
     }
 
-    private void getDeployedComponents() {
-        EnumerationServices services = new EnumerationServices();
-        services.getDeployedComponents(new AsyncCallback<String>() {
-            @Override
-            public void onSuccess(String result) {
-                ArrayList<DeployedComponent> components = parseJson(result);
-                grid.getStore().add(components);
-                grid.getStore().sort(DeployedComponent.NAME, SortDir.ASC);
-                setCurrentCompSelection();
-            }
-
-            @Override
-            public void onFailure(Throwable caught) {
-                ErrorHandler.post(I18N.DISPLAY.cantLoadDeployedComponents(), caught);
-            }
-        });
+    private void showLookUpDialog() {
+        dialog = new DCLookUpDialog(new DialogOkBtnSelectionListenerImpl(), idComponentField.getValue());
+        dialog.show();
     }
 
-    private ArrayList<DeployedComponent> parseJson(String result) {
-        ArrayList<DeployedComponent> components = new ArrayList<DeployedComponent>();
 
-        JSONArray jsonComponents = JsonUtil.getArray(JsonUtil.getObject(result), "components"); //$NON-NLS-1$
-        if (jsonComponents != null) {
-            JsArray<JsDeployedComponent> jscomps = JsonUtil.asArrayOf(jsonComponents.toString());
-            for (int i = 0; i < jscomps.length(); i++) {
-                JsDeployedComponent jsComponent = jscomps.get(i);
-
-                DeployedComponent dc = new DeployedComponent(jsComponent.getId(), jsComponent.getName(),
-                        jsComponent.getType(), jsComponent.getDescription(),
-                        jsComponent.getAttribution(), jsComponent.getLocation(),
-                        jsComponent.getVersion());
-
-                components.add(dc);
-            }
-        }
-
-        return components;
-    }
 
     /**
      * Validates all input fields and highlights any invalid ones.
@@ -528,7 +382,7 @@ public class TemplateInfoEditorPanel extends ContentPanel {
 
         valid &= nameField.isValid();
         valid &= descField.isValid();
-        valid &= componentField.isValid();
+        valid &= idComponentField != null && !idComponentField.getValue().isEmpty();
 
         return valid;
     }
@@ -547,6 +401,6 @@ public class TemplateInfoEditorPanel extends ContentPanel {
     }
 
     protected String getComponent() {
-        return componentField.getValue();
+        return dcCombo.getValue().getName();
     }
 }
