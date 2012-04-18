@@ -87,7 +87,6 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         String name = template.getName();
         if (name != null && !name.isEmpty()) {
             nameField.setValue(name);
-
             TemplateNameChangeEvent e = new TemplateNameChangeEvent(nameField.getValue());
             EventBus.getInstance().fireEvent(e);
         }
@@ -98,20 +97,11 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         }
 
         String comp = template.getComp();
-        if (comp != null) {
-            dcCombo.setRawValue(comp);
-
-            if (comp.isEmpty()) {
-                fireToolSelectedEvent(false);
-            } else {
-                fireToolSelectedEvent(true);
-            }
-
-        }
-
         String compId = template.getCompId();
-        if (compId != null && !compId.isEmpty()) {
+        if (comp != null && compId != null && !compId.isEmpty()) {
             idComponentField.setValue(compId);
+            dcCombo.setValue(new DeployedComponent(compId, comp, null, null, null, null, null));
+            fireToolSelectedEvent(!comp.isEmpty());
         }
 
         List<String> references = template.getReferences();
@@ -224,25 +214,6 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         return field;
     }
 
-    // private TextField<String> buildComponentTextField() {
-    // final TextField<String> field = new TextField<String>();
-    // field.setId(ID_FLD_D_COMP);
-    // field.setReadOnly(true);
-    //        field.setStyleAttribute("padding-bottom", "5px"); //$NON-NLS-1$ //$NON-NLS-2$
-    // field.setEmptyText(I18N.DISPLAY.componentFieldEmptyText());
-    //
-    // field.setFireChangeEventOnSetValue(true);
-    // field.addListener(Events.Change, new Listener<BaseEvent>() {
-    // @Override
-    // public void handleEvent(BaseEvent be) {
-    // ExecutableChangeEvent event = new ExecutableChangeEvent(field.getValue());
-    // EventBus.getInstance().fireEvent(event);
-    // }
-    // });
-    //
-    // return field;
-    // }
-
     @SuppressWarnings("unchecked")
     private void initComponentField() {
         DeployedComponentSearchUtil util = new DeployedComponentSearchUtil();
@@ -348,7 +319,7 @@ public class TemplateInfoEditorPanel extends ContentPanel {
 
     private HorizontalPanel buildToolLookUpPanel() {
         HorizontalPanel panel = new HorizontalPanel();
-
+        dcCombo.setWidth(648);
         panel.setSpacing(5);
         panel.add(dcCombo);
         Button lookup = new Button(I18N.DISPLAY.browse(),
@@ -382,7 +353,7 @@ public class TemplateInfoEditorPanel extends ContentPanel {
 
         valid &= nameField.isValid();
         valid &= descField.isValid();
-        valid &= idComponentField != null && !idComponentField.getValue().isEmpty();
+        valid &= idComponentField.getValue() != null && !idComponentField.getValue().isEmpty();
 
         return valid;
     }
@@ -401,6 +372,10 @@ public class TemplateInfoEditorPanel extends ContentPanel {
     }
 
     protected String getComponent() {
-        return dcCombo.getValue().getName();
+        if (dcCombo.getValue() != null) {
+            return dcCombo.getValue().getName();
+        } else {
+            return null;
+        }
     }
 }

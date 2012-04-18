@@ -671,4 +671,11 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
      * @return string representing the text
      */
     String search();
+
+    /**
+     * Localized text for search tool tip text
+     * 
+     * @return string representing the text
+     */
+    String searchToolTip();
 }

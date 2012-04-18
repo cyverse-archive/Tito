@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.iplantc.core.tito.client.I18N;
+import org.iplantc.core.tito.client.images.Resources;
 import org.iplantc.core.tito.client.models.DeployedComponent;
+import org.iplantc.core.tito.client.services.DeployedComponentSearchServiceFacade;
 import org.iplantc.core.tito.client.services.EnumerationServices;
 import org.iplantc.core.tito.client.utils.DeployedComponentSearchUtil;
 import org.iplantc.core.tito.client.utils.DeployedComponentSorter;
@@ -17,11 +19,13 @@ import com.extjs.gxt.ui.client.core.XTemplate;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Events;
+import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.button.Button;
+import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.grid.ColumnConfig;
 import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
@@ -29,6 +33,7 @@ import com.extjs.gxt.ui.client.widget.grid.RowExpander;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.AbstractImagePrototype;
 
 /**
  * 
@@ -39,8 +44,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public class DCLookUpDialog extends Dialog {
 
+    private static final String ID_SEARCH_FLD = "idSearchFld";
+    private static final String ID_SEARCH_BTN = "idSearchBtn";
     private Grid<DeployedComponent> grid;
     private RowExpander expander;
+    private TextField<String> filter;
+    private String currentSelection;
 
 
     public DCLookUpDialog(SelectionListener<ButtonEvent> DialogOkBtnSelectionListenerImpl,
@@ -78,9 +87,49 @@ public class DCLookUpDialog extends Dialog {
 
     private ToolBar buildToolBar() {
         ToolBar tool = new ToolBar();
-        DeployedComponentSearchUtil util = new DeployedComponentSearchUtil();
-        tool.add(util.buildSearchField());
+        tool.add(buildFilterField());
+        tool.add(buildSearchButton());
         return tool;
+    }
+
+    private Button buildSearchButton() {
+        Button searchBtn = new Button();
+        searchBtn.addSelectionListener(new SelectionListener<ButtonEvent>() {
+
+            @Override
+            public void componentSelected(ButtonEvent ce) {
+                search(filter.getValue());
+            }
+        });
+
+        searchBtn.setId(ID_SEARCH_BTN);
+        searchBtn.setIcon(AbstractImagePrototype.create(Resources.ICONS.search()));
+        return searchBtn;
+    }
+
+    private TextField<String> buildFilterField() {
+        filter = new TextField<String>() {
+            @Override
+            public void onKeyUp(FieldEvent fe) {
+                String val = getValue();
+                if (val == null || val.isEmpty()) {
+                    search("");
+                    return;
+                }
+
+                if (fe.getKeyCode() == 13) {
+                    if (val.length() >= 3) {
+                        search(val);
+                    }
+                }
+            }
+        };
+
+        filter.setEmptyText(I18N.DISPLAY.searchToolTip());
+        filter.setToolTip(I18N.DISPLAY.searchToolTip());
+        filter.setId(ID_SEARCH_FLD);
+        filter.setWidth(350);
+        return filter;
     }
 
     private void initGridSelectionModel(final Button btnOk) {
@@ -160,29 +209,33 @@ public class DCLookUpDialog extends Dialog {
     }
 
     private void getDeployedComponents(final String currentSelection) {
+        grid.mask(I18N.DISPLAY.loadingMask());
         EnumerationServices services = new EnumerationServices();
         services.getDeployedComponents(new AsyncCallback<String>() {
             @Override
             public void onSuccess(String result) {
+                grid.getStore().removeAll();
                 ArrayList<DeployedComponent> components = DeployedComponentSearchUtil.parseJson(result);
                 grid.getStore().add(components);
                 grid.getStore().sort(DeployedComponent.NAME, SortDir.ASC);
                 setCurrentCompSelection(currentSelection);
+                grid.unmask();
             }
 
             @Override
             public void onFailure(Throwable caught) {
                 ErrorHandler.post(I18N.DISPLAY.cantLoadDeployedComponents(), caught);
+                grid.unmask();
             }
         });
     }
 
-    public void setCurrentCompSelection(String currentSelction) {
-        List<DeployedComponent> comps = grid.getStore().getModels();
-
-        if (currentSelction != null && !currentSelction.equals("")) { //$NON-NLS-1$
+    public void setCurrentCompSelection(String curr) {
+        this.currentSelection = curr;
+        if (currentSelection != null && !currentSelection.equals("")) { //$NON-NLS-1$
+            List<DeployedComponent> comps = grid.getStore().getModels();
             for (DeployedComponent dc : comps) {
-                if (dc.getId().equals(currentSelction)) {
+                if (dc.getId().equals(currentSelection)) {
                     grid.getSelectionModel().select(false, dc);
                     break;
                 }
@@ -192,5 +245,32 @@ public class DCLookUpDialog extends Dialog {
 
     public DeployedComponent getSelectedItem() {
         return grid.getSelectionModel().getSelectedItem();
+    }
+
+    private void search(String filter) {
+        if (filter != null && !filter.isEmpty()) {
+            if (filter.length() >= 3) {
+                grid.mask(I18N.DISPLAY.loadingMask());
+                DeployedComponentSearchServiceFacade facade = new DeployedComponentSearchServiceFacade();
+                facade.searchDeployedComponents(filter, new AsyncCallback<String>() {
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        ErrorHandler.post(caught);
+                        grid.unmask();
+                    }
+
+                    @Override
+                    public void onSuccess(String result) {
+                        List<DeployedComponent> dc_list = DeployedComponentSearchUtil.parseJson(result);
+                        grid.getStore().removeAll();
+                        grid.getStore().add(dc_list);
+                        grid.unmask();
+                    }
+                });
+            }
+        } else {
+            getDeployedComponents(currentSelection);
+        }
     }
 }

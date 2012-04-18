@@ -43,10 +43,10 @@ public class DeployedComponentSearchUtil {
     private static final String ID_FLD_D_COMP = "idFldDComp";
 
     /**
-     * Builds a combo box for searching all apps, filtered by the user's combo text, and displayed in the
+     * Builds a combo box for searching all DC, filtered by the user's combo text, and displayed in the
      * combo's drop-down list.
      * 
-     * @return A combo box of Analysis models, remotely loaded and filtered by the user's combo text.
+     * @return A combo box of DC models, remotely loaded and filtered by the user's combo text.
      */
     public Component buildSearchField() {
         // Create a loader with our custom RpcProxy.
@@ -98,7 +98,7 @@ public class DeployedComponentSearchUtil {
         final ModelKeyProvider<DeployedComponent> storeKeyProvider = new ModelKeyProvider<DeployedComponent>() {
             @Override
             public String getKey(DeployedComponent model) {
-                return model.getId() + model.getLocation();
+                return model.getId();
             }
         };
 
@@ -127,13 +127,17 @@ public class DeployedComponentSearchUtil {
         combo.setHideTrigger(true);
         combo.setEmptyText(I18N.DISPLAY.search());
         combo.setMinChars(3);
+        combo.setFireChangeEventOnSetValue(true);
+        combo.setPropertyEditor(new ListModelPropertyEditor<DeployedComponent>(DeployedComponent.NAME));
 
         combo.addSelectionChangedListener(new SelectionChangedListener<DeployedComponent>() {
             @Override
             public void selectionChanged(SelectionChangedEvent<DeployedComponent> se) {
-                DeployedComponent dc = se.getSelectedItem();
-                ExecutableChangeEvent event = new ExecutableChangeEvent(dc.getName());
-                EventBus.getInstance().fireEvent(event);
+                if (combo.getValue() != null) {
+                    DeployedComponent dc = combo.getValue();
+                    ExecutableChangeEvent event = new ExecutableChangeEvent(dc.getName());
+                    EventBus.getInstance().fireEvent(event);
+                }
             }
         });
 
@@ -142,7 +146,7 @@ public class DeployedComponentSearchUtil {
         combo.addListener(Events.Select, new Listener<FieldEvent>() {
             @Override
             public void handleEvent(FieldEvent event) {
-                combo.setRawValue(lastQueryText);
+                combo.setRawValue(combo.getValue().getName());
             }
         });
 
@@ -198,14 +202,15 @@ public class DeployedComponentSearchUtil {
 
         template.append("<tpl for=\".\"><div class=\"search-item\">"); //$NON-NLS-1$
 
+        template.append("<h3>"); //$NON-NLS-1$
         template.append("<b>{name}</b>"); //$NON-NLS-1$
-
-        template.append("<span>");
-        template.append("path: {location}");
-        template.append("</span>");
+        template.append("</h3>");//$NON-NLS-1$
+        template.append("<p>"); //$NON-NLS-1$
+        template.append("<b>path</b>: {location}</p>");
         // Description line
+        template.append("<h4>"); //$NON-NLS-1$
         template.append("<tpl if=\"description\"><p>{description}</p></tpl>"); //$NON-NLS-1$
-        template.append("<br/>"); //$NON-NLS-1$
+        template.append("</h4>"); //$NON-NLS-1$
         template.append("</div></tpl>"); //$NON-NLS-1$
 
         return template.toString();
