@@ -37,8 +37,14 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+/**
+ * 
+ * A util class that build advanced search combo for DC
+ * 
+ * @author sriram
+ * 
+ */
 public class DeployedComponentSearchUtil {
-
     private String lastQueryText = "";
     private static final String ID_FLD_D_COMP = "idFldDComp";
 
@@ -49,58 +55,9 @@ public class DeployedComponentSearchUtil {
      * @return A combo box of DC models, remotely loaded and filtered by the user's combo text.
      */
     public Component buildSearchField() {
-        // Create a loader with our custom RpcProxy.
-        ListLoader<ListLoadResult<DeployedComponent>> loader = new BaseListLoader<ListLoadResult<DeployedComponent>>(
-                buildSearchProxy());
+        final ListStore<DeployedComponent> store = buildStore();
 
-        // Create the store
-        final ListStore<DeployedComponent> store = new ListStore<DeployedComponent>(loader);
-
-        // Add a load listener that sorts the store's search results.
-        loader.addLoadListener(new LoadListener() {
-            @Override
-            public void loaderLoad(LoadEvent le) {
-                store.sort(Analysis.NAME, SortDir.ASC);
-            }
-        });
-
-        // Set a custom store sorter to order Apps with names that match the search before description
-        // matches.
-        store.setStoreSorter(new StoreSorter<DeployedComponent>() {
-            @Override
-            public int compare(Store<DeployedComponent> store, DeployedComponent dc1,
-                    DeployedComponent app2, String property) {
-                if (dc1 != null && app2 != null) {
-                    String searchTerm = lastQueryText.toLowerCase();
-
-                    boolean dc11NameMatches = dc1.getName().toLowerCase().contains(searchTerm);
-                    boolean dc2NameMatches = app2.getName().toLowerCase().contains(searchTerm);
-
-                    if (dc11NameMatches && !dc2NameMatches) {
-                        // Only app1's name contains the search term, so order it before app2
-                        return -1;
-                    }
-                    if (!dc11NameMatches && dc2NameMatches) {
-                        // Only app2's name contains the search term, so order it before app1
-                        return 1;
-                    }
-                }
-
-                // If both or neither app contains the search term in the app name, order them according
-                // to the sort called above (by App name, ascending)
-                return super.compare(store, dc1, app2, property);
-            }
-        });
-
-        // We need to use a custom key string that will allow the combobox to find the correct model if 2
-        // apps in different groups have the same name, since the combo's SelectionChange event will find
-        // the first model that matches the raw text in the combo's text field.
-        final ModelKeyProvider<DeployedComponent> storeKeyProvider = new ModelKeyProvider<DeployedComponent>() {
-            @Override
-            public String getKey(DeployedComponent model) {
-                return model.getId();
-            }
-        };
+        final ModelKeyProvider<DeployedComponent> storeKeyProvider = getModelKeyProvider();
 
         store.setKeyProvider(storeKeyProvider);
 
@@ -130,27 +87,48 @@ public class DeployedComponentSearchUtil {
         combo.setFireChangeEventOnSetValue(true);
         combo.setPropertyEditor(new ListModelPropertyEditor<DeployedComponent>(DeployedComponent.NAME));
 
-        combo.addSelectionChangedListener(new SelectionChangedListener<DeployedComponent>() {
-            @Override
-            public void selectionChanged(SelectionChangedEvent<DeployedComponent> se) {
-                if (combo.getValue() != null) {
-                    DeployedComponent dc = combo.getValue();
-                    ExecutableChangeEvent event = new ExecutableChangeEvent(dc.getName());
-                    EventBus.getInstance().fireEvent(event);
-                }
-            }
-        });
+        combo.addSelectionChangedListener(new SearchComboSelectionChangeListener());
 
         // Since we don't want our custom key provider's string to display after a user selects a search
         // result, reset the raw text field to the cached user query string after a selection is made.
-        combo.addListener(Events.Select, new Listener<FieldEvent>() {
+        combo.addListener(Events.Select, new SearchComboSelectEventListener());
+
+        return combo;
+    }
+
+    private ModelKeyProvider<DeployedComponent> getModelKeyProvider() {
+        // We need to use a custom key string that will allow the combobox to find the correct model if 2
+        // apps in different groups have the same name, since the combo's SelectionChange event will find
+        // the first model that matches the raw text in the combo's text field.
+        final ModelKeyProvider<DeployedComponent> storeKeyProvider = new ModelKeyProvider<DeployedComponent>() {
             @Override
-            public void handleEvent(FieldEvent event) {
-                combo.setRawValue(combo.getValue().getName());
+            public String getKey(DeployedComponent model) {
+                return model.getId();
+            }
+        };
+        return storeKeyProvider;
+    }
+
+    private ListStore<DeployedComponent> buildStore() {
+        // Create a loader with our custom RpcProxy.
+        ListLoader<ListLoadResult<DeployedComponent>> loader = new BaseListLoader<ListLoadResult<DeployedComponent>>(
+                buildSearchProxy());
+
+        // Create the store
+        final ListStore<DeployedComponent> store = new ListStore<DeployedComponent>(loader);
+
+        // Add a load listener that sorts the store's search results.
+        loader.addLoadListener(new LoadListener() {
+            @Override
+            public void loaderLoad(LoadEvent le) {
+                store.sort(Analysis.NAME, SortDir.ASC);
             }
         });
 
-        return combo;
+        // Set a custom store sorter to order Apps with names that match the search before description
+        // matches.
+        store.setStoreSorter(new CustomStoreSorter());
+        return store;
     }
 
     /**
@@ -235,6 +213,55 @@ public class DeployedComponentSearchUtil {
         }
 
         return components;
+    }
+
+    private final class SearchComboSelectEventListener implements Listener<FieldEvent> {
+        @Override
+        public void handleEvent(FieldEvent event) {
+            @SuppressWarnings("unchecked")
+            ComboBox<DeployedComponent> combo = (ComboBox<DeployedComponent>)event.getSource();
+            combo.setRawValue(combo.getValue().getName());
+        }
+    }
+
+    private final class SearchComboSelectionChangeListener extends
+            SelectionChangedListener<DeployedComponent> {
+        @Override
+        public void selectionChanged(SelectionChangedEvent<DeployedComponent> se) {
+            @SuppressWarnings("unchecked")
+            ComboBox<DeployedComponent> combo = (ComboBox<DeployedComponent>)se.getSource();
+            if (combo.getValue() != null) {
+                DeployedComponent dc = combo.getValue();
+                ExecutableChangeEvent event = new ExecutableChangeEvent(dc.getName());
+                EventBus.getInstance().fireEvent(event);
+            }
+        }
+    }
+
+    private final class CustomStoreSorter extends StoreSorter<DeployedComponent> {
+        @Override
+        public int compare(Store<DeployedComponent> store, DeployedComponent dc1,
+                DeployedComponent app2, String property) {
+            if (dc1 != null && app2 != null) {
+                String searchTerm = lastQueryText.toLowerCase();
+
+                boolean dc11NameMatches = dc1.getName().toLowerCase().contains(searchTerm);
+                boolean dc2NameMatches = app2.getName().toLowerCase().contains(searchTerm);
+
+                if (dc11NameMatches && !dc2NameMatches) {
+                    // Only app1's name contains the search term, so order it before app2
+                    return -1;
+                }
+                if (!dc11NameMatches && dc2NameMatches) {
+                    // Only app2's name contains the search term, so order it before app1
+                    return 1;
+                }
+            }
+
+            // If both or neither app contains the search term in the app name, order them according
+            // to the sort called above (by App name, ascending)
+            return super.compare(store, dc1, app2, property);
+        }
     }
 
 }
