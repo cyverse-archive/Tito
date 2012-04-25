@@ -27,6 +27,7 @@ import org.iplantc.core.tito.client.events.TemplateNameChangeEventHandler;
 import org.iplantc.core.tito.client.models.MetaDataTreeModel;
 import org.iplantc.core.tito.client.models.Template;
 import org.iplantc.core.tito.client.utils.PropertyGroupContainerUtil;
+import org.iplantc.core.tito.client.utils.PropertyUtil;
 import org.iplantc.core.uicommons.client.events.EventBus;
 
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
@@ -221,7 +222,7 @@ public class WidgetPanel extends ContentPanel {
                     if (obj != null) {
                         if (PropertyGroupContainerUtil.isInstanceOfProperty(obj)) {
                             Property property = (Property)obj;
-                            if (NavigationTreePanel.TYPE_STATIC_TEXT.equals(property.getType())) {
+                            if (PropertyUtil.TYPE_STATIC_TEXT.equals(property.getType())) {
                                 // static text
                                 replaceCenterPanel(new StaticTextEditorPanel(property));
                             } else {

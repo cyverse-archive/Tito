@@ -22,6 +22,7 @@ import org.iplantc.core.tito.client.models.MetaDataTreeModel.TreeElementType;
 import org.iplantc.core.tito.client.services.EnumerationServices;
 import org.iplantc.core.tito.client.utils.PanelHelper;
 import org.iplantc.core.tito.client.utils.PropertyGroupContainerUtil;
+import org.iplantc.core.tito.client.utils.PropertyUtil;
 import org.iplantc.core.uicommons.client.ErrorHandler;
 import org.iplantc.core.uicommons.client.events.EventBus;
 
@@ -61,9 +62,8 @@ public class NavigationTreePanel extends ContentPanel {
     private static final String ID_STATIC_TEXT_MENU_ITEM = "idAddDescTextMenuItem"; //$NON-NLS-1$
     private static final String ID_PROPERTY_GROUP_MENU_ITEM = "idAddGroupItem"; //$NON-NLS-1$
 
-    static final String DEFAULT_TYPE_PROPERTY = "FileInput"; // default type when a property is first created //$NON-NLS-1$
-    static final String TYPE_STATIC_TEXT = "Info"; // not named DEFAULT_..... because it can't be changed //$NON-NLS-1$
-                                                   // by the user
+    // default type when a property is first created
+    private static final String DEFAULT_TYPE_PROPERTY = "FileInput"; //$NON-NLS-1$
 
     private TreePanel<MetaDataTreeModel> tree;
     private Menu propertyMenu;
@@ -298,7 +298,7 @@ public class NavigationTreePanel extends ContentPanel {
 
             case STATIC_TEXT:
                 object = new Property();
-                object.setType(TYPE_STATIC_TEXT);
+                object.setType(PropertyUtil.TYPE_STATIC_TEXT);
                 break;
         }
 

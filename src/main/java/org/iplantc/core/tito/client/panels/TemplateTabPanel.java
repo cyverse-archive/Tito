@@ -29,9 +29,11 @@ import org.iplantc.core.tito.client.events.ToolSelectedEventHandler;
 import org.iplantc.core.tito.client.images.Resources;
 import org.iplantc.core.tito.client.models.Template;
 import org.iplantc.core.tito.client.services.EnumerationServices;
+import org.iplantc.core.tito.client.utils.PropertyUtil;
 import org.iplantc.core.tito.client.utils.SaveUtil;
 import org.iplantc.core.uicommons.client.ErrorHandler;
 import org.iplantc.core.uicommons.client.events.EventBus;
+import org.iplantc.core.uicommons.client.util.ByteArrayComparer;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Listener;
@@ -55,7 +57,6 @@ import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import org.iplantc.core.uicommons.client.util.ByteArrayComparer;
 
 /**
  * 
@@ -81,7 +82,7 @@ public class TemplateTabPanel extends ContentPanel {
     private WidgetPanel pnlWidgetsdObj;
     private Window newToolRequestWin;
 
-    private SaveUtil saveUtil;
+    private final SaveUtil saveUtil;
     
     private Button btnSave;
   
@@ -225,49 +226,53 @@ public class TemplateTabPanel extends ContentPanel {
 
     private Button buildPublishButton() {
         btnSave = new Button(I18N.DISPLAY.save(), AbstractImagePrototype.create(Resources.ICONS.save()));
-    	btnSave.setId(ID_BTN_PUB);
-    	btnSave.addSelectionListener(new SelectionListener<ButtonEvent>() {
-    			  /**
-    	         * Displays a confirmation dialog with a warning message if all parameters are unordered. Calls
-    	         * publish otherwise, or if the user confirms the warning.
-    	         */
-    	        @Override
-    	        public void componentSelected(ButtonEvent ce) {
-    	            // check if any parameters are still unordered
-    	            boolean paramsOrdered = isOrdered();
-
-    	            if (paramsOrdered) {
-    	                // the user has already ordered their parameters.
-    	            	save();
-    	            } else {
-    	                // Display a warning to the user before publishing.
-    	                MessageBox.confirm(I18N.DISPLAY.publish(), I18N.DISPLAY.publishOrderingWarning(),
-    	                        new Listener<MessageBoxEvent>() {
-    	                            @Override
-    	                            public void handleEvent(MessageBoxEvent be) {
-    	                                if (be.getButtonClicked().getItemId() == Dialog.YES) {
-    	                                    // the user wishes to publish anyway
-    	                                	save();
-    	                                } else {
-    	                                	saveUtil.showOrderingGrid(pnlWidgetsdObj.getProperties());
-    	                            }
-    	                      }
-    	                });
-    	            }
-    	        }
-			});
+        btnSave.setId(ID_BTN_PUB);
+        btnSave.addSelectionListener(new SelectionListener<ButtonEvent>() {
+            /**
+             * Displays a confirmation dialog with a warning message if any parameters are unordered.
+             * Calls save otherwise, or if the user confirms the warning. Displays the ordering grid if
+             * the user cancels the save.
+             */
+            @Override
+            public void componentSelected(ButtonEvent ce) {
+                // check if any parameters are still unordered
+                if (isOrdered()) {
+                    // the user has already ordered their parameters.
+                    save();
+                } else {
+                    // Display a warning to the user before publishing.
+                    confirmUnorderedPublish();
+                }
+            }
+        });
 
         return btnSave;
     }
-    
+
     private boolean isOrdered() {
-     for (Property param : pnlWidgetsdObj.getProperties()) {
-          if (param.getOrder() < 1) {
-              return false;
-          }
-      }
-      return true;
-  }
+        for (Property param : pnlWidgetsdObj.getProperties()) {
+            if (param.getOrder() < 0 && PropertyUtil.orderingRequired(param)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void confirmUnorderedPublish() {
+        MessageBox.confirm(I18N.DISPLAY.publish(), I18N.DISPLAY.publishOrderingWarning(),
+                new Listener<MessageBoxEvent>() {
+                    @Override
+                    public void handleEvent(MessageBoxEvent be) {
+                        if (be.getButtonClicked().getItemId() == Dialog.YES) {
+                            // the user wishes to save anyway
+                            save();
+                        } else {
+                            saveUtil.showOrderingGrid(pnlWidgetsdObj.getProperties());
+                        }
+                    }
+                });
+    }
 
     private Button buildCmdLineOrderButton() {
         Button cmdLineOrder = new Button(I18N.DISPLAY.commandLineOrder());
@@ -579,7 +584,6 @@ public class TemplateTabPanel extends ContentPanel {
                 && !templateInfo.getComponent().isEmpty();
         return (templateHasName && templateHasInfo);
     }
-    
 
     private class NewToolSelectionListenerImpl extends SelectionListener<ButtonEvent> {
         private final ToolRequestFormPanel requestForm;

@@ -10,6 +10,7 @@ import org.iplantc.core.metadata.client.property.Property;
 import org.iplantc.core.metadata.client.property.PropertyData;
 import org.iplantc.core.tito.client.I18N;
 import org.iplantc.core.tito.client.events.CommandLineArgumentChangeEvent;
+import org.iplantc.core.tito.client.utils.PropertyUtil;
 import org.iplantc.core.uicommons.client.events.EventBus;
 
 import com.extjs.gxt.ui.client.Style.Orientation;
@@ -122,9 +123,7 @@ public class CommandLineOrderingGridPanel extends ContentPanel {
             PropertyData propData = new PropertyData(property);
 
             if (propData.getOrder() < 0) {
-            	Property prop = propData.getProperty();
-	        	if(! prop.getType().equals(NavigationTreePanel.TYPE_STATIC_TEXT) 
-            			&& !dataObjectImplicit(prop.getDataObject())) {
+                if (PropertyUtil.orderingRequired(propData.getProperty())) {
             		unorderedListStore.add(propData);
             	}
             } else {
