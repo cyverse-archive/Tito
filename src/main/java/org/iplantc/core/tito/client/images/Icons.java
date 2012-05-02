@@ -78,13 +78,4 @@ public interface Icons extends ClientBundle {
      */
     @Source("copy.png")
     ImageResource copy();
-
-    /**
-     * Image resource.
-     * 
-     * @return image.
-     */
-    @Source("magnifier.png")
-    ImageResource search();
-
 }
