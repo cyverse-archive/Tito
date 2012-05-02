@@ -262,7 +262,7 @@ public class PropertyEditorPanel extends ContentPanel {
         // enable auto-complete
         comboPropertyTypeCategory.setEditable(true);
         comboPropertyTypeCategory.setTypeAhead(true);
-        comboPropertyTypeCategory.setQueryDelay(0);
+        comboPropertyTypeCategory.setQueryDelay(1000);
 
         comboPropertyTypeCategory.setFireChangeEventOnSetValue(true);
         comboPropertyTypeCategory.setForceSelection(true);
