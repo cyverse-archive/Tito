@@ -188,7 +188,7 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
         // enable auto-complete
         infoTypeField.setEditable(true);
         infoTypeField.setTypeAhead(true);
-        infoTypeField.setQueryDelay(0);
+        infoTypeField.setQueryDelay(1000);
 
         ListStore<InfoType> store = new ListStore<InfoType>();
         store.add(infoTypes);
