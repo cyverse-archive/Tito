@@ -11,7 +11,7 @@ import org.iplantc.core.tito.client.models.Template;
 import org.iplantc.core.tito.client.panels.CommandLineOrderingGridPanel;
 import org.iplantc.core.tito.client.services.EnumerationServices;
 import org.iplantc.core.uiapplications.client.events.AnalysisGroupCountUpdateEvent;
-import org.iplantc.core.uiapplications.client.events.AnalysisSelectEvent;
+import org.iplantc.core.uiapplications.client.events.AppSearchResultSelectedEvent;
 import org.iplantc.core.uicommons.client.ErrorHandler;
 import org.iplantc.core.uicommons.client.events.EventBus;
 
@@ -61,7 +61,8 @@ public class SaveUtil {
         @Override
         public void onSuccess(String result) {
             EventBus.getInstance().fireEvent(new TemplateSaveEvent(result));
-            AnalysisSelectEvent event = new AnalysisSelectEvent(TitoPanel.tag, null, result);
+            AppSearchResultSelectedEvent event = new AppSearchResultSelectedEvent(TitoPanel.tag, null,
+                    result);
             EventBus.getInstance().fireEvent(event);
             Info.display(I18N.DISPLAY.save(), name + " " + I18N.DISPLAY.saved());
             if (titoId == null || titoId.isEmpty()) {

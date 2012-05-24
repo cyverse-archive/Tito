@@ -3,7 +3,8 @@ package org.iplantc.core.tito.client;
 import org.iplantc.core.jsonutil.JsonUtil;
 import org.iplantc.core.tito.client.panels.TemplateTabPanel;
 import org.iplantc.core.tito.client.services.EnumerationServices;
-import org.iplantc.core.uiapplications.client.events.AnalysisSelectEvent;
+import org.iplantc.core.uiapplications.client.events.AppSearchResultSelectedEvent;
+
 import org.iplantc.core.uicommons.client.ErrorHandler;
 
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
@@ -117,7 +118,7 @@ public class TitoPanel extends LayoutContainer {
                 if (jsonObjects != null && jsonObjects.size() > 0) {
                     pnlAppTemplate = new TemplateTabPanel(jsonObjects.get(0).isObject(), false);
                     replaceContent(pnlAppTemplate);
-                    AnalysisSelectEvent event = new AnalysisSelectEvent(tag, null, id);
+                    AppSearchResultSelectedEvent event = new AppSearchResultSelectedEvent(tag, null, id);
                     org.iplantc.core.uicommons.client.events.EventBus.getInstance().fireEvent(event);
                 }
             }
