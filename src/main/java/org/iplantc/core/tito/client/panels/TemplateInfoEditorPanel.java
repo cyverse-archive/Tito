@@ -10,9 +10,9 @@ import org.iplantc.core.tito.client.I18N;
 import org.iplantc.core.tito.client.dialogs.DCLookUpDialog;
 import org.iplantc.core.tito.client.events.TemplateNameChangeEvent;
 import org.iplantc.core.tito.client.events.ToolSelectedEvent;
-import org.iplantc.core.tito.client.models.DeployedComponent;
 import org.iplantc.core.tito.client.models.Template;
 import org.iplantc.core.tito.client.utils.DeployedComponentSearchUtil;
+import org.iplantc.core.uicommons.client.models.DeployedComponent;
 import org.iplantc.core.uicommons.client.events.EventBus;
 
 import com.extjs.gxt.ui.client.Style.Scroll;

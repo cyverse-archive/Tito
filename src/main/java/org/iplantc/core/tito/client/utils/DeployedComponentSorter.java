@@ -1,6 +1,6 @@
 package org.iplantc.core.tito.client.utils;
 
-import org.iplantc.core.tito.client.models.DeployedComponent;
+import org.iplantc.core.uicommons.client.models.DeployedComponent;
 
 import com.extjs.gxt.ui.client.store.Store;
 import com.extjs.gxt.ui.client.store.StoreSorter;

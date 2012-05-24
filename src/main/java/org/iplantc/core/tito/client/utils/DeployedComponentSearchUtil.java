@@ -6,10 +6,10 @@ import java.util.List;
 import org.iplantc.core.jsonutil.JsonUtil;
 import org.iplantc.core.tito.client.I18N;
 import org.iplantc.core.tito.client.events.ExecutableChangeEvent;
-import org.iplantc.core.tito.client.models.DeployedComponent;
-import org.iplantc.core.tito.client.models.JsDeployedComponent;
 import org.iplantc.core.tito.client.services.DeployedComponentSearchServiceFacade;
 import org.iplantc.core.uiapplications.client.models.Analysis;
+import org.iplantc.core.uicommons.client.models.DeployedComponent;
+import org.iplantc.core.uicommons.client.models.JsDeployedComponent;
 import org.iplantc.core.uicommons.client.ErrorHandler;
 import org.iplantc.core.uicommons.client.events.EventBus;
 

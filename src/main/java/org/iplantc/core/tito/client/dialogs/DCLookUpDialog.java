@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.iplantc.core.tito.client.I18N;
-import org.iplantc.core.tito.client.models.DeployedComponent;
 import org.iplantc.core.tito.client.services.DeployedComponentSearchServiceFacade;
 import org.iplantc.core.tito.client.services.EnumerationServices;
 import org.iplantc.core.tito.client.utils.DeployedComponentSearchUtil;
 import org.iplantc.core.tito.client.utils.DeployedComponentSorter;
 import org.iplantc.core.uicommons.client.ErrorHandler;
 import org.iplantc.core.uicommons.client.images.Resources;
+import org.iplantc.core.uicommons.client.models.DeployedComponent;
+import org.iplantc.core.uicommons.client.models.JsDeployedComponent;
+
 
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.Style.SelectionMode;
