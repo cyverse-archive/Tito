@@ -514,6 +514,7 @@ public class TemplateTabPanel extends ContentPanel {
         }
 
         pnlWidgetsdObj.cleanup();
+        templateInfo.cleanup();
     }
 
     private void updateHash() {

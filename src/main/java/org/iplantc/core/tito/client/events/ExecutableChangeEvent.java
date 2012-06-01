@@ -19,12 +19,23 @@ public class ExecutableChangeEvent extends GwtEvent<ExecutableChangeEventHandler
     public static final GwtEvent.Type<ExecutableChangeEventHandler> TYPE = new GwtEvent.Type<ExecutableChangeEventHandler>();
 
     private String executable;
+    private String id;
 
     /**
      * @param executable the executable whose name changed
      */
-    public ExecutableChangeEvent(String executable) {
+    public ExecutableChangeEvent(String id, String executable) {
         this.executable = executable;
+        this.id = id;
+    }
+
+    /**
+     * 
+     * 
+     * @return get id of DC
+     */
+    public String getId() {
+        return id;
     }
 
     /**

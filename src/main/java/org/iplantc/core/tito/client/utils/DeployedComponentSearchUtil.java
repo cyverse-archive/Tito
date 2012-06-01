@@ -232,7 +232,7 @@ public class DeployedComponentSearchUtil {
             ComboBox<DeployedComponent> combo = (ComboBox<DeployedComponent>)se.getSource();
             if (combo.getValue() != null) {
                 DeployedComponent dc = combo.getValue();
-                ExecutableChangeEvent event = new ExecutableChangeEvent(dc.getName());
+                ExecutableChangeEvent event = new ExecutableChangeEvent(dc.getId(), dc.getName());
                 EventBus.getInstance().fireEvent(event);
             }
         }

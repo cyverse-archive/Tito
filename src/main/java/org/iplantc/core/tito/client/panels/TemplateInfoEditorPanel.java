@@ -8,6 +8,8 @@ import org.iplantc.core.client.widgets.BoundedTextField;
 import org.iplantc.core.client.widgets.utils.FormLabel;
 import org.iplantc.core.tito.client.I18N;
 import org.iplantc.core.tito.client.dialogs.DCLookUpDialog;
+import org.iplantc.core.tito.client.events.ExecutableChangeEvent;
+import org.iplantc.core.tito.client.events.ExecutableChangeEventHandler;
 import org.iplantc.core.tito.client.events.TemplateNameChangeEvent;
 import org.iplantc.core.tito.client.events.ToolSelectedEvent;
 import org.iplantc.core.tito.client.models.Template;
@@ -137,7 +139,18 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         panel.setBodyBorder(false);
         panel.setLabelAlign(LabelAlign.TOP);
         formData = new FormData("-20"); //$NON-NLS-1$
+        addListeners();
 
+    }
+
+    private void addListeners() {
+        EventBus.getInstance().addHandler(ExecutableChangeEvent.TYPE, new ExecutableChangeEventHandler() {
+            @Override
+            public void onChange(ExecutableChangeEvent event) {
+                        idComponentField.setValue(event.getId());
+                        fireToolSelectedEvent(true);
+            }
+                });
     }
 
     private void addFields() {
@@ -377,5 +390,9 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         } else {
             return null;
         }
+    }
+
+    public void cleanup() {
+        EventBus.getInstance().removeHandlers(ExecutableChangeEvent.TYPE);
     }
 }
