@@ -1181,15 +1181,14 @@ public class PropertyEditorPanel extends ContentPanel {
      * 
      */
     private static class TextFieldContainer extends LayoutContainer {
-        private static final String ID_TEXT_FLD = "idTextFld";
-		TextField<String> field;
+        TextField<String> field;
 
         private TextFieldContainer(Label label, TextField<String> field) {
             this.field = field;
-            field.setId(ID_TEXT_FLD);
+            this.field.setId(label.getText());
 
             add(label);
-            add(field);
+            add(this.field);
         }
     }
 }
