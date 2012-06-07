@@ -1,5 +1,6 @@
 package org.iplantc.core.tito.client.panels;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -14,8 +15,8 @@ import org.iplantc.core.tito.client.events.TemplateNameChangeEvent;
 import org.iplantc.core.tito.client.events.ToolSelectedEvent;
 import org.iplantc.core.tito.client.models.Template;
 import org.iplantc.core.tito.client.utils.DeployedComponentSearchUtil;
-import org.iplantc.core.uicommons.client.models.DeployedComponent;
 import org.iplantc.core.uicommons.client.events.EventBus;
+import org.iplantc.core.uicommons.client.models.DeployedComponent;
 
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -35,6 +36,7 @@ import com.extjs.gxt.ui.client.widget.form.HiddenField;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
+import com.google.gwt.event.shared.HandlerRegistration;
 
 /**
  * 
@@ -44,11 +46,9 @@ import com.extjs.gxt.ui.client.widget.layout.FormData;
  *
  */
 public class TemplateInfoEditorPanel extends ContentPanel {
-    private static final String ID_BTN_BROWSE = "idBtnBrowse";
-
-	private static final String ID_FLD_DESC = "idFldDesc";
-
-	private static final String ID_FLD_NAME = "idFldName";
+    private static final String ID_BTN_BROWSE = "idBtnBrowse"; //$NON-NLS-1$
+    private static final String ID_FLD_DESC = "idFldDesc"; //$NON-NLS-1$
+    private static final String ID_FLD_NAME = "idFldName"; //$NON-NLS-1$
 
 	private Template template;
 
@@ -64,6 +64,7 @@ public class TemplateInfoEditorPanel extends ContentPanel {
     private DCLookUpDialog dialog;
     private ComboBox<DeployedComponent> dcCombo;
 
+    private ArrayList<HandlerRegistration> handlers;
 
 
     /**
@@ -144,13 +145,16 @@ public class TemplateInfoEditorPanel extends ContentPanel {
     }
 
     private void addListeners() {
-        EventBus.getInstance().addHandler(ExecutableChangeEvent.TYPE, new ExecutableChangeEventHandler() {
-            @Override
-            public void onChange(ExecutableChangeEvent event) {
+        handlers = new ArrayList<HandlerRegistration>();
+
+        handlers.add(EventBus.getInstance().addHandler(ExecutableChangeEvent.TYPE,
+                new ExecutableChangeEventHandler() {
+                    @Override
+                    public void onChange(ExecutableChangeEvent event) {
                         idComponentField.setValue(event.getId());
                         fireToolSelectedEvent(true);
-            }
-                });
+                    }
+                }));
     }
 
     private void addFields() {
@@ -318,7 +322,7 @@ public class TemplateInfoEditorPanel extends ContentPanel {
                 idComponentField.setValue(dc.getId());
                 fireToolSelectedEvent(true);
             } else {
-                dcCombo.setValue(null); //$NON-NLS-1$
+                dcCombo.setValue(null);
                 idComponentField.setValue(""); //$NON-NLS-1$
                 fireToolSelectedEvent(false);
             }
@@ -393,6 +397,10 @@ public class TemplateInfoEditorPanel extends ContentPanel {
     }
 
     public void cleanup() {
-        EventBus.getInstance().removeHandlers(ExecutableChangeEvent.TYPE);
+        for (HandlerRegistration handler : handlers) {
+            handler.removeHandler();
+        }
+
+        handlers.clear();
     }
 }
