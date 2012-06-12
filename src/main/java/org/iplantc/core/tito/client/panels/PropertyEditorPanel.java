@@ -52,6 +52,8 @@ import com.google.gwt.user.client.ui.ListBox;
  * 
  */
 public class PropertyEditorPanel extends ContentPanel {
+    private static final String ID_PROPERTY_TYPE = "idPropertyType";
+    private static final String ID_ARG_TYPE = "idArgType";
     private static final String ID_OPTN_FLAG_CBX = "idOptnFlagCbx";
 	private static final String ID_IMPLICIT_OPT_CBX = "idImplicitOptCbx";
 	private static final String ID_REQ_CBX = "idReqCbx";
@@ -257,6 +259,7 @@ public class PropertyEditorPanel extends ContentPanel {
 
     private void buildPropertyTypeCategoryList() {
         comboPropertyTypeCategory = new ComboBox<CategoryListItem>();
+        comboPropertyTypeCategory.setId(ID_PROPERTY_TYPE);
         comboPropertyTypeCategory.setWidth("140px"); //$NON-NLS-1$
 
         // enable auto-complete
@@ -816,6 +819,7 @@ public class PropertyEditorPanel extends ContentPanel {
         VerticalPanel ret = new VerticalPanel();
 
         listPropertyType = new ListBox();
+        listPropertyType.getElement().setId(ID_ARG_TYPE);
         listPropertyType.addChangeHandler(new ChangeHandler() {
             @Override
             public void onChange(ChangeEvent event) {
