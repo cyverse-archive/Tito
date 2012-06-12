@@ -51,7 +51,6 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
 import com.extjs.gxt.ui.client.widget.menu.MenuItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.json.client.JSONBoolean;
 import com.google.gwt.json.client.JSONObject;
@@ -511,12 +510,9 @@ public class TemplateTabPanel extends ContentPanel {
 
     public void cleanup() {
         for (HandlerRegistration handler : handlers) {
-            try {
-                handler.removeHandler();
-            } catch (Exception e) {
-                GWT.log(e.getMessage());
-            }
+            handler.removeHandler();
         }
+        handlers.clear();
 
         pnlWidgetsdObj.cleanup();
         templateInfo.cleanup();
