@@ -333,7 +333,7 @@ public class NavigationTreePanel extends ContentPanel {
      * @return
      */
     private String getDefaultTitle(TreeElementType treeElementType) {
-        String label = "";
+        String label = ""; //$NON-NLS-1$
 
         int i = 0;
         boolean labelExists;

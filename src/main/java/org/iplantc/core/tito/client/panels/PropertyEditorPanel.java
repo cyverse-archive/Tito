@@ -53,16 +53,16 @@ import com.google.gwt.user.client.ui.ListBox;
  * 
  */
 public class PropertyEditorPanel extends ContentPanel {
-    private static final String ID_PROPERTY_TYPE = "idPropertyType";
-    private static final String ID_ARG_TYPE = "idArgType";
-    private static final String ID_OPTN_FLAG_CBX = "idOptnFlagCbx";
-	private static final String ID_IMPLICIT_OPT_CBX = "idImplicitOptCbx";
-	private static final String ID_REQ_CBX = "idReqCbx";
-	private static final String ID_DISP_GUI_CBX = "idDispGuiCbx";
-	private static final String ID_TOOL_TIP = "idToolTip";
-	private static final String ID_PROP_LBL = "idPropLbl";
-	private static final String ID_FIELD_NUM = "idFieldNum";
-	private static final String ID_FLD_CMD_L_OPTN = "idFldCmdLOptn";
+    private static final String ID_PROPERTY_TYPE = "idPropertyType"; //$NON-NLS-1$
+    private static final String ID_ARG_TYPE = "idArgType"; //$NON-NLS-1$
+    private static final String ID_OPTN_FLAG_CBX = "idOptnFlagCbx"; //$NON-NLS-1$
+    private static final String ID_IMPLICIT_OPT_CBX = "idImplicitOptCbx"; //$NON-NLS-1$
+    private static final String ID_REQ_CBX = "idReqCbx"; //$NON-NLS-1$
+    private static final String ID_DISP_GUI_CBX = "idDispGuiCbx"; //$NON-NLS-1$
+    private static final String ID_TOOL_TIP = "idToolTip"; //$NON-NLS-1$
+    private static final String ID_PROP_LBL = "idPropLbl"; //$NON-NLS-1$
+    private static final String ID_FIELD_NUM = "idFieldNum"; //$NON-NLS-1$
+    private static final String ID_FLD_CMD_L_OPTN = "idFldCmdLOptn"; //$NON-NLS-1$
 	private final Property property;
     private LayoutContainer containerMain;
     private LayoutContainer containerPropertyTypeEditor;
@@ -1074,7 +1074,7 @@ public class PropertyEditorPanel extends ContentPanel {
     }
 
     private class StringDefaultValuePanel extends VerticalPanel {
-        private static final String ID_FLD_DEF_STR_VAL = "idFldDefStrVal";
+        private static final String ID_FLD_DEF_STR_VAL = "idFldDefStrVal"; //$NON-NLS-1$
 
 		public StringDefaultValuePanel(final String value) {
             String caption = I18N.DISPLAY.defaultValueLabel();
