@@ -10,9 +10,10 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.TextField;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -23,17 +24,18 @@ import com.google.gwt.user.client.ui.Widget;
  * @author hariolf
  * 
  */
-public class MultiTextFieldPanel extends LayoutContainer {
+public class MultiTextFieldPanel extends VerticalPanel {
     private static final int BUTTON_WIDTH = 20;
 
-    List<TextField<String>> textFields;
-    Button addButton;
+    private final List<TextField<String>> textFields;
+    private Button addButton;
 
     /**
      * Creates a new MultiTextFieldPanel containing one empty text field.
      */
     public MultiTextFieldPanel() {
         textFields = new ArrayList<TextField<String>>();
+        setLayout(new FitLayout());
 
         addListener(Events.AfterLayout, new Listener<BaseEvent>() {
             @Override
@@ -79,6 +81,8 @@ public class MultiTextFieldPanel extends LayoutContainer {
                     HorizontalPanel panel = (HorizontalPanel)w;
                     Component c = panel.getItem(0);
                     textFields.remove(c);
+
+                    layout();
                 }
             }
         };
@@ -112,12 +116,15 @@ public class MultiTextFieldPanel extends LayoutContainer {
         TextField<String> field = new TextField<String>();
         field.setStyleAttribute("padding-bottom", "5px"); //$NON-NLS-1$ //$NON-NLS-2$
         field.setValue(text);
+
         textFields.add(field);
 
         HorizontalPanel hPanel = new HorizontalPanel();
-        hPanel.add(field);
+        hPanel.setLayout(new FitLayout());
 
+        hPanel.add(field);
         hPanel.add(buildAddButton());
+
         add(hPanel);
         layout();
     }

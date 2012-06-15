@@ -35,6 +35,7 @@ import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
 import com.extjs.gxt.ui.client.widget.form.HiddenField;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.extjs.gxt.ui.client.widget.form.TextField;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
 import com.google.gwt.event.shared.HandlerRegistration;
 
@@ -129,10 +130,9 @@ public class TemplateInfoEditorPanel extends ContentPanel {
     private void init() {
         setHeaderVisible(false);
         setBodyBorder(false);
-        setStyleAttribute("padding-bottom", "10px"); //$NON-NLS-1$ //$NON-NLS-2$
+        setLayout(new FitLayout());
 
         panel = new FormPanel();
-        panel.setSize(800, 600);
         panel.setScrollMode(Scroll.AUTOY);
         panel.setBodyBorder(false);
         panel.setFrame(true);
@@ -190,8 +190,8 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         
         panel.add(new Html("<br/>"), formData); //$NON-NLS-1$
         refPanel = buildRefPanel();
-        panel.add(new FormLabel(I18N.DISPLAY.referencesLabel()));
-        panel.add(refPanel);
+        panel.add(new FormLabel(I18N.DISPLAY.referencesLabel()), formData);
+        panel.add(refPanel, formData);
     }
 
     private Label buildComponentLabel() {
@@ -250,7 +250,7 @@ public class TemplateInfoEditorPanel extends ContentPanel {
 
     private MultiTextFieldPanel buildRefPanel() {
         MultiTextFieldPanel pnl = new MultiTextFieldPanel();
-        pnl.setWidth(748);
+        pnl.setWidth(750);
         return pnl;
     }
     
@@ -336,7 +336,8 @@ public class TemplateInfoEditorPanel extends ContentPanel {
 
     private HorizontalPanel buildToolLookUpPanel() {
         HorizontalPanel panel = new HorizontalPanel();
-        dcCombo.setWidth(648);
+        panel.setLayout(new FitLayout());
+        dcCombo.setWidth(640);
         panel.setSpacing(5);
         panel.add(dcCombo);
         Button lookup = new Button(I18N.DISPLAY.browse(),

@@ -4,18 +4,11 @@ import org.iplantc.core.jsonutil.JsonUtil;
 import org.iplantc.core.tito.client.panels.TemplateTabPanel;
 import org.iplantc.core.tito.client.services.EnumerationServices;
 import org.iplantc.core.uiapplications.client.events.AppSearchResultSelectedEvent;
-
 import org.iplantc.core.uicommons.client.ErrorHandler;
 
-import com.extjs.gxt.ui.client.Style.LayoutRegion;
-import com.extjs.gxt.ui.client.event.BorderLayoutEvent;
-import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.Listener;
-import com.extjs.gxt.ui.client.util.Margins;
 import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
-import com.extjs.gxt.ui.client.widget.layout.FlowLayout;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -27,8 +20,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public class TitoPanel extends LayoutContainer {
     private TemplateTabPanel pnlAppTemplate;
-    private Component content;
-    private final FlowLayout layout;
     public static String tag;
 
     /**
@@ -38,17 +29,7 @@ public class TitoPanel extends LayoutContainer {
      */
     public TitoPanel(String winTag) {
         tag = winTag;
-        // build top level layout
-        layout = new FlowLayout(0);
-
-        // make sure we re-draw when a panel expands
-        layout.addListener(Events.Expand, new Listener<BorderLayoutEvent>() {
-            @Override
-            public void handleEvent(BorderLayoutEvent be) {
-                layout();
-            }
-        });
-        setLayout(layout);
+        setLayout(new FitLayout());
     }
     
     public void cleanup() {
@@ -67,31 +48,15 @@ public class TitoPanel extends LayoutContainer {
      * @param view a new component to set in the center of the BorderLayout.
      */
     public void replaceContent(Component view) {
-        if (content != null) {
-            remove(content);
-        }
+        removeAll();
 
-        content = view;
-
-        BorderLayoutData data = new BorderLayoutData(LayoutRegion.CENTER);
-        data.setMargins(new Margins(0));
-
-        if (content != null) {
-            add(content, data);
+        if (view != null) {
+            add(view);
         }
 
         if (isRendered()) {
             layout();
         }
-    }
-
-    public void reset() {
-        // clear our center
-        if (content != null) {
-            remove(content);
-        }
-
-        content = null;
     }
 
     public void newTool() {
@@ -144,6 +109,7 @@ public class TitoPanel extends LayoutContainer {
     	return null;
     }
 
+    @Override
     public String getId() {
         if (pnlAppTemplate != null) {
             return pnlAppTemplate.getTitoId();

@@ -12,6 +12,7 @@ import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.Element;
 
 /**
@@ -36,6 +37,7 @@ public class PropertyGroupEditorPanel extends ContentPanel {
     private void init() {
         setHeaderVisible(false);
         setBodyStyle("background-color: #EDEDED"); //$NON-NLS-1$
+        setLayout(new FitLayout());
     }
 
     private void fireEditEvent(final String name) {
@@ -54,6 +56,7 @@ public class PropertyGroupEditorPanel extends ContentPanel {
         ret.setMaxLength(32);
 
         ret.addKeyListener(new KeyListener() {
+            @Override
             public void componentKeyUp(ComponentEvent event) {
                 if (ret.getValue() != null && !(ret.getValue().isEmpty())) {
                     group.setLabel(ret.getValue());

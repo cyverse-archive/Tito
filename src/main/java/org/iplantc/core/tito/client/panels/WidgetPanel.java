@@ -39,6 +39,7 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.Element;
@@ -76,6 +77,7 @@ public class WidgetPanel extends ContentPanel {
 
     private void init() {
         setHeaderVisible(false);
+        setLayout(new BorderLayout());
         initListeners();
         executableName = I18N.DISPLAY.executableNameDefault();
         compose();
@@ -83,18 +85,20 @@ public class WidgetPanel extends ContentPanel {
     }
 
     private void compose() {
-        add(buildCmdLinePanel());
+        BorderLayoutData data = new BorderLayoutData(LayoutRegion.NORTH, 170);
+        data.setCollapsible(true);
+        data.setSplit(true);
+        add(buildCmdLinePanel(), data);
+
         parameterPanel = new LayoutContainer(new BorderLayout());
         parameterPanel.setHeight(325);
-        add(parameterPanel);
+        add(parameterPanel, new BorderLayoutData(LayoutRegion.CENTER));
     }
     
     private LayoutContainer buildCmdLinePanel() {
         LayoutContainer panel = new LayoutContainer();
-        panel.setHeight(170);
-        panel.setStyleAttribute("background-color", "#EDEDED"); //$NON-NLS-1$ //$NON-NLS-2$
-        panel.setStyleAttribute("padding-left", "10px"); //$NON-NLS-1$ //$NON-NLS-2$
-        panel.setStyleAttribute("padding-top", "3px"); //$NON-NLS-1$ //$NON-NLS-2$
+        panel.setLayout(new FitLayout());
+        panel.setStyleAttribute("padding", "3px 10px"); //$NON-NLS-1$ //$NON-NLS-2$
 
         // add command line scratch area
         TextArea cmdLineField = new TextArea();

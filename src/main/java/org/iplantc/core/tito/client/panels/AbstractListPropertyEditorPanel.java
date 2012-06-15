@@ -4,6 +4,7 @@ import org.iplantc.core.metadata.client.property.Property;
 import org.iplantc.core.tito.client.dialogs.validation.BasicEditableList;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.Element;
 /**
  * 
@@ -28,6 +29,8 @@ public abstract class AbstractListPropertyEditorPanel extends LayoutContainer {
     public AbstractListPropertyEditorPanel(Property property, String category) {
         this.property = property;
         this.category = category;
+
+        setLayout(new FitLayout());
         allocateList(category);
     }
    

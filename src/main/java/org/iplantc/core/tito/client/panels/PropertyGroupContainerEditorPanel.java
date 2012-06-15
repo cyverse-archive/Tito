@@ -9,6 +9,7 @@ import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.layout.BoxLayout.BoxLayoutPack;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.HBoxLayout;
 import com.extjs.gxt.ui.client.widget.layout.HBoxLayout.HBoxLayoutAlign;
 import com.extjs.gxt.ui.client.widget.layout.HBoxLayoutData;
@@ -35,6 +36,7 @@ public class PropertyGroupContainerEditorPanel extends ContentPanel {
     private void init() {
         setHeaderVisible(false);
         setBodyStyle("background-color: #EDEDED"); //$NON-NLS-1$
+        setLayout(new FitLayout());
     }
 
     private LayoutContainer buildMessagePanel() {

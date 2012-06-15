@@ -14,6 +14,7 @@ import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 
 /**
  * A panel to edit static text
@@ -37,6 +38,7 @@ public class StaticTextEditorPanel extends ContentPanel {
 
     private void init() {
         setHeaderVisible(false);
+        setLayout(new FitLayout());
         setBodyStyle("background-color: #EDEDED"); //$NON-NLS-1$
         textArea = buildTextArea();
         add(buildPanel());
@@ -66,6 +68,7 @@ public class StaticTextEditorPanel extends ContentPanel {
 
     private LayoutContainer buildPanel() {
         VerticalPanel ret = new VerticalPanel();
+        ret.setLayout(new FitLayout());
         ret.setStyleAttribute("background-color", "#EDEDED"); //$NON-NLS-1$ //$NON-NLS-2$
         ret.setSpacing(8);
 

@@ -37,6 +37,7 @@ import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.NumberField;
 import com.extjs.gxt.ui.client.widget.form.TextField;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.json.client.JSONArray;
@@ -103,6 +104,7 @@ public class PropertyEditorPanel extends ContentPanel {
     private void init() {
         setHeaderVisible(false);
         setBodyStyle("background-color: #EDEDED"); //$NON-NLS-1$
+        setLayout(new FitLayout());
     }
 
     private void buildInstanceWidgets(final PropertyGroupContainer container) {
@@ -138,11 +140,13 @@ public class PropertyEditorPanel extends ContentPanel {
     private void buildDefaultValuePanel() {
         pnlDefaultValue = new VerticalPanel();
 
+        pnlDefaultValue.setLayout(new FitLayout());
         pnlDefaultValue.add(new StringDefaultValuePanel(property.getValue()));
     }
 
     private void buildBottomPanel() {
         pnlBottom = new LayoutContainer();
+        pnlBottom.setLayout(new FitLayout());
     }
 
     private void buildValidationPanel(final PropertyGroupContainer container) {
@@ -883,6 +887,7 @@ public class PropertyEditorPanel extends ContentPanel {
 
     private void buildWidgetPanel() {
         pnlWidget = new VerticalPanel();
+        pnlWidget.setLayout(new FitLayout());
         pnlWidget.setSpacing(8);
 
         pnlWidget.add(buildWidgetTypeDropdown());
@@ -892,6 +897,7 @@ public class PropertyEditorPanel extends ContentPanel {
 
     private LayoutContainer buildPanel() {
         VerticalPanel ret = new VerticalPanel();
+        ret.setLayout(new FitLayout());
         ret.setStyleAttribute("background-color", "#EDEDED"); //$NON-NLS-1$ //$NON-NLS-2$
         ret.setSpacing(8);
 
@@ -1191,6 +1197,7 @@ public class PropertyEditorPanel extends ContentPanel {
             this.field = field;
             this.field.setId(label.getText());
 
+            setLayout(new FitLayout());
             add(label);
             add(this.field);
         }

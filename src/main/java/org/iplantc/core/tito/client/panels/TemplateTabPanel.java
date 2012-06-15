@@ -130,7 +130,6 @@ public class TemplateTabPanel extends ContentPanel {
         setBodyBorder(false);
         setHeaderVisible(false);
         setLayout(new FitLayout());
-
     }
 
     private PropertyGroupContainer buildDefaultContainer() {
@@ -164,6 +163,7 @@ public class TemplateTabPanel extends ContentPanel {
         panel = new TabPanel();
         final TabItem templateItem = new TabItem(I18N.DISPLAY.template());
         templateItem.add(templateInfo);
+        templateItem.setLayout(new FitLayout());
 
         panel.add(templateItem);
 

@@ -28,6 +28,7 @@ import com.extjs.gxt.ui.client.widget.form.RadioGroup;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.form.Validator;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
@@ -122,6 +123,7 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
 
     private void init() {
         setSize(450, 450);
+        setLayout(new FitLayout());
     }
 
     private void initForm() {
