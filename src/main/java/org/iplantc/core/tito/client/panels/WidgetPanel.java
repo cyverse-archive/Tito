@@ -232,7 +232,7 @@ public class WidgetPanel extends ContentPanel {
                     JSONMetaDataObject obj = model.getObject();
 
                     if (obj != null) {
-                        if (PropertyGroupContainerUtil.isInstanceOfProperty(obj)) {
+                        if (PropertyGroupContainerUtil.isProperty(obj)) {
                             Property property = (Property)obj;
                             if (PropertyUtil.TYPE_STATIC_TEXT.equals(property.getType())) {
                                 // static text
@@ -241,14 +241,13 @@ public class WidgetPanel extends ContentPanel {
                                 // property
                                 replaceCenterPanel(new PropertyEditorPanel(container, property));
                             }
-                        } else if (PropertyGroupContainerUtil.isInstanceOfPropertyGroupContainer(obj)
-                                && !PropertyGroupContainerUtil.isInstanceOfPropertyGroup(obj)) {
+                        } else if (PropertyGroupContainerUtil.isPropertyGroup(obj)) {
+                            // property group
+                            replaceCenterPanel(new PropertyGroupEditorPanel((PropertyGroup)obj));
+                        } else if (PropertyGroupContainerUtil.isPropertyGroupContainer(obj)) {
                             // property group container
                             replaceCenterPanel(new PropertyGroupContainerEditorPanel(
                                     (PropertyGroupContainer)obj));
-                        } else {
-                            // property group
-                            replaceCenterPanel(new PropertyGroupEditorPanel((PropertyGroup)obj));
                         }
                     }
                 }
@@ -300,8 +299,8 @@ public class WidgetPanel extends ContentPanel {
         JSONMetaDataObject obj = event.getSelectedItem().getObject();
         JSONMetaDataObject parent = event.getParent().getObject();
 
-        if (PropertyGroupContainerUtil.isInstanceOfPropertyGroupContainer(parent)) {
-            if (PropertyGroupContainerUtil.isInstanceOfPropertyGroup(parent)) {
+        if (PropertyGroupContainerUtil.isPropertyGroupContainer(parent)) {
+            if (PropertyGroupContainerUtil.isPropertyGroup(parent)) {
                 PropertyGroup group = (PropertyGroup)parent;
                 group.remove(obj);
             } else {
@@ -321,8 +320,8 @@ public class WidgetPanel extends ContentPanel {
                 JSONMetaDataObject obj = event.getSelectedElement().getObject();
 
                 if (obj != null) {
-                    if (PropertyGroupContainerUtil.isInstanceOfPropertyGroupContainer(obj)) {
-                        if (PropertyGroupContainerUtil.isInstanceOfPropertyGroup(obj)) {
+                    if (PropertyGroupContainerUtil.isPropertyGroupContainer(obj)) {
+                        if (PropertyGroupContainerUtil.isPropertyGroup(obj)) {
                             PropertyGroup group = (PropertyGroup)obj;
                             group.add(addedObject);
                         } else {

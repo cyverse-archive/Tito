@@ -67,7 +67,7 @@ public class PropertyGroupContainerUtil {
      * @param obj a  JSONMetaDataObject
      * @return boolean
      */
-    public static boolean isInstanceOfPropertyGroupContainer(JSONMetaDataObject obj) {
+    public static boolean isPropertyGroupContainer(JSONMetaDataObject obj) {
         return obj instanceof PropertyGroupContainer;
     }
 
@@ -77,7 +77,7 @@ public class PropertyGroupContainerUtil {
      * @param obj  a  JSONMetaDataObject
      * @return boolean
      */
-    public static boolean isInstanceOfPropertyGroup(JSONMetaDataObject obj) {
+    public static boolean isPropertyGroup(JSONMetaDataObject obj) {
         return obj instanceof PropertyGroup;
     }
 
@@ -87,7 +87,7 @@ public class PropertyGroupContainerUtil {
      * @param obj  a  JSONMetaDataObject
      * @return boolean
      */
-    public static boolean isInstanceOfProperty(JSONMetaDataObject obj) {
+    public static boolean isProperty(JSONMetaDataObject obj) {
         return obj instanceof Property;
     }
 

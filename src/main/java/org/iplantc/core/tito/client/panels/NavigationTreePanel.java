@@ -543,8 +543,8 @@ public class NavigationTreePanel extends ContentPanel {
                 MetaDataTreeModel selected = (MetaDataTreeModel)selectedItem;
 
                 JSONMetaDataObject source = selected.get(MetaDataTreeModel.OBJECT_PROPERTY);
-                if (!PropertyGroupContainerUtil.isInstanceOfProperty(source)
-                        && !PropertyGroupContainerUtil.isInstanceOfPropertyGroup(source)) {
+                if (!PropertyGroupContainerUtil.isProperty(source)
+                        && !PropertyGroupContainerUtil.isPropertyGroup(source)) {
                     e.setCancelled(true);
                     e.getStatus().setStatus(false);
 
@@ -596,7 +596,7 @@ public class NavigationTreePanel extends ContentPanel {
                 target = targetModel.get(MetaDataTreeModel.OBJECT_PROPERTY);
             }
 
-            if (!PropertyGroupContainerUtil.isInstanceOfPropertyGroup(target)) {
+            if (!PropertyGroupContainerUtil.isPropertyGroup(target)) {
                 event.setCancelled(true);
                 event.getStatus().setStatus(false);
 
@@ -612,7 +612,7 @@ public class NavigationTreePanel extends ContentPanel {
 
                 JSONMetaDataObject source = selected.get(MetaDataTreeModel.OBJECT_PROPERTY);
 
-                if (PropertyGroupContainerUtil.isInstanceOfPropertyGroup(source)) {
+                if (PropertyGroupContainerUtil.isPropertyGroup(source)) {
                     event.setCancelled(true);
                     event.getStatus().setStatus(false);
                     skipHandleInsert = false;
@@ -646,16 +646,15 @@ public class NavigationTreePanel extends ContentPanel {
             }
 
             // make sure each drag source item can be inserted before or after the target
-            boolean dstIsProperty = PropertyGroupContainerUtil.isInstanceOfProperty(target);
-            boolean dstIsPropertyGroup = PropertyGroupContainerUtil.isInstanceOfPropertyGroup(target);
+            boolean dstIsProperty = PropertyGroupContainerUtil.isProperty(target);
+            boolean dstIsPropertyGroup = PropertyGroupContainerUtil.isPropertyGroup(target);
 
             for (ModelData selectedItem : tree.getSelectionModel().getSelectedItems()) {
                 MetaDataTreeModel selected = (MetaDataTreeModel)selectedItem;
                 JSONMetaDataObject source = selected.get(MetaDataTreeModel.OBJECT_PROPERTY);
 
-                boolean srcIsProperty = PropertyGroupContainerUtil.isInstanceOfProperty(source);
-                boolean srcIsPropertyGroup = PropertyGroupContainerUtil
-                        .isInstanceOfPropertyGroup(source);
+                boolean srcIsProperty = PropertyGroupContainerUtil.isProperty(source);
+                boolean srcIsPropertyGroup = PropertyGroupContainerUtil.isPropertyGroup(source);
 
                 if ((srcIsProperty && !dstIsProperty) || (srcIsPropertyGroup && !dstIsPropertyGroup)) {
                     event.setCancelled(true);
@@ -695,14 +694,14 @@ public class NavigationTreePanel extends ContentPanel {
                 srcParent.remove(childModel);
                 childModel.setParent(destParent);
 
-                if (PropertyGroupContainerUtil.isInstanceOfPropertyGroup(jsonmetaChild)) {
+                if (PropertyGroupContainerUtil.isPropertyGroup(jsonmetaChild)) {
                     PropertyGroup childGroup = (PropertyGroup)jsonmetaChild;
                     PropertyGroupContainer srcContainer = (PropertyGroupContainer)jsonmetaParent;
 
                     srcContainer.remove(childGroup);
                     propertyGroupCollection.add(childGroup);
-                } else if (PropertyGroupContainerUtil.isInstanceOfProperty(jsonmetaChild)
-                        && PropertyGroupContainerUtil.isInstanceOfPropertyGroup(jsonmetaParent)) {
+                } else if (PropertyGroupContainerUtil.isProperty(jsonmetaChild)
+                        && PropertyGroupContainerUtil.isPropertyGroup(jsonmetaParent)) {
                     Property childProperty = (Property)jsonmetaChild;
                     PropertyGroup srcGroup = (PropertyGroup)jsonmetaParent;
 
@@ -714,7 +713,7 @@ public class NavigationTreePanel extends ContentPanel {
             if (propertyGroupCollection.size() > 0) {
                 destPropertyGroupContainer.insertGroups(index, propertyGroupCollection);
             } else if (propertyCollection.size() > 0
-                    && PropertyGroupContainerUtil.isInstanceOfPropertyGroup(destPropertyGroupContainer)) {
+                    && PropertyGroupContainerUtil.isPropertyGroup(destPropertyGroupContainer)) {
                 PropertyGroup destPropertyGroup = (PropertyGroup)destPropertyGroupContainer;
                 destPropertyGroup.insertProperties(index, propertyCollection);
             }
