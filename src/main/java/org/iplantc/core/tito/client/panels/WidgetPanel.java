@@ -52,6 +52,9 @@ import com.google.gwt.user.client.Element;
  *
  */
 public class WidgetPanel extends ContentPanel {
+    private static final String ID_FIELD_CMDLN_REF = "idFieldCmdlnReference"; //$NON-NLS-1$
+    private static final String ID_FIELD_CMDLN_PREVIEW = "idFieldCmdlnPreview"; //$NON-NLS-1$
+
     private final PropertyGroupContainer container;
     private LayoutContainer parameterPanel;
     private NavigationTreePanel west;
@@ -102,16 +105,21 @@ public class WidgetPanel extends ContentPanel {
 
         // add command line scratch area
         TextArea cmdLineField = new TextArea();
+        cmdLineField.setId(ID_FIELD_CMDLN_REF);
         cmdLineField.setWidth(750);
+
         panel.add(new Label(I18N.DISPLAY.enterCmdLineArgs()));
         panel.add(cmdLineField);
         
         // add command line preview area
         txtCmdLinePreview = new TextArea();
+        txtCmdLinePreview.setId(ID_FIELD_CMDLN_PREVIEW);
         txtCmdLinePreview.setWidth(750);
         txtCmdLinePreview.setReadOnly(true);
+
         panel.add(new Label(I18N.DISPLAY.cmdLinePreview()));
         panel.add(txtCmdLinePreview);
+
         return panel;
     }
     
