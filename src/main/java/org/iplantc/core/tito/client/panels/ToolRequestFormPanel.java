@@ -165,6 +165,24 @@ public class ToolRequestFormPanel extends LayoutContainer {
     }
 
     private void setDefaultValues() {
+        UserInfo user = UserInfo.getInstance();
+        if (user != null) {
+            userField.setValue(user.getUsername());
+
+            String firstName = user.getFirstName();
+            String lastName = user.getLastName();
+            if (!(firstName == null || firstName.isEmpty()) && !(lastName == null || lastName.isEmpty())) {
+                nameField.setValue(firstName + " " + lastName); //$NON-NLS-1$
+                nameField.setReadOnly(true);
+            }
+
+            String email = user.getEmail();
+            if (!(email == null || email.isEmpty())) {
+                emailField.setValue(email);
+                emailField.setReadOnly(true);
+            }
+        }
+
         srcUploadOptionField.setValue(true);
         srcLinkField.setVisible(false);
         srcLinkField.setEnabled(false);
@@ -203,26 +221,23 @@ public class ToolRequestFormPanel extends LayoutContainer {
         buildSrcOptionsFields(I18N.DISPLAY.link(), I18N.DISPLAY.upload(),
                 ASTERISK_HTML + I18N.DISPLAY.srcLinkPrompt());
 
-        nameField = buildTextField(I18N.DISPLAY.name(), false, null, NAME, null, 100);
-        emailField = buildTextField(I18N.DISPLAY.email(), false, getEmail(), EMAIL,
-                new BasicEmailValidator(), 256);
-        phoneField = buildTextField(I18N.DISPLAY.phone(), true, null, PHONE, null, 30);
-
-        toolNameField = buildTextField(I18N.DISPLAY.toolName(), false, null, NAME,
-                new BasicNameValidator(), 64);
-        srcLinkField = buildTextField(null, false, null, SRC_LINK, new BasicUrlValidator(), 1024);
-        toolDescription = buildTextArea(I18N.DISPLAY.toolDesc(), false, null, TOOL_DESCRIPTION, 1024);
-        versionField = buildTextField(I18N.DISPLAY.version(), false, null, VERSION, null, 64);
-        docLinkField = buildTextField(I18N.DISPLAY.docLink(), false, null, DOCUMENTATION,
+        nameField = buildTextField(I18N.DISPLAY.name(), false, NAME, null, 100);
+        emailField = buildTextField(I18N.DISPLAY.email(), false, EMAIL, new BasicEmailValidator(), 256);
+        phoneField = buildTextField(I18N.DISPLAY.phone(), true, PHONE, null, 30);
+        toolNameField = buildTextField(I18N.DISPLAY.toolName(), false, NAME, new BasicNameValidator(),
+                64);
+        srcLinkField = buildTextField(null, false, SRC_LINK, new BasicUrlValidator(), 1024);
+        toolDescription = buildTextArea(I18N.DISPLAY.toolDesc(), false, TOOL_DESCRIPTION, 1024);
+        versionField = buildTextField(I18N.DISPLAY.version(), false, VERSION, null, 64);
+        docLinkField = buildTextField(I18N.DISPLAY.docLink(), false, DOCUMENTATION,
                 new BasicUrlValidator(), 1024);
         srcUpldField = buildFileUpldField(null, false, SRC_UPLOAD);
         testDataUpldField = buildFileUpldField(I18N.DISPLAY.upldTestData(), false, TEST_DATA);
-        cmdLineField = buildTextArea(I18N.DISPLAY.cmdLineRun(), false, null, CMD_LINE, 1024);
+        cmdLineField = buildTextArea(I18N.DISPLAY.cmdLineRun(), false, CMD_LINE, 1024);
         addnlUpldField = buildFileUpldField(I18N.DISPLAY.addnlData(), true, ADDNL_DATA);
-        addnlInfoField = buildTextArea(I18N.DISPLAY.comments(), true, null, ADDNL_INFO, 1024);
+        addnlInfoField = buildTextArea(I18N.DISPLAY.comments(), true, ADDNL_INFO, 1024);
         threadingCombo = buildThreadingOptionsCombo(I18N.DISPLAY.isMultiThreaded(), false,
                 MULTI_THREADED);
-
     }
 
     private SimpleComboBox<String> buildThreadingOptionsCombo(String label, boolean b, String name) {
@@ -239,9 +254,9 @@ public class ToolRequestFormPanel extends LayoutContainer {
         return combo;
     }
 
-    private TextArea buildTextArea(String label, boolean allowBlank, String defaultVal, String name,
-            int maxLength) {
+    private TextArea buildTextArea(String label, boolean allowBlank, String name, int maxLength) {
         TextArea field = new BoundedTextArea();
+
         field.setMaxLength(maxLength);
         field.setName(name);
         field.setId(ID + name);
@@ -252,9 +267,7 @@ public class ToolRequestFormPanel extends LayoutContainer {
         field.setAllowBlank(allowBlank);
         field.setValidateOnBlur(true);
         field.setStyleAttribute("padding-bottom", "5px"); //$NON-NLS-1$ //$NON-NLS-2$
-        if (defaultVal != null) {
-            field.setValue(defaultVal);
-        }
+
         return field;
     }
 
@@ -286,9 +299,10 @@ public class ToolRequestFormPanel extends LayoutContainer {
      * @param maxLength
      * @return
      */
-    private TextField<String> buildTextField(String label, boolean allowBlank, String defaultVal,
-            String name, Validator validator, int maxLength) {
+    private TextField<String> buildTextField(String label, boolean allowBlank, String name,
+            Validator validator, int maxLength) {
         BoundedTextField<String> field = new BoundedTextField<String>();
+
         field.setMaxLength(maxLength);
         field.setName(name);
         field.setId(ID + name);
@@ -304,9 +318,6 @@ public class ToolRequestFormPanel extends LayoutContainer {
         field.setValidateOnBlur(true);
         field.setStyleAttribute("padding-bottom", "5px"); //$NON-NLS-1$ //$NON-NLS-2$
 
-        if (defaultVal != null) {
-            field.setValue(defaultVal);
-        }
         if (validator != null) {
             field.setValidator(validator);
         }
@@ -362,15 +373,6 @@ public class ToolRequestFormPanel extends LayoutContainer {
         userField = new HiddenField<String>();
         userField.setName(USER_ID);
         userField.setId(ID + USER_ID);
-
-        UserInfo info = UserInfo.getInstance();
-        userField.setValue(info.getUsername());
-    }
-
-    private String getEmail() {
-        UserInfo info = UserInfo.getInstance();
-
-        return info.getEmail();
     }
 
     private void buildSrcOptionsFields(String urlLabel, String upldLabel, String grpLabel) {
