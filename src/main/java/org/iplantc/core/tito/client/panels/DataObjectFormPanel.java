@@ -3,7 +3,6 @@ package org.iplantc.core.tito.client.panels;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.iplantc.core.client.widgets.BoundedTextField;
 import org.iplantc.core.jsonutil.JsonUtil;
 import org.iplantc.core.metadata.client.property.DataObject;
 import org.iplantc.core.tito.client.I18N;
@@ -15,24 +14,21 @@ import org.iplantc.core.uicommons.client.ErrorHandler;
 
 import com.extjs.gxt.ui.client.Style.SortDir;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
-import com.extjs.gxt.ui.client.event.KeyListener;
 import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.store.ListStore;
+import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.Radio;
 import com.extjs.gxt.ui.client.widget.form.RadioGroup;
-import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.extjs.gxt.ui.client.widget.form.Validator;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -43,23 +39,16 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * 
  */
 public abstract class DataObjectFormPanel extends VerticalPanel {
-    private static final String ID_FLD_OP_NAME = "idFldOpName";
+    private static final String ID_INFO_TYPE_CBO = "idInfoTypeCbo"; //$NON-NLS-1$
+    private static final String ID_RADIO_MANY = "idRadioMany"; //$NON-NLS-1$
+    private static final String ID_RADIO_FOLDER = "idRadioFolder"; //$NON-NLS-1$
+    private static final String ID_RADIO_ONE = "idRadioOne"; //$NON-NLS-1$
 
-	private static final String ID_INFO_TYPE_CBO = "idInfoTypeCbo";
-
-	private static final String ID_RADIO_MANY = "idRadioMany";
-
-	private static final String ID_RADIO_FOLDER = "idRadioFolder";
-
-	private static final String ID_RADIO_ONE = "idRadioOne";
-
-	protected final DataObject data;
+    protected final DataObject data;
 
     protected RadioGroup multiplicityGroup;
     protected ComboBox<InfoType> infoTypeField;
     protected Grid<FileFormat> formatField;
-    protected TextField<String> outputFileNameField;
-    private Command outputFilenameChangeCommand;
 
     /**
      * Create a new instance of DataObjectFormPanel
@@ -73,18 +62,7 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
         init();
         initForm();
 
-        initFieldValues(obj);
-
         initInfoTypes();
-    }
-
-    /**
-     * Sets a command that will be called when the "output file" field changes.
-     * 
-     * @param cmd
-     */
-    public void setOutputFilenameChangeCommand(Command cmd) {
-        outputFilenameChangeCommand = cmd;
     }
 
     /**
@@ -94,14 +72,7 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
      */
     protected void initFieldValues(DataObject obj) {
         if (obj != null) {
-            initTextField(outputFileNameField, obj.getOutputFilename());
             initMultiplicity(obj.getMultiplicity());
-        }
-    }
-
-    private void initTextField(TextField<String> field, String value) {
-        if (value != null && !value.isEmpty()) {
-            field.setValue(value);
         }
     }
     
@@ -215,12 +186,14 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
     /**
      * Add fields to this form
      */
-    protected abstract void addFields();
+    protected void addFields() {
+        add(new Label(multiplicityGroup.getFieldLabel() + ":")); //$NON-NLS-1$
+        add(multiplicityGroup);
+        add(new Label(infoTypeField.getFieldLabel() + ":")); //$NON-NLS-1$
+        add(infoTypeField);
+    }
 
     protected void buildFields() {
-        outputFileNameField = buildTextField(ID_FLD_OP_NAME,I18N.DISPLAY.outputFileName(), false, null, 100, null,
-                new OutputFilenameKeyUpCommand());
-
         if (data.getType().equals(DataObject.INPUT_TYPE)) {
             buildMultiplicityRadio(I18N.DISPLAY.inputMultiplicityOption());
         } else {
@@ -228,37 +201,6 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
         }
         
         buildInfoTypeComboBox(I18N.DISPLAY.infoTypePrompt(), new ArrayList<InfoType>());
-    }
-
-    private TextField<String> buildTextField(String id,String label, boolean allowBlank, String defaultVal,
-            int maxLength, Validator validator, final KeyUpCommand cmdKeyUp) {
-        final TextField<String> field = new BoundedTextField<String>();
-
-        field.setFieldLabel(label);
-        field.setId(id);
-        field.setAllowBlank(allowBlank);
-        field.setMaxLength(maxLength);
-        field.setValidateOnBlur(true);
-        field.setStyleAttribute("padding-bottom", "5px"); //$NON-NLS-1$ //$NON-NLS-2$
-
-        if (defaultVal != null) {
-            field.setValue(defaultVal);
-        }
-
-        if (validator != null) {
-            field.setValidator(validator);
-        }
-
-        if (cmdKeyUp != null) {
-            field.addKeyListener(new KeyListener() {
-                @Override
-                public void componentKeyUp(ComponentEvent event) {
-                    cmdKeyUp.execute(field.getValue());
-                }
-            });
-        }
-
-        return field;
     }
     
     private void setInfoType() {
@@ -321,31 +263,6 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
                 ErrorHandler.post(I18N.DISPLAY.cantLoadInfoTypes(), caught);
             }
         });
-    }
-
-    public String getOutputFilename() {
-        String filename = outputFileNameField.getValue();
-        return filename == null ? "" : filename; //$NON-NLS-1$
-    }
-
-    private interface KeyUpCommand {
-        void handleNullInput();
-
-        void execute(String value);
-    }
-
-    private class OutputFilenameKeyUpCommand implements KeyUpCommand {
-        @Override
-        public void execute(String value) {
-            data.setOutputFilename(value);
-            outputFilenameChangeCommand.execute();
-        }
-
-        @Override
-        public void handleNullInput() {
-            data.setOutputFilename(""); //$NON-NLS-1$
-            outputFilenameChangeCommand.execute();
-        }
     }
 
 }
