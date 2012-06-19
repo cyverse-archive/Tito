@@ -455,7 +455,7 @@ public class PropertyEditorPanel extends ContentPanel {
                 cbxOptionFlag.setEnabled(false);
                 cbxRequired.setEnabled(false);
                 cbxImplicitOutput.setVisible(false);
-                cbxDisplayInGui.setValue(true);
+
                 containerPropertyTypeEditor = pnlWidget;
                 break;
 
@@ -463,8 +463,8 @@ public class PropertyEditorPanel extends ContentPanel {
                 cbxDisplayInGui.setEnabled(true);
                 cbxOptionFlag.setEnabled(true);
                 cbxRequired.setEnabled(true);
-                cbxDisplayInGui.setValue(true);
                 cbxImplicitOutput.setVisible(false);
+
                 containerPropertyTypeEditor = pnlWidget;
                 break;
         }
