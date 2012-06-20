@@ -1,6 +1,7 @@
 package org.iplantc.core.tito.client.panels;
 
 import org.iplantc.core.metadata.client.property.Property;
+import org.iplantc.core.metadata.client.property.PropertyTypeCategory;
 import org.iplantc.core.tito.client.dialogs.validation.BasicEditableList;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
@@ -17,7 +18,7 @@ import com.google.gwt.user.client.Element;
 public abstract class AbstractListPropertyEditorPanel extends LayoutContainer {
 
     protected final Property property;
-    protected final String category;
+    protected final PropertyTypeCategory category;
     protected BasicEditableList list;
     
     /**
@@ -26,7 +27,7 @@ public abstract class AbstractListPropertyEditorPanel extends LayoutContainer {
      * @param property property that is currently edited
      * @param category category for this property
      */
-    public AbstractListPropertyEditorPanel(Property property, String category) {
+    public AbstractListPropertyEditorPanel(Property property, PropertyTypeCategory category) {
         this.property = property;
         this.category = category;
 
@@ -39,7 +40,7 @@ public abstract class AbstractListPropertyEditorPanel extends LayoutContainer {
     * 
     * @param category
     */
-   protected abstract void allocateList(final String category);
+    protected abstract void allocateList(final PropertyTypeCategory category);
    
    /**
     * {@inheritDoc}

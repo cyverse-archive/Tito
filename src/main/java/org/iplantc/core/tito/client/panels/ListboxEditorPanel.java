@@ -17,7 +17,7 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.Command;
 
 public class ListboxEditorPanel extends AbstractListPropertyEditorPanel {
-    public ListboxEditorPanel(final String category, final Property property) {
+    public ListboxEditorPanel(final PropertyTypeCategory category, final Property property) {
         super(property, category);
     }
 
@@ -49,12 +49,12 @@ public class ListboxEditorPanel extends AbstractListPropertyEditorPanel {
     }
 
     @Override
-    protected void allocateList(final String category) {
+    protected void allocateList(final PropertyTypeCategory category) {
         JSONArray values = parseMustContainValues();
+        UpdatePropertyWithList updateCmd = new UpdatePropertyWithList();
 
-        list = (category.equalsIgnoreCase(PropertyTypeCategory.NUMBER.toString())) ? new EditableNumberList(
-                values, new UpdatePropertyWithList()) : new EditableStringList(values,
-                new UpdatePropertyWithList());
+        list = (category == PropertyTypeCategory.NUMBER) ? new EditableNumberList(values, updateCmd)
+                : new EditableStringList(values, updateCmd);
     }
 
     /**

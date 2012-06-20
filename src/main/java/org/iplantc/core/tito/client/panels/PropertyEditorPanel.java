@@ -854,7 +854,7 @@ public class PropertyEditorPanel extends ContentPanel {
         pnlBottom.removeAll();
 
         if (isSelectionWidget) {
-            pnlBottom.add(new ListboxEditorPanel(category.toString(), property));
+            pnlBottom.add(new ListboxEditorPanel(category, property));
         } else {
         	pnlValidation.enable();
             pnlBottom.add(pnlValidation);
