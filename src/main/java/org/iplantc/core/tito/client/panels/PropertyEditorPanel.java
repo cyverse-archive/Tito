@@ -130,11 +130,13 @@ public class PropertyEditorPanel extends ContentPanel {
     private void buildCommandLineOptionPanel() {
         String caption = I18N.DISPLAY.flag();
 
-        TextField<String> field = buildTextField(ID_FLD_CMD_L_OPTN,property.getName(), 128, new FlagEditKeyUpCommand(),
-                true);
+        TextField<String> field = buildTextField(ID_FLD_CMD_L_OPTN, property.getName(), 128,
+                new FlagEditKeyUpCommand());
+        field.focus();
+
         IPlantValidator.setRegexRestrictedCmdLineChars(field, caption);
 
-        pnlCommandLineOption = buildTextField(caption, field);
+        pnlCommandLineOption = buildTextFieldContainer(caption, field);
     }
 
     private void buildDefaultValuePanel() {
@@ -216,7 +218,7 @@ public class PropertyEditorPanel extends ContentPanel {
      * @param changeListener a listener to fire when the field's value changes; can be null
      * @return a configured instance of the NumberField GXT widget
      */
-    private LayoutContainer buildNumberFieldPanel(final String caption, final Number value, int width,
+    private LayoutContainer buildNumberFieldContainer(final String caption, final Number value, int width,
             final KeyUpCommand cmdKeyUp, boolean setFocus) {
         LayoutContainer ret = new LayoutContainer();
         
@@ -226,20 +228,16 @@ public class PropertyEditorPanel extends ContentPanel {
         return ret;
     }
 
-    private TextFieldContainer buildTextField(String id, final String caption, final String value, int width,
-            final KeyUpCommand cmdKeyUp) {
-        return buildTextField(caption, buildTextField(id, value, width, cmdKeyUp, false));
-    }
-
-    private TextFieldContainer buildTextField(final String caption, TextField<String> field) {
+    private TextFieldContainer buildTextFieldContainer(final String caption, TextField<String> field) {
         Label label = new Label(caption + ":"); //$NON-NLS-1$
         return new TextFieldContainer(label, field);
     }
 
-    private TextField<String> buildTextField(String id, final String value, int width, final KeyUpCommand cmdKeyUp,
-            boolean setFocus) {
+    private TextField<String> buildTextField(String id, final String value, int width,
+            final KeyUpCommand cmdKeyUp) {
         final TextField<String> ret = new TextField<String>();
-        setId(id);
+
+        ret.setId(id);
         ret.setWidth(width);
         ret.setSelectOnFocus(true);
         ret.setValue(value);
@@ -252,10 +250,6 @@ public class PropertyEditorPanel extends ContentPanel {
                     cmdKeyUp.execute(ret.getValue());
                 }
             });
-        }
-
-        if (setFocus) {
-            ret.focus();
         }
 
         return ret;
@@ -659,8 +653,10 @@ public class PropertyEditorPanel extends ContentPanel {
     }
 
     private void buildToolTipPanel() {
-        pnlToolTip = buildTextField(ID_TOOL_TIP, I18N.DISPLAY.toolTipText(), property.getDescription(), 480,
-                new DescriptionEditKeyUpCommand());
+        pnlToolTip = buildTextFieldContainer(
+                I18N.DISPLAY.toolTipText(),
+                buildTextField(ID_TOOL_TIP, property.getDescription(), 480,
+                        new DescriptionEditKeyUpCommand()));
     }
 
     private void updateValidationPanelOnUIChange(boolean displayUI) {
@@ -840,8 +836,8 @@ public class PropertyEditorPanel extends ContentPanel {
     }
 
     private void buildPropertyLabel() {
-        pnlPropertyLabel = buildTextField( ID_PROP_LBL, I18N.DISPLAY.label(), property.getLabel(), 255,
-                new LabelEditKeyUpCommand());
+        pnlPropertyLabel = buildTextFieldContainer(I18N.DISPLAY.label(),
+                buildTextField(ID_PROP_LBL, property.getLabel(), 255, new LabelEditKeyUpCommand()));
     }
 
     private void updatePanelsAfterWidgetTypeChange(final PropertyTypeCategory category,
@@ -1079,11 +1075,12 @@ public class PropertyEditorPanel extends ContentPanel {
 		public StringDefaultValuePanel(final String value) {
             String caption = I18N.DISPLAY.defaultValueLabel();
 
-            TextField<String> field = buildTextField(ID_FLD_DEF_STR_VAL,value, 255, new ValueEditKeyUpCommand(), false);
+            TextField<String> field = buildTextField(ID_FLD_DEF_STR_VAL, value, 255,
+                    new ValueEditKeyUpCommand());
             
             IPlantValidator.setRegexRestrictedArgValueChars(field, caption);
 
-            add(buildTextField(caption, field));
+            add(buildTextFieldContainer(caption, field));
         }
     }
 
@@ -1127,7 +1124,7 @@ public class PropertyEditorPanel extends ContentPanel {
      */
     private class NumberDefaultValuePanel extends VerticalPanel {
         public NumberDefaultValuePanel(String value) {
-            add(buildNumberFieldPanel(I18N.DISPLAY.defaultValue(), parseNumberFromString(value), 64,
+            add(buildNumberFieldContainer(I18N.DISPLAY.defaultValue(), parseNumberFromString(value), 64,
                     new NumberValueEditKeyUpCommand(), false));
         }
 
