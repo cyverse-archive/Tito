@@ -2,6 +2,7 @@ package org.iplantc.core.tito.client.panels;
 
 import org.iplantc.core.client.widgets.BoundedTextField;
 import org.iplantc.core.metadata.client.property.DataObject;
+import org.iplantc.core.metadata.client.property.Property;
 import org.iplantc.core.tito.client.I18N;
 
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -23,10 +24,13 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
     protected TextField<String> outputFileNameField;
     private Command outputFilenameChangeCommand;
 
-    public OutputDataObjectFormPanel(DataObject obj) {
-        super(obj);
+    public OutputDataObjectFormPanel(Property property) {
+        super(property);
+    }
 
-        initFieldValues(obj);
+    @Override
+    protected String getMultiplicityLabel() {
+        return I18N.DISPLAY.outPutMultiplicityOption();
     }
 
     @Override
@@ -119,13 +123,13 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
     private class OutputFilenameKeyUpCommand implements KeyUpCommand {
         @Override
         public void execute(String value) {
-            data.setOutputFilename(value);
+            getDataObject().setOutputFilename(value);
             outputFilenameChangeCommand.execute();
         }
 
         @Override
         public void handleNullInput() {
-            data.setOutputFilename(""); //$NON-NLS-1$
+            getDataObject().setOutputFilename(""); //$NON-NLS-1$
             outputFilenameChangeCommand.execute();
         }
     }

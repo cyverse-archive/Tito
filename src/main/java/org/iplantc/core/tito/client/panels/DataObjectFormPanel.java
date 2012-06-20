@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.iplantc.core.jsonutil.JsonUtil;
 import org.iplantc.core.metadata.client.property.DataObject;
+import org.iplantc.core.metadata.client.property.Property;
 import org.iplantc.core.tito.client.I18N;
 import org.iplantc.core.tito.client.models.FileFormat;
 import org.iplantc.core.tito.client.models.InfoType;
@@ -44,7 +45,7 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
     private static final String ID_RADIO_FOLDER = "idRadioFolder"; //$NON-NLS-1$
     private static final String ID_RADIO_ONE = "idRadioOne"; //$NON-NLS-1$
 
-    protected final DataObject data;
+    protected final Property property;
 
     protected RadioGroup multiplicityGroup;
     protected ComboBox<InfoType> infoTypeField;
@@ -56,13 +57,23 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
      * @param obj instance of DataObject
      * @param paramType DataObject type - input or output
      */
-    public DataObjectFormPanel(DataObject obj) {
-        data = obj;
+    protected DataObjectFormPanel(Property property) {
+        this.property = property;
 
         init();
         initForm();
 
+        initFieldValues(getDataObject());
+
         initInfoTypes();
+    }
+
+    protected DataObject getDataObject() {
+        if (property != null) {
+            return property.getDataObject();
+        }
+
+        return null;
     }
 
     /**
@@ -102,6 +113,8 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
         addFields();
     }
    
+    protected abstract String getMultiplicityLabel();
+
     private void buildMultiplicityRadio(String label) {
         multiplicityGroup = new RadioGroup();
         multiplicityGroup.setFieldLabel(label);
@@ -111,7 +124,7 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
             protected void onClick(ComponentEvent be) {
                 super.onClick(be);
 
-                data.setMultiplicity(DataObject.MULTIPLICITY_ONE);
+                getDataObject().setMultiplicity(DataObject.MULTIPLICITY_ONE);
             }
         };
         one.setBoxLabel(I18N.DISPLAY.multiplicityOne());
@@ -123,7 +136,7 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
             protected void onClick(ComponentEvent be) {
                 super.onClick(be);
 
-                data.setMultiplicity(DataObject.MULTIPLICITY_MANY);
+                getDataObject().setMultiplicity(DataObject.MULTIPLICITY_MANY);
             }
         };
         many.setBoxLabel(I18N.DISPLAY.multiplicityMany());
@@ -134,7 +147,7 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
             protected void onClick(ComponentEvent be) {
                 super.onClick(be);
 
-                data.setMultiplicity(DataObject.MULTIPLICITY_FOLDER);
+                getDataObject().setMultiplicity(DataObject.MULTIPLICITY_FOLDER);
             }
         };
         folder.setBoxLabel(I18N.DISPLAY.folder());
@@ -173,10 +186,10 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
                 InfoType type = sce.getSelectedItem();
                 if (type != null) {
                     if (type.getId() != null) {
-                        data.setFileTypeId(type.getId());
+                        getDataObject().setFileTypeId(type.getId());
                     }
                     if (type.getName() != null) {
-                        data.setFileType(type.getName());
+                        getDataObject().setFileType(type.getName());
                     }
                 }
             }
@@ -194,12 +207,7 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
     }
 
     protected void buildFields() {
-        if (data.getType().equals(DataObject.INPUT_TYPE)) {
-            buildMultiplicityRadio(I18N.DISPLAY.inputMultiplicityOption());
-        } else {
-            buildMultiplicityRadio(I18N.DISPLAY.outPutMultiplicityOption());
-        }
-        
+        buildMultiplicityRadio(getMultiplicityLabel());
         buildInfoTypeComboBox(I18N.DISPLAY.infoTypePrompt(), new ArrayList<InfoType>());
     }
     
@@ -207,13 +215,13 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
         ListStore<InfoType> store = infoTypeField.getStore();
 
         InfoType value = null;
-        if (data != null) {
+        if (getDataObject() != null) {
             // select the info type based on the file info type ID.
-            value = store.findModel(InfoType.ID, data.getFileInfoTypeId());
+            value = store.findModel(InfoType.ID, getDataObject().getFileInfoTypeId());
 
             if (value == null) {
                 // The file info type ID is not available, so search for the file info type by name next.
-                value = store.findModel(InfoType.NAME, data.getFileInfoType());
+                value = store.findModel(InfoType.NAME, getDataObject().getFileInfoType());
             }
         }
 

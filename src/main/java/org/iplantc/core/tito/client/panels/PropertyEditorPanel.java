@@ -423,7 +423,7 @@ public class PropertyEditorPanel extends ContentPanel {
 
                 updateDataObjectFromProperty();
 
-                containerPropertyTypeEditor = new InputDataObjectFormPanel(property.getDataObject());
+                containerPropertyTypeEditor = new InputDataObjectFormPanel(property);
                 break;
 
             case OUTPUT:
@@ -438,8 +438,7 @@ public class PropertyEditorPanel extends ContentPanel {
 
                 updateDataObjectFromProperty();
 
-                OutputDataObjectFormPanel outputPnl = new OutputDataObjectFormPanel(
-                        property.getDataObject());
+                OutputDataObjectFormPanel outputPnl = new OutputDataObjectFormPanel(property);
                 outputPnl.setOutputFilenameChangeCommand(buildFilenameChangeCommand());
                 containerPropertyTypeEditor = outputPnl;
                 break;
