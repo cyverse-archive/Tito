@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.iplantc.core.client.widgets.BoundedTextField;
 import org.iplantc.core.client.widgets.validator.IPlantValidator;
 import org.iplantc.core.jsonutil.JsonUtil;
 import org.iplantc.core.metadata.client.PropertyType;
@@ -63,7 +64,8 @@ public class PropertyEditorPanel extends ContentPanel {
     private static final String ID_PROP_LBL = "idPropLbl"; //$NON-NLS-1$
     private static final String ID_FIELD_NUM = "idFieldNum"; //$NON-NLS-1$
     private static final String ID_FLD_CMD_L_OPTN = "idFldCmdLOptn"; //$NON-NLS-1$
-	private final Property property;
+
+    private final Property property;
     private LayoutContainer containerMain;
     private LayoutContainer containerPropertyTypeEditor;
     private VerticalPanel pnlWidget;
@@ -130,7 +132,7 @@ public class PropertyEditorPanel extends ContentPanel {
     private void buildCommandLineOptionPanel() {
         String caption = I18N.DISPLAY.flag();
 
-        TextField<String> field = buildTextField(ID_FLD_CMD_L_OPTN, property.getName(), 128,
+        TextField<String> field = buildTextField(ID_FLD_CMD_L_OPTN, property.getName(), 255, 128,
                 new FlagEditKeyUpCommand());
         field.focus();
 
@@ -233,14 +235,15 @@ public class PropertyEditorPanel extends ContentPanel {
         return new TextFieldContainer(label, field);
     }
 
-    private TextField<String> buildTextField(String id, final String value, int width,
+    private TextField<String> buildTextField(String id, final String value, int maxLength, int width,
             final KeyUpCommand cmdKeyUp) {
-        final TextField<String> ret = new TextField<String>();
+        final TextField<String> ret = new BoundedTextField<String>();
 
         ret.setId(id);
+        ret.setValue(value);
+        ret.setMaxLength(maxLength);
         ret.setWidth(width);
         ret.setSelectOnFocus(true);
-        ret.setValue(value);
         ret.setAutoValidate(true);
 
         if (cmdKeyUp != null) {
@@ -654,7 +657,7 @@ public class PropertyEditorPanel extends ContentPanel {
     private void buildToolTipPanel() {
         pnlToolTip = buildTextFieldContainer(
                 I18N.DISPLAY.toolTipText(),
-                buildTextField(ID_TOOL_TIP, property.getDescription(), 480,
+                buildTextField(ID_TOOL_TIP, property.getDescription(), 255, 480,
                         new DescriptionEditKeyUpCommand()));
     }
 
@@ -836,7 +839,7 @@ public class PropertyEditorPanel extends ContentPanel {
 
     private void buildPropertyLabel() {
         pnlPropertyLabel = buildTextFieldContainer(I18N.DISPLAY.label(),
-                buildTextField(ID_PROP_LBL, property.getLabel(), 255, new LabelEditKeyUpCommand()));
+                buildTextField(ID_PROP_LBL, property.getLabel(), 255, 255, new LabelEditKeyUpCommand()));
     }
 
     private void updatePanelsAfterWidgetTypeChange(final PropertyTypeCategory category,
@@ -1074,7 +1077,7 @@ public class PropertyEditorPanel extends ContentPanel {
 		public StringDefaultValuePanel(final String value) {
             String caption = I18N.DISPLAY.defaultValueLabel();
 
-            TextField<String> field = buildTextField(ID_FLD_DEF_STR_VAL, value, 255,
+            TextField<String> field = buildTextField(ID_FLD_DEF_STR_VAL, value, 255, 255,
                     new ValueEditKeyUpCommand());
             
             IPlantValidator.setRegexRestrictedArgValueChars(field, caption);
