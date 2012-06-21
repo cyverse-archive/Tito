@@ -19,14 +19,12 @@ import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.Label;
-import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.Field;
 import com.extjs.gxt.ui.client.widget.form.Radio;
 import com.extjs.gxt.ui.client.widget.form.RadioGroup;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
-import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
@@ -39,13 +37,11 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * @author sriram
  * 
  */
-public abstract class DataObjectFormPanel extends VerticalPanel {
+public abstract class DataObjectFormPanel extends PropertyTypeEditorPanel {
     private static final String ID_INFO_TYPE_CBO = "idInfoTypeCbo"; //$NON-NLS-1$
     private static final String ID_RADIO_MANY = "idRadioMany"; //$NON-NLS-1$
     private static final String ID_RADIO_FOLDER = "idRadioFolder"; //$NON-NLS-1$
     private static final String ID_RADIO_ONE = "idRadioOne"; //$NON-NLS-1$
-
-    protected final Property property;
 
     protected RadioGroup multiplicityGroup;
     protected ComboBox<InfoType> infoTypeField;
@@ -58,15 +54,12 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
      * @param paramType DataObject type - input or output
      */
     protected DataObjectFormPanel(Property property) {
-        this.property = property;
-
-        init();
-        initForm();
-
-        initFieldValues(getDataObject());
+        super(property);
 
         initInfoTypes();
     }
+
+    protected abstract String getMultiplicityLabel();
 
     protected DataObject getDataObject() {
         if (property != null) {
@@ -81,7 +74,10 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
      * 
      * @param obj an instance of DataObject to be loaded into this form
      */
-    protected void initFieldValues(DataObject obj) {
+    @Override
+    protected void initFieldValues() {
+        DataObject obj = getDataObject();
+
         if (obj != null) {
             initMultiplicity(obj.getMultiplicity());
         }
@@ -102,18 +98,6 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
         }
 
     }
-
-    private void init() {
-        setSize(450, 450);
-        setLayout(new FitLayout());
-    }
-
-    private void initForm() {
-        buildFields();
-        addFields();
-    }
-   
-    protected abstract String getMultiplicityLabel();
 
     private void buildMultiplicityRadio(String label) {
         multiplicityGroup = new RadioGroup();
@@ -199,6 +183,7 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
     /**
      * Add fields to this form
      */
+    @Override
     protected void addFields() {
         add(new Label(multiplicityGroup.getFieldLabel() + ":")); //$NON-NLS-1$
         add(multiplicityGroup);
@@ -206,6 +191,7 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
         add(infoTypeField);
     }
 
+    @Override
     protected void buildFields() {
         buildMultiplicityRadio(getMultiplicityLabel());
         buildInfoTypeComboBox(I18N.DISPLAY.infoTypePrompt(), new ArrayList<InfoType>());
@@ -272,5 +258,4 @@ public abstract class DataObjectFormPanel extends VerticalPanel {
             }
         });
     }
-
 }
