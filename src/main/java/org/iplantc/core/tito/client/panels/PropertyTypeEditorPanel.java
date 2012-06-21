@@ -3,11 +3,15 @@ package org.iplantc.core.tito.client.panels;
 import org.iplantc.core.client.widgets.BoundedTextField;
 import org.iplantc.core.metadata.client.property.Property;
 
+import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
+import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.KeyListener;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
+import com.extjs.gxt.ui.client.widget.form.CheckBox;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 
@@ -57,6 +61,19 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
                     cmdKeyUp.execute(ret.getValue());
                 }
             });
+        }
+
+        return ret;
+    }
+
+    protected CheckBox buildCheckBox(String id, String label, Listener<BaseEvent> changeListener) {
+        CheckBox ret = new CheckBox();
+
+        ret.setId(id);
+        ret.setBoxLabel(label);
+
+        if (changeListener != null) {
+            ret.addListener(Events.Change, changeListener);
         }
 
         return ret;

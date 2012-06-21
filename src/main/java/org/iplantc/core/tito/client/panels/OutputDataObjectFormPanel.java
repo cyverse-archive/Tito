@@ -4,7 +4,10 @@ import org.iplantc.core.metadata.client.property.DataObject;
 import org.iplantc.core.metadata.client.property.Property;
 import org.iplantc.core.tito.client.I18N;
 
+import com.extjs.gxt.ui.client.event.BaseEvent;
+import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.widget.Label;
+import com.extjs.gxt.ui.client.widget.form.CheckBox;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.google.gwt.user.client.Command;
 
@@ -15,8 +18,10 @@ import com.google.gwt.user.client.Command;
  *
  */
 public class OutputDataObjectFormPanel extends DataObjectFormPanel {
+    private static final String ID_IMPLICIT_OPT_CBX = "idImplicitOptCbx"; //$NON-NLS-1$
     private static final String ID_FLD_OP_NAME = "idFldOpName"; //$NON-NLS-1$
 
+    private CheckBox cbxImplicitOutput;
     protected TextField<String> outputFileNameField;
     private Command outputFilenameChangeCommand;
 
@@ -31,6 +36,7 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
 
     @Override
     protected void addFields() {
+        add(cbxImplicitOutput);
         add(new Label(outputFileNameField.getFieldLabel() + ":")); //$NON-NLS-1$
         add(outputFileNameField);
 
@@ -56,6 +62,7 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
         DataObject obj = getDataObject();
 
         if (obj != null) {
+            cbxImplicitOutput.setValue(obj.isImplicit());
             initTextField(outputFileNameField, obj.getOutputFilename());
         }
 
@@ -65,6 +72,7 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
     @Override
     protected void buildFields() {
         buildOutputFileNameField();
+        buildImplicitOutputCheckbox();
 
         super.buildFields();
     }
@@ -72,6 +80,19 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
     public String getOutputFilename() {
         String filename = outputFileNameField.getValue();
         return filename == null ? "" : filename; //$NON-NLS-1$
+    }
+
+    private void buildImplicitOutputCheckbox() {
+        cbxImplicitOutput = buildCheckBox(ID_IMPLICIT_OPT_CBX, I18N.DISPLAY.implicitOutput(),
+                new Listener<BaseEvent>() {
+                    @Override
+                    public void handleEvent(BaseEvent be) {
+                        if (getDataObject() != null) {
+                            getDataObject().setImplicit(cbxImplicitOutput.getValue());
+                        }
+
+                    }
+                });
     }
 
     private void buildOutputFileNameField() {
