@@ -82,8 +82,8 @@ public abstract class DataObjectFormPanel extends PropertyTypeEditorPanel {
             initMultiplicity(obj.getMultiplicity());
         }
     }
-    
-   private void initMultiplicity(String multiplicity) {
+
+    private void initMultiplicity(String multiplicity) {
         String label = multiplicity;
 
         if (I18N.DISPLAY.multiplicityFolder().equals(multiplicity)) {
@@ -196,7 +196,14 @@ public abstract class DataObjectFormPanel extends PropertyTypeEditorPanel {
         buildMultiplicityRadio(getMultiplicityLabel());
         buildInfoTypeComboBox(I18N.DISPLAY.infoTypePrompt(), new ArrayList<InfoType>());
     }
-    
+
+    @Override
+    protected void updatePropertyName(String value) {
+        getDataObject().setCmdSwitch(value);
+
+        super.updatePropertyName(value);
+    }
+
     private void setInfoType() {
         ListStore<InfoType> store = infoTypeField.getStore();
 
@@ -221,6 +228,7 @@ public abstract class DataObjectFormPanel extends PropertyTypeEditorPanel {
 
     /**
      * Populates the "Type of information..." combo box.
+     * 
      * @param selected
      */
     private void initInfoTypes() {

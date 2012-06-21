@@ -1,7 +1,11 @@
 package org.iplantc.core.tito.client.panels;
 
 import org.iplantc.core.client.widgets.BoundedTextField;
+import org.iplantc.core.client.widgets.validator.IPlantValidator;
 import org.iplantc.core.metadata.client.property.Property;
+import org.iplantc.core.tito.client.I18N;
+import org.iplantc.core.tito.client.events.CommandLineArgumentChangeEvent;
+import org.iplantc.core.uicommons.client.events.EventBus;
 
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -16,7 +20,13 @@ import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 
 public abstract class PropertyTypeEditorPanel extends VerticalPanel {
+    public static final String DEFAULT_STRING = ""; //$NON-NLS-1$
+
+    private static final String ID_FLD_CMD_L_OPTN = "idFldCmdLOptn"; //$NON-NLS-1$
+
     protected final Property property;
+
+    private TextFieldContainer pnlCommandLineOption;
 
     protected PropertyTypeEditorPanel(Property property) {
         this.property = property;
@@ -27,19 +37,41 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
         addFields();
     }
 
-    protected abstract void buildFields();
+    protected void buildFields() {
+        buildCommandLineOptionPanel();
+    }
 
-    protected abstract void addFields();
+    protected void addFields() {
+        add(pnlCommandLineOption);
+    }
 
-    protected abstract void initFieldValues();
+    protected void initFieldValues() {
+        TextField<String> field = pnlCommandLineOption.getField();
+
+        initTextField(field, property.getName());
+        field.focus();
+    }
 
     private void init() {
         setSize(450, 450);
         setLayout(new FitLayout());
     }
 
+    private void buildCommandLineOptionPanel() {
+        String caption = I18N.DISPLAY.flag();
+
+        TextField<String> field = buildTextField(ID_FLD_CMD_L_OPTN, 255, 128, new FlagEditKeyUpCommand());
+        IPlantValidator.setRegexRestrictedCmdLineChars(field, caption);
+
+        pnlCommandLineOption = buildTextFieldContainer(caption, field);
+    }
+
+    protected void updatePropertyName(String value) {
+        property.setName(value);
+    }
+
     protected void initTextField(TextField<String> field, String value) {
-        if (value != null && !value.isEmpty()) {
+        if (field != null && value != null && !value.isEmpty()) {
             field.setValue(value);
         }
     }
@@ -66,6 +98,11 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
         return ret;
     }
 
+    protected TextFieldContainer buildTextFieldContainer(final String caption, TextField<String> field) {
+        Label label = new Label(caption + ":"); //$NON-NLS-1$
+        return new TextFieldContainer(label, field);
+    }
+
     protected CheckBox buildCheckBox(String id, String label, Listener<BaseEvent> changeListener) {
         CheckBox ret = new CheckBox();
 
@@ -79,10 +116,32 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
         return ret;
     }
 
+    private void fireCommandLineArgumentChangeEvent() {
+        EventBus.getInstance().fireEvent(new CommandLineArgumentChangeEvent(property));
+    }
+
     protected interface KeyUpCommand {
         void handleNullInput();
 
         void execute(String value);
+    }
+
+    private class FlagEditKeyUpCommand implements KeyUpCommand {
+        @Override
+        public void execute(String value) {
+            if (value == null) {
+                handleNullInput();
+            } else {
+                updatePropertyName(value);
+            }
+
+            fireCommandLineArgumentChangeEvent();
+        }
+
+        @Override
+        public void handleNullInput() {
+            property.setName(DEFAULT_STRING);
+        }
     }
 
     /**
