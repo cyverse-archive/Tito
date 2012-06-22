@@ -171,13 +171,16 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
             }
         }
 
-        updateOptionalFlag(value);
+        updateOptionFlag(value);
     }
 
-    private void updateOptionalFlag(boolean required) {
+    private void updateOptionFlag(boolean requiredFlag) {
         if (cbxOptionFlag != null) {
-            cbxOptionFlag.setEnabled(!required && cbxRequired.isEnabled());
-            cbxOptionFlag.setValue(!required);
+            cbxOptionFlag.setEnabled(!requiredFlag && cbxRequired.isEnabled());
+
+            if (!requiredFlag) {
+                cbxOptionFlag.setValue(false);
+            }
         }
     }
 
