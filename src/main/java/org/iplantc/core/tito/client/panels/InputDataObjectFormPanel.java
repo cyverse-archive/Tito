@@ -20,11 +20,17 @@ public class InputDataObjectFormPanel extends DataObjectFormPanel {
         super(property);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected String getMultiplicityLabel() {
         return I18N.DISPLAY.inputMultiplicityOption();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void buildFields() {
         super.buildFields();
@@ -53,6 +59,9 @@ public class InputDataObjectFormPanel extends DataObjectFormPanel {
         super.initFieldValues();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void addFields() {
         super.addFields();
