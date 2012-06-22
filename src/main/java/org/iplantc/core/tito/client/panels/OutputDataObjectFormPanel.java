@@ -9,7 +9,6 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.form.CheckBox;
 import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.google.gwt.user.client.Command;
 
 /**
  * A form panel to collect output DataObject
@@ -23,7 +22,6 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
 
     private CheckBox cbxImplicitOutput;
     protected TextField<String> outputFileNameField;
-    private Command outputFilenameChangeCommand;
 
     public OutputDataObjectFormPanel(Property property) {
         super(property);
@@ -36,26 +34,20 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
 
     @Override
     protected void addFields() {
+        super.addFields();
+
         add(cbxImplicitOutput);
         add(new Label(outputFileNameField.getFieldLabel() + ":")); //$NON-NLS-1$
         add(outputFileNameField);
 
-        super.addFields();
+        add(new Label(multiplicityGroup.getFieldLabel() + ":")); //$NON-NLS-1$
+        add(multiplicityGroup);
+        add(new Label(infoTypeField.getFieldLabel() + ":")); //$NON-NLS-1$
+        add(infoTypeField);
     }
 
     /**
-     * Sets a command that will be called when the "output file" field changes.
-     * 
-     * @param cmd
-     */
-    public void setOutputFilenameChangeCommand(Command cmd) {
-        outputFilenameChangeCommand = cmd;
-    }
-
-    /**
-     * set the form field values from the DataObject
-     * 
-     * @param obj an instance of DataObject to be loaded into this form
+     * {@inheritDoc}
      */
     @Override
     protected void initFieldValues() {
@@ -104,17 +96,21 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
         outputFileNameField.setStyleAttribute("padding-bottom", "5px"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    private class OutputFilenameKeyUpCommand implements KeyUpCommand {
+    private class OutputFilenameKeyUpCommand extends LabelEditKeyUpCommand {
         @Override
         public void execute(String value) {
-            getDataObject().setOutputFilename(value);
-            outputFilenameChangeCommand.execute();
+            if (value != null) {
+                getDataObject().setOutputFilename(value);
+            }
+
+            super.execute(value);
         }
 
         @Override
         public void handleNullInput() {
-            getDataObject().setOutputFilename(""); //$NON-NLS-1$
-            outputFilenameChangeCommand.execute();
+            getDataObject().setOutputFilename(DEFAULT_STRING);
+
+            super.handleNullInput();
         }
     }
 }

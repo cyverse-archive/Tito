@@ -18,7 +18,6 @@ import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.store.ListStore;
-import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
 import com.extjs.gxt.ui.client.widget.form.Field;
@@ -180,17 +179,6 @@ public abstract class DataObjectFormPanel extends PropertyTypeEditorPanel {
         });
     }
 
-    /**
-     * Add fields to this form
-     */
-    @Override
-    protected void addFields() {
-        add(new Label(multiplicityGroup.getFieldLabel() + ":")); //$NON-NLS-1$
-        add(multiplicityGroup);
-        add(new Label(infoTypeField.getFieldLabel() + ":")); //$NON-NLS-1$
-        add(infoTypeField);
-    }
-
     @Override
     protected void buildFields() {
         buildMultiplicityRadio(getMultiplicityLabel());
@@ -202,6 +190,14 @@ public abstract class DataObjectFormPanel extends PropertyTypeEditorPanel {
         getDataObject().setCmdSwitch(value);
 
         super.updatePropertyName(value);
+    }
+
+    @Override
+    protected void updatePropertyLabel(String value) {
+        getDataObject().setName(value);
+        getDataObject().setLabel(value);
+
+        super.updatePropertyLabel(value);
     }
 
     private void setInfoType() {

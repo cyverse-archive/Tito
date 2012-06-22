@@ -5,6 +5,7 @@ import org.iplantc.core.client.widgets.validator.IPlantValidator;
 import org.iplantc.core.metadata.client.property.Property;
 import org.iplantc.core.tito.client.I18N;
 import org.iplantc.core.tito.client.events.CommandLineArgumentChangeEvent;
+import org.iplantc.core.tito.client.events.JSONMetaDataObjectChangedEvent;
 import org.iplantc.core.uicommons.client.events.EventBus;
 
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -23,6 +24,7 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
     public static final String DEFAULT_STRING = ""; //$NON-NLS-1$
 
     private static final String ID_FLD_CMD_L_OPTN = "idFldCmdLOptn"; //$NON-NLS-1$
+    private static final String ID_PROP_LBL = "idPropLbl"; //$NON-NLS-1$
 
     protected final Property property;
 
@@ -68,6 +70,10 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
 
     protected void updatePropertyName(String value) {
         property.setName(value);
+    }
+
+    protected void updatePropertyLabel(String value) {
+        property.setLabel(value);
     }
 
     protected void initTextField(TextField<String> field, String value) {
@@ -116,8 +122,17 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
         return ret;
     }
 
+    protected TextFieldContainer buildLabelFieldContainer() {
+        return buildTextFieldContainer(I18N.DISPLAY.label(),
+                buildTextField(ID_PROP_LBL, 255, 255, new LabelEditKeyUpCommand()));
+    }
+
     private void fireCommandLineArgumentChangeEvent() {
         EventBus.getInstance().fireEvent(new CommandLineArgumentChangeEvent(property));
+    }
+
+    private void firePropertyChangedEvent() {
+        EventBus.getInstance().fireEvent(new JSONMetaDataObjectChangedEvent(property));
     }
 
     protected interface KeyUpCommand {
@@ -141,6 +156,25 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
         @Override
         public void handleNullInput() {
             property.setName(DEFAULT_STRING);
+        }
+    }
+
+    protected class LabelEditKeyUpCommand implements KeyUpCommand {
+        @Override
+        public void execute(String value) {
+            if (value == null) {
+                handleNullInput();
+            } else {
+                updatePropertyLabel(value);
+            }
+
+            fireCommandLineArgumentChangeEvent();
+            firePropertyChangedEvent();
+        }
+
+        @Override
+        public void handleNullInput() {
+            updatePropertyLabel(DEFAULT_STRING);
         }
     }
 
