@@ -50,17 +50,11 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
      * {@inheritDoc}
      */
     @Override
-    protected void addFields() {
-        super.addFields();
+    protected void buildFields() {
+        super.buildFields();
 
-        add(cbxImplicitOutput);
-        add(new Label(outputFileNameField.getFieldLabel() + ":")); //$NON-NLS-1$
-        add(outputFileNameField);
-
-        add(new Label(multiplicityGroup.getFieldLabel() + ":")); //$NON-NLS-1$
-        add(multiplicityGroup);
-        add(new Label(infoTypeField.getFieldLabel() + ":")); //$NON-NLS-1$
-        add(infoTypeField);
+        buildOutputFileNameField();
+        buildImplicitOutputCheckbox();
     }
 
     /**
@@ -82,16 +76,17 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
      * {@inheritDoc}
      */
     @Override
-    protected void buildFields() {
-        super.buildFields();
+    protected void addFields() {
+        super.addFields();
 
-        buildOutputFileNameField();
-        buildImplicitOutputCheckbox();
-    }
+        add(cbxImplicitOutput);
+        add(new Label(outputFileNameField.getFieldLabel() + ":")); //$NON-NLS-1$
+        add(outputFileNameField);
 
-    public String getOutputFilename() {
-        String filename = outputFileNameField.getValue();
-        return filename == null ? "" : filename; //$NON-NLS-1$
+        add(new Label(multiplicityGroup.getFieldLabel() + ":")); //$NON-NLS-1$
+        add(multiplicityGroup);
+        add(new Label(infoTypeField.getFieldLabel() + ":")); //$NON-NLS-1$
+        add(infoTypeField);
     }
 
     private void buildImplicitOutputCheckbox() {
