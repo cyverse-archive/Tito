@@ -200,6 +200,13 @@ public abstract class DataObjectFormPanel extends PropertyTypeEditorPanel {
         super.updatePropertyLabel(value);
     }
 
+    @Override
+    protected void updatePropertyDescription(String value) {
+        getDataObject().setDescription(value);
+
+        super.updatePropertyDescription(value);
+    }
+
     private void setInfoType() {
         ListStore<InfoType> store = infoTypeField.getStore();
 

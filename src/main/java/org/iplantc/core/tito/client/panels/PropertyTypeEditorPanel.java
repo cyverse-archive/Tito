@@ -25,6 +25,7 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
 
     private static final String ID_FLD_CMD_L_OPTN = "idFldCmdLOptn"; //$NON-NLS-1$
     private static final String ID_PROP_LBL = "idPropLbl"; //$NON-NLS-1$
+    private static final String ID_TOOL_TIP = "idToolTip"; //$NON-NLS-1$
 
     protected final Property property;
 
@@ -74,6 +75,10 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
 
     protected void updatePropertyLabel(String value) {
         property.setLabel(value);
+    }
+
+    protected void updatePropertyDescription(String value) {
+        property.setDescription(value);
     }
 
     protected void initTextField(TextField<String> field, String value) {
@@ -127,6 +132,12 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
                 buildTextField(ID_PROP_LBL, 255, 255, new LabelEditKeyUpCommand()));
     }
 
+    protected TextFieldContainer buildToolTipFieldContainer() {
+        return buildTextFieldContainer(
+                I18N.DISPLAY.toolTipText(),
+                buildTextField(ID_TOOL_TIP, 255, 480, new DescriptionEditKeyUpCommand()));
+    }
+
     private void fireCommandLineArgumentChangeEvent() {
         EventBus.getInstance().fireEvent(new CommandLineArgumentChangeEvent(property));
     }
@@ -175,6 +186,22 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
         @Override
         public void handleNullInput() {
             updatePropertyLabel(DEFAULT_STRING);
+        }
+    }
+
+    private class DescriptionEditKeyUpCommand implements KeyUpCommand {
+        @Override
+        public void execute(String value) {
+            if (value == null) {
+                handleNullInput();
+            } else {
+                updatePropertyDescription(value);
+            }
+        }
+
+        @Override
+        public void handleNullInput() {
+            updatePropertyDescription(DEFAULT_STRING);
         }
     }
 

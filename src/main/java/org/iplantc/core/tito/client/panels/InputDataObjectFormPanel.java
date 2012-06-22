@@ -14,6 +14,7 @@ import com.extjs.gxt.ui.client.widget.Label;
  */
 public class InputDataObjectFormPanel extends DataObjectFormPanel {
     private TextFieldContainer pnlPropertyLabel;
+    private TextFieldContainer pnlToolTip;
 
     public InputDataObjectFormPanel(Property property) {
         super(property);
@@ -29,6 +30,7 @@ public class InputDataObjectFormPanel extends DataObjectFormPanel {
         super.buildFields();
 
         pnlPropertyLabel = buildLabelFieldContainer();
+        pnlToolTip = buildToolTipFieldContainer();
     }
 
     /**
@@ -40,6 +42,7 @@ public class InputDataObjectFormPanel extends DataObjectFormPanel {
 
         if (obj != null) {
             initTextField(pnlPropertyLabel.getField(), obj.getLabel());
+            initTextField(pnlToolTip.getField(), obj.getDescription());
         }
 
         super.initFieldValues();
@@ -50,6 +53,7 @@ public class InputDataObjectFormPanel extends DataObjectFormPanel {
         super.addFields();
 
         add(pnlPropertyLabel);
+        add(pnlToolTip);
 
         add(new Label(multiplicityGroup.getFieldLabel() + ":")); //$NON-NLS-1$
         add(multiplicityGroup);
