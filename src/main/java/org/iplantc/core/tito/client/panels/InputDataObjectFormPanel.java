@@ -31,6 +31,7 @@ public class InputDataObjectFormPanel extends DataObjectFormPanel {
 
         pnlPropertyLabel = buildLabelFieldContainer();
         pnlToolTip = buildToolTipFieldContainer();
+        buildOptionalFlagCheckbox();
     }
 
     /**
@@ -45,6 +46,8 @@ public class InputDataObjectFormPanel extends DataObjectFormPanel {
             initTextField(pnlToolTip.getField(), obj.getDescription());
         }
 
+        cbxOptionFlag.setValue(property.isOmit_if_blank());
+
         super.initFieldValues();
     }
 
@@ -53,6 +56,7 @@ public class InputDataObjectFormPanel extends DataObjectFormPanel {
         super.addFields();
 
         add(pnlPropertyLabel);
+        add(cbxOptionFlag);
         add(pnlToolTip);
 
         add(new Label(multiplicityGroup.getFieldLabel() + ":")); //$NON-NLS-1$

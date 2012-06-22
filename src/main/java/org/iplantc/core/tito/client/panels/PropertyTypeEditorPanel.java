@@ -25,9 +25,11 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
 
     private static final String ID_FLD_CMD_L_OPTN = "idFldCmdLOptn"; //$NON-NLS-1$
     private static final String ID_PROP_LBL = "idPropLbl"; //$NON-NLS-1$
+    private static final String ID_OPTN_FLAG_CBX = "idOptnFlagCbx"; //$NON-NLS-1$
     private static final String ID_TOOL_TIP = "idToolTip"; //$NON-NLS-1$
 
     protected final Property property;
+    protected CheckBox cbxOptionFlag;
 
     private TextFieldContainer pnlCommandLineOption;
 
@@ -69,6 +71,16 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
         pnlCommandLineOption = buildTextFieldContainer(caption, field);
     }
 
+    protected void buildOptionalFlagCheckbox() {
+        cbxOptionFlag = buildCheckBox(ID_OPTN_FLAG_CBX, I18N.DISPLAY.passFlag(),
+                new Listener<BaseEvent>() {
+                    @Override
+                    public void handleEvent(final BaseEvent be) {
+                        updatePropertyOmitIfBlank(cbxOptionFlag.getValue());
+                    }
+                });
+    }
+
     protected void updatePropertyName(String value) {
         property.setName(value);
     }
@@ -79,6 +91,10 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
 
     protected void updatePropertyDescription(String value) {
         property.setDescription(value);
+    }
+
+    protected void updatePropertyOmitIfBlank(Boolean value) {
+        property.setOmit_if_blank(value);
     }
 
     protected void initTextField(TextField<String> field, String value) {
