@@ -33,6 +33,9 @@ public class BooleanPropertyEditorPanel extends PropertyTypeEditorPanel {
 
         pnlPropertyLabel = buildLabelFieldContainer();
         pnlToolTip = buildToolTipFieldContainer();
+
+        buildGuiEnabledCheckbox();
+        buildWidgetsPanel();
     }
 
     /**
@@ -46,6 +49,8 @@ public class BooleanPropertyEditorPanel extends PropertyTypeEditorPanel {
 
         initTextField(pnlPropertyLabel.getField(), property.getLabel());
         initTextField(pnlToolTip.getField(), property.getDescription());
+
+        cbxDisplayInGui.setValue(property.isVisible());
     }
 
     /**
@@ -57,8 +62,9 @@ public class BooleanPropertyEditorPanel extends PropertyTypeEditorPanel {
 
         add(pnlPropertyLabel);
         add(pnlDefaultValue);
+        add(cbxDisplayInGui);
 
-        add(pnlToolTip);
+        pnlWidgets.add(pnlToolTip);
     }
 
     private void initBooleanListBox(final ListBox field, final String value) {

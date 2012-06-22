@@ -17,6 +17,9 @@ public class StringPropertyEditorPanel extends PropertyTypeEditorPanel {
         super(property);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void buildFields() {
         super.buildFields();
@@ -25,8 +28,11 @@ public class StringPropertyEditorPanel extends PropertyTypeEditorPanel {
         pnlDefaultValue = buildDefaultValueContainer();
         pnlToolTip = buildToolTipFieldContainer();
 
+        buildGuiEnabledCheckbox();
         buildOptionalFlagCheckbox();
         buildRequiredCheckBox();
+
+        buildWidgetsPanel();
     }
 
     /**
@@ -42,6 +48,8 @@ public class StringPropertyEditorPanel extends PropertyTypeEditorPanel {
 
         cbxOptionFlag.setValue(property.isOmit_if_blank());
         initRequiredCheckBox();
+
+        cbxDisplayInGui.setValue(property.isVisible());
     }
 
     /**
@@ -53,11 +61,12 @@ public class StringPropertyEditorPanel extends PropertyTypeEditorPanel {
 
         add(pnlPropertyLabel);
         add(pnlDefaultValue);
+        add(cbxDisplayInGui);
 
-        add(cbxOptionFlag);
-        add(cbxRequired);
+        pnlWidgets.add(cbxOptionFlag);
+        pnlWidgets.add(cbxRequired);
 
-        add(pnlToolTip);
+        pnlWidgets.add(pnlToolTip);
     }
 
     private TextFieldContainer buildDefaultValueContainer() {

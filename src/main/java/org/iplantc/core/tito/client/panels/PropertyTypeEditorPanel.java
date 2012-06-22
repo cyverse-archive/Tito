@@ -26,11 +26,15 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
 
     private static final String ID_FLD_CMD_L_OPTN = "idFldCmdLOptn"; //$NON-NLS-1$
     private static final String ID_PROP_LBL = "idPropLbl"; //$NON-NLS-1$
+    private static final String ID_DISP_GUI_CBX = "idDispGuiCbx"; //$NON-NLS-1$
     private static final String ID_OPTN_FLAG_CBX = "idOptnFlagCbx"; //$NON-NLS-1$
     private static final String ID_REQ_CBX = "idReqCbx"; //$NON-NLS-1$
     private static final String ID_TOOL_TIP = "idToolTip"; //$NON-NLS-1$
 
     protected final Property property;
+
+    protected VerticalPanel pnlWidgets;
+    protected CheckBox cbxDisplayInGui;
     protected CheckBox cbxOptionFlag;
     protected CheckBox cbxRequired;
 
@@ -72,6 +76,21 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
         IPlantValidator.setRegexRestrictedCmdLineChars(field, caption);
 
         pnlCommandLineOption = buildTextFieldContainer(caption, field);
+    }
+
+    protected void buildWidgetsPanel() {
+        pnlWidgets = new VerticalPanel();
+        pnlWidgets.setLayout(new FitLayout());
+    }
+
+    protected void buildGuiEnabledCheckbox() {
+        cbxDisplayInGui = buildCheckBox(ID_DISP_GUI_CBX, I18N.DISPLAY.displayInGUI(),
+                new Listener<BaseEvent>() {
+                    @Override
+                    public void handleEvent(final BaseEvent be) {
+                        updatePropertyVisible(cbxDisplayInGui.getValue());
+                    }
+                });
     }
 
     protected void buildOptionalFlagCheckbox() {
@@ -120,6 +139,21 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
 
     protected void updatePropertyOmitIfBlank(boolean value) {
         property.setOmit_if_blank(value);
+    }
+
+    protected void updatePropertyVisible(boolean isVisible) {
+        property.setVisible(isVisible);
+        setGuiWidgetsEnabled(isVisible);
+    }
+
+    private void setGuiWidgetsEnabled(boolean enabled) {
+        if (cbxRequired != null && !enabled) {
+            cbxRequired.setValue(false);
+        }
+
+        if (pnlWidgets != null) {
+            pnlWidgets.setEnabled(enabled);
+        }
     }
 
     protected void updatePropertyRequired(boolean value) {
