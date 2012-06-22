@@ -32,6 +32,17 @@ public class InputDataObjectFormPanel extends DataObjectFormPanel {
      * {@inheritDoc}
      */
     @Override
+    protected void init() {
+        super.init();
+
+        property.setType(DataObject.INPUT_TYPE);
+        property.setVisible(true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void buildFields() {
         super.buildFields();
 
@@ -46,6 +57,8 @@ public class InputDataObjectFormPanel extends DataObjectFormPanel {
      */
     @Override
     protected void initFieldValues() {
+        super.initFieldValues();
+
         DataObject obj = getDataObject();
 
         if (obj != null) {
@@ -55,8 +68,6 @@ public class InputDataObjectFormPanel extends DataObjectFormPanel {
 
         cbxOptionFlag.setValue(property.isOmit_if_blank());
         initRequiredCheckBox();
-
-        super.initFieldValues();
     }
 
     /**

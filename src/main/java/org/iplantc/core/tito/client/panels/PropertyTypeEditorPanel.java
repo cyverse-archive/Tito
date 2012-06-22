@@ -57,6 +57,9 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
         add(pnlCommandLineOption);
     }
 
+    /**
+     * set the form field values from the property
+     */
     protected void initFieldValues() {
         TextField<String> field = pnlCommandLineOption.getField();
 
@@ -64,7 +67,7 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
         field.focus();
     }
 
-    private void init() {
+    protected void init() {
         setSize(450, 450);
         setLayout(new FitLayout());
     }

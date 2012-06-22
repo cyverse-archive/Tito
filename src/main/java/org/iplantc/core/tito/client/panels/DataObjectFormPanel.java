@@ -68,17 +68,32 @@ public abstract class DataObjectFormPanel extends PropertyTypeEditorPanel {
         return null;
     }
 
-    /**
-     * set the form field values from the DataObject
-     * 
-     * @param obj an instance of DataObject to be loaded into this form
-     */
     @Override
     protected void initFieldValues() {
-        DataObject obj = getDataObject();
+        updateDataObjectFromProperty();
 
-        if (obj != null) {
-            initMultiplicity(obj.getMultiplicity());
+        initMultiplicity(getDataObject().getMultiplicity());
+    }
+
+    private void updateDataObjectFromProperty() {
+        DataObject dataObject = property.getDataObject();
+
+        if (dataObject == null) {
+            dataObject = new DataObject();
+            property.setDataObject(dataObject);
+        }
+
+        dataObject.setName(property.getLabel());
+        dataObject.setLabel(property.getLabel());
+        dataObject.setCmdSwitch(property.getName());
+        dataObject.setDescription(property.getDescription());
+        dataObject.setType(property.getType());
+        dataObject.setOrder(property.getOrder());
+        dataObject.setVisible(property.isVisible());
+        if (property.getValidator() != null) {
+            dataObject.setRequired(property.getValidator().isRequired());
+        } else {
+            dataObject.setRequired(false);
         }
     }
 

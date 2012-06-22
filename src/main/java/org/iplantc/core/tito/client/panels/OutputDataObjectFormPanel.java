@@ -27,11 +27,28 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
         super(property);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected String getMultiplicityLabel() {
         return I18N.DISPLAY.outPutMultiplicityOption();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void init() {
+        super.init();
+
+        property.setType(DataObject.OUTPUT_TYPE);
+        property.setVisible(false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void addFields() {
         super.addFields();
@@ -51,22 +68,25 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
      */
     @Override
     protected void initFieldValues() {
+        super.initFieldValues();
+
         DataObject obj = getDataObject();
 
         if (obj != null) {
             cbxImplicitOutput.setValue(obj.isImplicit());
             initTextField(outputFileNameField, obj.getOutputFilename());
         }
-
-        super.initFieldValues();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void buildFields() {
+        super.buildFields();
+
         buildOutputFileNameField();
         buildImplicitOutputCheckbox();
-
-        super.buildFields();
     }
 
     public String getOutputFilename() {
