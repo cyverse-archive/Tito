@@ -3,6 +3,7 @@ package org.iplantc.core.tito.client.panels;
 import org.iplantc.core.client.widgets.BoundedTextField;
 import org.iplantc.core.client.widgets.validator.IPlantValidator;
 import org.iplantc.core.metadata.client.property.Property;
+import org.iplantc.core.metadata.client.validation.MetaDataValidator;
 import org.iplantc.core.tito.client.I18N;
 import org.iplantc.core.tito.client.events.CommandLineArgumentChangeEvent;
 import org.iplantc.core.tito.client.events.JSONMetaDataObjectChangedEvent;
@@ -26,10 +27,12 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
     private static final String ID_FLD_CMD_L_OPTN = "idFldCmdLOptn"; //$NON-NLS-1$
     private static final String ID_PROP_LBL = "idPropLbl"; //$NON-NLS-1$
     private static final String ID_OPTN_FLAG_CBX = "idOptnFlagCbx"; //$NON-NLS-1$
+    private static final String ID_REQ_CBX = "idReqCbx"; //$NON-NLS-1$
     private static final String ID_TOOL_TIP = "idToolTip"; //$NON-NLS-1$
 
     protected final Property property;
     protected CheckBox cbxOptionFlag;
+    protected CheckBox cbxRequired;
 
     private TextFieldContainer pnlCommandLineOption;
 
@@ -81,6 +84,24 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
                 });
     }
 
+    protected void buildRequiredCheckBox() {
+        cbxRequired = buildCheckBox(ID_REQ_CBX, I18N.DISPLAY.userInputRequired(),
+                new Listener<BaseEvent>() {
+                    @Override
+                    public void handleEvent(final BaseEvent be) {
+                        updatePropertyRequired(cbxRequired.getValue());
+                    }
+                });
+    }
+
+    protected void initRequiredCheckBox() {
+        MetaDataValidator validator = property.getValidator();
+
+        if (validator != null) {
+            cbxRequired.setValue(validator.isRequired());
+        }
+    }
+
     protected void updatePropertyName(String value) {
         property.setName(value);
     }
@@ -93,8 +114,33 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
         property.setDescription(value);
     }
 
-    protected void updatePropertyOmitIfBlank(Boolean value) {
+    protected void updatePropertyOmitIfBlank(boolean value) {
         property.setOmit_if_blank(value);
+    }
+
+    protected void updatePropertyRequired(boolean value) {
+        // add rule to validator
+        MetaDataValidator validator = property.getValidator();
+
+        if (validator != null) {
+            validator.setRequired(value);
+        } else {
+            // safety check - this should always be true if our validator is null.
+            if (value) {
+                validator = new MetaDataValidator();
+                validator.setRequired(value);
+                property.setValidator(validator);
+            }
+        }
+
+        updateOptionalFlag(value);
+    }
+
+    private void updateOptionalFlag(boolean required) {
+        if (cbxOptionFlag != null) {
+            cbxOptionFlag.setEnabled(!required && cbxRequired.isEnabled());
+            cbxOptionFlag.setValue(!required);
+        }
     }
 
     protected void initTextField(TextField<String> field, String value) {

@@ -207,6 +207,15 @@ public abstract class DataObjectFormPanel extends PropertyTypeEditorPanel {
         super.updatePropertyDescription(value);
     }
 
+    @Override
+    protected void updatePropertyRequired(boolean value) {
+        if (getDataObject() != null) {
+            getDataObject().setRequired(value);
+        }
+
+        super.updatePropertyRequired(value);
+    }
+
     private void setInfoType() {
         ListStore<InfoType> store = infoTypeField.getStore();
 
