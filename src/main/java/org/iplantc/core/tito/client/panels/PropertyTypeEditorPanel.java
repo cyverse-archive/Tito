@@ -106,6 +106,10 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
         property.setName(value);
     }
 
+    protected void updatePropertyValue(String value) {
+        property.setValue(value);
+    }
+
     protected void updatePropertyLabel(String value) {
         property.setLabel(value);
     }
@@ -229,6 +233,24 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
         @Override
         public void handleNullInput() {
             updatePropertyName(DEFAULT_STRING);
+        }
+    }
+
+    protected class ValueEditKeyUpCommand implements KeyUpCommand {
+        @Override
+        public void execute(String value) {
+            if (value == null) {
+                handleNullInput();
+            } else {
+                updatePropertyValue(value);
+            }
+
+            fireCommandLineArgumentChangeEvent();
+        }
+
+        @Override
+        public void handleNullInput() {
+            updatePropertyValue(DEFAULT_STRING);
         }
     }
 
