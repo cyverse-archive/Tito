@@ -228,7 +228,7 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
 
         @Override
         public void handleNullInput() {
-            property.setName(DEFAULT_STRING);
+            updatePropertyName(DEFAULT_STRING);
         }
     }
 
