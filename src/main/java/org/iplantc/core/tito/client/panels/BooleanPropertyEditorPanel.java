@@ -14,6 +14,8 @@ public class BooleanPropertyEditorPanel extends PropertyTypeEditorPanel {
     public static final String PROPERTY_BOOLEAN_FALSE = "false"; //$NON-NLS-1$
     public static final String DEFAULT_BOOLEAN = PROPERTY_BOOLEAN_FALSE;
 
+    private static final String ID_FLD_BOOLEAN_VAL = "idFldBoolean"; //$NON-NLS-1$
+
     private BooleanDefaultValuePanel pnlDefaultValue;
     private TextFieldContainer pnlPropertyLabel;
     private TextFieldContainer pnlToolTip;
@@ -95,6 +97,7 @@ public class BooleanPropertyEditorPanel extends PropertyTypeEditorPanel {
         private ListBox buildBooleanListBox() {
             final ListBox ret = new ListBox();
 
+            ret.getElement().setId(ID_FLD_BOOLEAN_VAL);
             ret.setWidth("140px"); //$NON-NLS-1$
 
             ret.addItem(I18N.DISPLAY.propertyEditorTrue());

@@ -341,7 +341,6 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
 
         protected TextFieldContainer(Label label, TextField<String> field) {
             this.field = field;
-            this.field.setId(label.getText());
 
             setLayout(new FitLayout());
             add(label);
