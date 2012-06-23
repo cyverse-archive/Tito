@@ -70,6 +70,8 @@ public abstract class DataObjectFormPanel extends PropertyTypeEditorPanel {
 
     @Override
     protected void initFieldValues() {
+        super.initFieldValues();
+
         updateDataObjectFromProperty();
 
         initMultiplicity(getDataObject().getMultiplicity());
@@ -196,6 +198,8 @@ public abstract class DataObjectFormPanel extends PropertyTypeEditorPanel {
 
     @Override
     protected void buildFields() {
+        super.buildFields();
+
         buildMultiplicityRadio(getMultiplicityLabel());
         buildInfoTypeComboBox(I18N.DISPLAY.infoTypePrompt(), new ArrayList<InfoType>());
     }

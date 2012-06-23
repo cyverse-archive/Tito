@@ -44,6 +44,7 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
 
         property.setType(DataObject.OUTPUT_TYPE);
         property.setVisible(false);
+        property.setOmit_if_blank(true);
     }
 
     /**
