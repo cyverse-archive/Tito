@@ -181,7 +181,7 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
         if (cbxOptionFlag != null) {
             cbxOptionFlag.setEnabled(!requiredFlag && cbxRequired.isEnabled());
 
-            if (!requiredFlag) {
+            if (requiredFlag) {
                 cbxOptionFlag.setValue(false);
             }
         }
