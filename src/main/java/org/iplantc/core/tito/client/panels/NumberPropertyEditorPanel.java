@@ -1,6 +1,7 @@
 package org.iplantc.core.tito.client.panels;
 
 import org.iplantc.core.metadata.client.property.Property;
+import org.iplantc.core.metadata.client.property.PropertyTypeCategory;
 import org.iplantc.core.tito.client.I18N;
 
 import com.extjs.gxt.ui.client.event.ComponentEvent;
@@ -10,15 +11,14 @@ import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.form.NumberField;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 
-public class NumberPropertyEditorPanel extends PropertyTypeEditorPanel {
+public class NumberPropertyEditorPanel extends PropertyValidationEditorPanel {
     private static final String ID_FIELD_NUM = "idFieldNum"; //$NON-NLS-1$
 
     private TextFieldContainer pnlPropertyLabel;
-    private NumberFieldContainer pnlDefaultValue;
     private TextFieldContainer pnlToolTip;
 
     public NumberPropertyEditorPanel(Property property) {
-        super(property);
+        super(property, PropertyTypeCategory.NUMBER);
     }
 
     /**
@@ -46,7 +46,10 @@ public class NumberPropertyEditorPanel extends PropertyTypeEditorPanel {
     protected void initFieldValues() {
         super.initFieldValues();
 
-        pnlDefaultValue.getField().setValue(parseNumberFromString(property.getValue()));
+        pnlValidation.reset(PropertyTypeCategory.NUMBER);
+
+        NumberField fieldDefaultValue = ((NumberFieldContainer)pnlDefaultValue).getField();
+        fieldDefaultValue.setValue(parseNumberFromString(property.getValue()));
 
         initTextField(pnlPropertyLabel.getField(), property.getLabel());
         initTextField(pnlToolTip.getField(), property.getDescription());
@@ -72,6 +75,9 @@ public class NumberPropertyEditorPanel extends PropertyTypeEditorPanel {
         pnlWidgets.add(cbxRequired);
 
         pnlWidgets.add(pnlToolTip);
+        pnlWidgets.add(pnlValidationContainer);
+
+        add(pnlWidgets);
     }
 
     /**

@@ -33,12 +33,11 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
 
     protected final Property property;
 
+    protected TextFieldContainer pnlCommandLineOption;
     protected VerticalPanel pnlWidgets;
     protected CheckBox cbxDisplayInGui;
     protected CheckBox cbxOptionFlag;
     protected CheckBox cbxRequired;
-
-    private TextFieldContainer pnlCommandLineOption;
 
     protected PropertyTypeEditorPanel(Property property) {
         this.property = property;

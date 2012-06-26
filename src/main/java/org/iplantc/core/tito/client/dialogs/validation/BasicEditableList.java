@@ -39,6 +39,7 @@ import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.grid.EditorGrid;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.grid.GridCellRenderer;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.toolbar.FillToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.json.client.JSONArray;
@@ -78,6 +79,7 @@ public abstract class BasicEditableList extends ContentPanel implements Property
 
     private void buildPanel() {
         setWidth(520);
+        setLayout(new FitLayout());
         setHeaderVisible(true);
         setHeading(I18N.DISPLAY.listBoxFormatNotice());
       

@@ -9,7 +9,7 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.ui.ListBox;
 
-public class BooleanPropertyEditorPanel extends PropertyTypeEditorPanel {
+public class BooleanPropertyEditorPanel extends PropertySubTypeEditorPanel {
     public static final String PROPERTY_BOOLEAN_TRUE = "true"; //$NON-NLS-1$
     public static final String PROPERTY_BOOLEAN_FALSE = "false"; //$NON-NLS-1$
     public static final String DEFAULT_BOOLEAN = PROPERTY_BOOLEAN_FALSE;
@@ -20,7 +20,7 @@ public class BooleanPropertyEditorPanel extends PropertyTypeEditorPanel {
     private TextFieldContainer pnlPropertyLabel;
     private TextFieldContainer pnlToolTip;
 
-    protected BooleanPropertyEditorPanel(Property property) {
+    public BooleanPropertyEditorPanel(Property property) {
         super(property);
     }
 
@@ -117,5 +117,10 @@ public class BooleanPropertyEditorPanel extends PropertyTypeEditorPanel {
 
             return ret;
         }
+    }
+
+    @Override
+    protected void handleWidgetTypeChange() {
+        // intentionally do nothing, because Boolean types currently only have one sub-type.
     }
 }
