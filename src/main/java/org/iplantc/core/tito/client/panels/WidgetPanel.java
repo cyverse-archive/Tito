@@ -239,7 +239,7 @@ public class WidgetPanel extends ContentPanel {
                                 replaceCenterPanel(new StaticTextEditorPanel(property));
                             } else {
                                 // property
-                                replaceCenterPanel(new PropertyEditorPanel(container, property));
+                                replaceCenterPanel(new PropertyEditorPanel(property));
                             }
                         } else if (PropertyGroupContainerUtil.isPropertyGroup(obj)) {
                             // property group

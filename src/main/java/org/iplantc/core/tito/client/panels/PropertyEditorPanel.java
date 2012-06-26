@@ -1,31 +1,21 @@
 package org.iplantc.core.tito.client.panels;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import org.iplantc.core.client.widgets.BoundedTextField;
-import org.iplantc.core.client.widgets.validator.IPlantValidator;
 import org.iplantc.core.jsonutil.JsonUtil;
 import org.iplantc.core.metadata.client.PropertyType;
 import org.iplantc.core.metadata.client.property.DataObject;
 import org.iplantc.core.metadata.client.property.Property;
 import org.iplantc.core.metadata.client.property.PropertyTypeCategory;
-import org.iplantc.core.metadata.client.property.groups.PropertyGroupContainer;
-import org.iplantc.core.metadata.client.validation.MetaDataValidator;
 import org.iplantc.core.tito.client.I18N;
 import org.iplantc.core.tito.client.events.CommandLineArgumentChangeEvent;
-import org.iplantc.core.tito.client.events.JSONMetaDataObjectChangedEvent;
 import org.iplantc.core.tito.client.services.EnumerationServices;
 import org.iplantc.core.uicommons.client.ErrorHandler;
 import org.iplantc.core.uicommons.client.events.EventBus;
 
+import com.extjs.gxt.ui.client.core.FastMap;
 import com.extjs.gxt.ui.client.data.BaseModelData;
-import com.extjs.gxt.ui.client.event.BaseEvent;
-import com.extjs.gxt.ui.client.event.ComponentEvent;
-import com.extjs.gxt.ui.client.event.Events;
-import com.extjs.gxt.ui.client.event.KeyListener;
-import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.store.ListStore;
@@ -33,19 +23,12 @@ import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Label;
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
-import com.extjs.gxt.ui.client.widget.form.CheckBox;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.ComboBox.TriggerAction;
-import com.extjs.gxt.ui.client.widget.form.NumberField;
-import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.json.client.JSONArray;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.ListBox;
 
 /**
  * Panel for editing property specific data.
@@ -55,37 +38,14 @@ import com.google.gwt.user.client.ui.ListBox;
  */
 public class PropertyEditorPanel extends ContentPanel {
     private static final String ID_PROPERTY_TYPE = "idPropertyType"; //$NON-NLS-1$
-    private static final String ID_ARG_TYPE = "idArgType"; //$NON-NLS-1$
-    private static final String ID_OPTN_FLAG_CBX = "idOptnFlagCbx"; //$NON-NLS-1$
-    private static final String ID_REQ_CBX = "idReqCbx"; //$NON-NLS-1$
-    private static final String ID_DISP_GUI_CBX = "idDispGuiCbx"; //$NON-NLS-1$
-    private static final String ID_TOOL_TIP = "idToolTip"; //$NON-NLS-1$
-    private static final String ID_PROP_LBL = "idPropLbl"; //$NON-NLS-1$
-    private static final String ID_FIELD_NUM = "idFieldNum"; //$NON-NLS-1$
-    private static final String ID_FLD_CMD_L_OPTN = "idFldCmdLOptn"; //$NON-NLS-1$
 
     private final Property property;
     private LayoutContainer containerMain;
-    private LayoutContainer containerPropertyTypeEditor;
-    private VerticalPanel pnlWidget;
+    private PropertyTypeEditorPanel pnlPropertyTypeEditor;
 
-    private HashMap<String, List<PropertyType>> propertyTypes; // category, property types
+    private FastMap<List<PropertyType>> propertyTypes; // category -> property types
 
-    private LayoutContainer pnlDefaultValue;
-    private CheckBox cbxDisplayInGui;
-    private CheckBox cbxOptionFlag;
-    private LayoutContainer pnlToolTip;
     private ComboBox<CategoryListItem> comboPropertyTypeCategory;
-    private ListBox listPropertyType;
-    private TextFieldContainer pnlPropertyLabel;
-    private ValidationPanel pnlValidation;
-    private LayoutContainer pnlCommandLineOption;
-    private LayoutContainer pnlBottom;
-    private CheckBox cbxRequired;
-  
-
-    private static final String DEFAULT_BOOLEAN = "false"; //$NON-NLS-1$
-    private static final String DEFAULT_STRING = ""; //$NON-NLS-1$
 
     /**
      * Instantiate from the property group container and property to be edited.
@@ -93,12 +53,12 @@ public class PropertyEditorPanel extends ContentPanel {
      * @param container parent property group container (needed for validating against external fields).
      * @param property property to be edited.
      */
-    public PropertyEditorPanel(final PropertyGroupContainer container, final Property property) {
+    public PropertyEditorPanel(final Property property) {
         this.property = property;
 
         init();
 
-        buildInstanceWidgets(container);
+        buildInstanceWidgets();
     }
 
     private void init() {
@@ -107,152 +67,14 @@ public class PropertyEditorPanel extends ContentPanel {
         setLayout(new FitLayout());
     }
 
-    private void buildInstanceWidgets(final PropertyGroupContainer container) {
+    private void buildInstanceWidgets() {
         buildPropertyTypeCategoryList();
-        buildDefaultValuePanel();
-        buildGUIEnabledCheckbox();
-        buildOptionFlagCheckbox();
-        buildRequiredCheckbox();
-        buildToolTipPanel();
-        buildCommandLineOptionPanel();
-        buildBottomPanel();
-        buildValidationPanel(container);
-        buildPropertyLabel();
 
         // This should be called last, since it will build the propertyTypes map and call
         // initFromPropertyCategory, which will make a selection in the PropertyTypeCategory list, which
-        // will call handlePropertyCategoryChange, which configures many other widgets in this panel that
-        // should be initialized before this method call.
-        buildWidgetPanel();
-    }
-
-    private void buildCommandLineOptionPanel() {
-        String caption = I18N.DISPLAY.flag();
-
-        TextField<String> field = buildTextField(ID_FLD_CMD_L_OPTN, property.getName(), 255, 128,
-                new FlagEditKeyUpCommand());
-        field.focus();
-
-        IPlantValidator.setRegexRestrictedCmdLineChars(field, caption);
-
-        pnlCommandLineOption = buildTextFieldContainer(caption, field);
-    }
-
-    private void buildDefaultValuePanel() {
-        pnlDefaultValue = new VerticalPanel();
-
-        pnlDefaultValue.setLayout(new FitLayout());
-        pnlDefaultValue.add(new StringDefaultValuePanel(property.getValue()));
-    }
-
-    private void buildBottomPanel() {
-        pnlBottom = new LayoutContainer();
-        pnlBottom.setLayout(new FitLayout());
-    }
-
-    private void buildValidationPanel(final PropertyGroupContainer container) {
-        pnlValidation = new ValidationPanel(container, property);
-    }
-
-    private void firePropertyChangedEvent() {
-        EventBus.getInstance().fireEvent(new JSONMetaDataObjectChangedEvent(property));
-    }
-
-    private void fireCommandLineArgumentChangeEvent() {
-        EventBus.getInstance().fireEvent(new CommandLineArgumentChangeEvent(property));
-    }
-
-    /**
-     * Provide an instance of the NumberField GXT widget with the arguments set.
-     * 
-     * @param value the number value
-     * @param width the desired width of the field
-     * @param cmdKeyUp the command to execute when the on key up event fires
-     * @param setFocus whether the field should have focus
-     * @param changeListener a listener to fire when the field's value changes; can be null
-     * @return a configured instance of the NumberField GXT widget
-     */
-    private NumberField buildNumberField(final Number value, int width, final KeyUpCommand cmdKeyUp,
-            boolean setFocus, boolean onlyPositiveValues) {
-        final NumberField ret = new NumberField();
-        ret.setId(ID_FIELD_NUM);
-        ret.setWidth(width);
-        ret.setSelectOnFocus(setFocus);
-
-        if (value != null) {
-            ret.setValue(value);
-        }
-
-        if (cmdKeyUp != null) {
-            ret.addKeyListener(new KeyListener() {
-                @Override
-                public void componentKeyUp(ComponentEvent event) {
-                    // always send the raw value so validation can tell no input from invalid input
-                    cmdKeyUp.execute(ret.getRawValue());
-                }
-            });
-        }
-
-        if (setFocus) {
-            ret.focus();
-        }
-
-        if (onlyPositiveValues) {
-            ret.setMinValue(0);
-            ret.setAllowNegative(false);
-            ret.setAllowDecimals(false);
-        }
-
-        return ret;
-    }
-
-    /**
-     * Constructs a NumberField for usage by a container.
-     * 
-     * @param caption text to be used as a caption
-     * @param value numeric value to be shown
-     * @param width the desired width of the field
-     * @param cmdKeyUp the command to execute when the on key up event fires
-     * @param setFocus whether the field should have focus
-     * @param changeListener a listener to fire when the field's value changes; can be null
-     * @return a configured instance of the NumberField GXT widget
-     */
-    private LayoutContainer buildNumberFieldContainer(final String caption, final Number value, int width,
-            final KeyUpCommand cmdKeyUp, boolean setFocus) {
-        LayoutContainer ret = new LayoutContainer();
-        
-        ret.add(new Label(caption + ":")); //$NON-NLS-1$
-        ret.add(buildNumberField(value, width, cmdKeyUp, setFocus, false));
-        
-        return ret;
-    }
-
-    private TextFieldContainer buildTextFieldContainer(final String caption, TextField<String> field) {
-        Label label = new Label(caption + ":"); //$NON-NLS-1$
-        return new TextFieldContainer(label, field);
-    }
-
-    private TextField<String> buildTextField(String id, final String value, int maxLength, int width,
-            final KeyUpCommand cmdKeyUp) {
-        final TextField<String> ret = new BoundedTextField<String>();
-
-        ret.setId(id);
-        ret.setValue(value);
-        ret.setMaxLength(maxLength);
-        ret.setWidth(width);
-        ret.setSelectOnFocus(true);
-        ret.setAutoValidate(true);
-
-        if (cmdKeyUp != null) {
-            ret.addKeyListener(new KeyListener() {
-                @Override
-                public void componentKeyUp(ComponentEvent event) {
-                    cmdKeyUp.execute(ret.getValue());
-                }
-            });
-        }
-
-        return ret;
+        // should be initialized before this method call, and will call handlePropertyCategoryChange,
+        // which builds and displays the correct PropertyTypeEditorPanel.
+        populateWidgetTypeList();
     }
 
     private void buildPropertyTypeCategoryList() {
@@ -282,8 +104,8 @@ public class PropertyEditorPanel extends ContentPanel {
         // Also, this listener is only fired if the category changes, which won't happen if we select a
         // default category that is the same for the given property type, but we need this listener to
         // fire from the selection made in initFromPropertyCategory since handlePropertyCategoryChange
-        // will correctly initialize the remaining widgets in this panel (which also depend on an
-        // initialized propertyTypes map).
+        // will initialize the correct PropertyTypeEditorPanel (which may also depend on an initialized
+        // propertyTypes map).
         comboPropertyTypeCategory
                 .addSelectionChangedListener(new SelectionChangedListener<CategoryListItem>() {
                     @Override
@@ -322,14 +144,6 @@ public class PropertyEditorPanel extends ContentPanel {
         return ret;
     }
 
-    private void updateValidationPanel(PropertyTypeCategory category) {
-        if (containerPropertyTypeEditor.isEnabled()) {
-            pnlValidation.setEnabled(category != PropertyTypeCategory.BOOLEAN);
-        }
-
-        pnlValidation.reset(category);
-    }
-
     private void handlePropertyCategoryChange(final PropertyTypeCategory category) {
         // Check if the current default value is already valid for the new category.
         // If editing a saved property, or if the user only navigated away from this property then back,
@@ -352,36 +166,6 @@ public class PropertyEditorPanel extends ContentPanel {
         }
 
         updateEditorPanel(category);
-
-        updatePropertyLabel(category);
-
-        updateDefaultValuePanel(category);
-
-        updateValidationPanel(category);
-
-        updatePropertyTypesToListBox();
-    }
-
-    private void updateDataObjectFromProperty() {
-        DataObject dataObject = property.getDataObject();
-
-        if (dataObject == null) {
-            dataObject = new DataObject();
-            property.setDataObject(dataObject);
-        }
-
-        dataObject.setName(property.getLabel());
-        dataObject.setLabel(property.getLabel());
-        dataObject.setCmdSwitch(property.getName());
-        dataObject.setDescription(property.getDescription());
-        dataObject.setType(property.getType());
-        dataObject.setOrder(property.getOrder());
-        dataObject.setVisible(property.isVisible());
-        if(property.getValidator() != null) {
-        	dataObject.setRequired(property.getValidator().isRequired());
-        } else {
-        	dataObject.setRequired(false);
-        }
     }
 
     /**
@@ -392,11 +176,11 @@ public class PropertyEditorPanel extends ContentPanel {
     private void resetPropertyValue(PropertyTypeCategory category) {
         switch (category) {
             case BOOLEAN:
-                property.setValue(DEFAULT_BOOLEAN);
+                property.setValue(BooleanPropertyEditorPanel.DEFAULT_BOOLEAN);
                 break;
 
             default:
-                property.setValue(DEFAULT_STRING);
+                property.setValue(PropertyTypeEditorPanel.DEFAULT_STRING);
                 break;
         }
     }
@@ -407,293 +191,47 @@ public class PropertyEditorPanel extends ContentPanel {
      * @param container a new component to set in the center of the BorderLayout.
      */
     private void updateEditorPanel(final PropertyTypeCategory category) {
-        if (containerMain != null && containerPropertyTypeEditor != null) {
-            containerMain.remove(containerPropertyTypeEditor);
+        if (containerMain != null && pnlPropertyTypeEditor != null) {
+            containerMain.remove(pnlPropertyTypeEditor);
         }
 
         switch (category) {
             case INPUT:
-                cbxDisplayInGui.setEnabled(false);
-                cbxOptionFlag.setEnabled(true);
-                cbxRequired.setEnabled(true);
-
-                property.setType(DataObject.INPUT_TYPE);
-                property.setVisible(true);
-
-                updateDataObjectFromProperty();
-
-                containerPropertyTypeEditor = new InputDataObjectFormPanel(property);
+                pnlPropertyTypeEditor = new InputDataObjectFormPanel(property);
                 break;
 
             case OUTPUT:
-                cbxDisplayInGui.setEnabled(false);
-                cbxOptionFlag.setEnabled(false);
-                cbxOptionFlag.setValue(true);
-                cbxRequired.setEnabled(false);
-
-                property.setType(DataObject.OUTPUT_TYPE);
-                property.setVisible(false);
-
-                updateDataObjectFromProperty();
-
-                OutputDataObjectFormPanel outputPnl = new OutputDataObjectFormPanel(property);
-                outputPnl.setOutputFilenameChangeCommand(buildFilenameChangeCommand());
-                containerPropertyTypeEditor = outputPnl;
+                pnlPropertyTypeEditor = new OutputDataObjectFormPanel(property);
                 break;
 
             case BOOLEAN:
-                cbxDisplayInGui.setEnabled(true);
-                cbxOptionFlag.setEnabled(false);
-                cbxRequired.setEnabled(false);
-
-                containerPropertyTypeEditor = pnlWidget;
+                pnlPropertyTypeEditor = new BooleanPropertyEditorPanel(property);
                 break;
 
-            default:
-                cbxDisplayInGui.setEnabled(true);
-                cbxOptionFlag.setEnabled(true);
-                cbxRequired.setEnabled(true);
-
-                containerPropertyTypeEditor = pnlWidget;
-                break;
-        }
-
-        if (containerMain != null) {
-            containerMain.add(containerPropertyTypeEditor);
-        }
-
-        // make sure we start with the GUI widgets in the correct state
-        cbxDisplayInGui.setValue(property.isVisible());
-        setGuiWidgetsEnabled(property.isVisible());
-    }
-
-    /**
-     * Returns a command that updates the navigation tree when the filename field on the output panel
-     * changes its value.
-     * 
-     * @return a command
-     */
-    private Command buildFilenameChangeCommand() {
-        return new Command() {
-            @Override
-            public void execute() {
-                fireLabelChangeEvent();
-            }
-        };
-    }
-
-    /**
-     * Makes the "Label" field visible or invisible depending on the category, and fires an event to
-     * update the navigation tree.
-     * 
-     * @param category
-     */
-    private void updatePropertyLabel(PropertyTypeCategory category) {
-        // show the "Label" field for all categories but output
-        pnlPropertyLabel.setVisible((category != PropertyTypeCategory.OUTPUT));
-
-        // send an event to update the label in the tree if we're switching from or to OUTPUT
-        fireLabelChangeEvent();
-    }
-
-    /**
-     * Updates the navigation tree to show the filename (if category=OUTPUT) or the label (for all other
-     * categories).
-     */
-    private void fireLabelChangeEvent() {
-        PropertyTypeCategory category = getSelectedPropertyTypeCategory();
-        String newLabel;
-        if (category == PropertyTypeCategory.OUTPUT) {
-            newLabel = ((OutputDataObjectFormPanel)containerPropertyTypeEditor).getOutputFilename();
-        }
-        else {
-            newLabel = pnlPropertyLabel.field.getValue();
-        }
-        new LabelEditKeyUpCommand().execute(newLabel);
-    }
-    
-    private void buildOptionFlagCheckbox() {
-        cbxOptionFlag = new CheckBox();
-        cbxOptionFlag.setId(ID_OPTN_FLAG_CBX);
-        cbxOptionFlag.setBoxLabel(I18N.DISPLAY.passFlag());
-
-        cbxOptionFlag.setValue(property.isOmit_if_blank());
-      
-        // add our change listener
-        cbxOptionFlag.addListener(Events.Change, new Listener<BaseEvent>() {
-            @Override
-            public void handleEvent(final BaseEvent be) {
-                handleOptionaFlagCheckboxChanged(cbxOptionFlag.getValue());
-            }
-        });
-        
-    }
-    
-    
-    private void handleOptionaFlagCheckboxChanged(Boolean value) {
-        property.setOmit_if_blank(value);
-    }
-    
-    
-    private void buildRequiredCheckbox() {
-        cbxRequired = new CheckBox();
-        cbxRequired.setId(ID_REQ_CBX);
-        cbxRequired.setBoxLabel(I18N.DISPLAY.userInputRequired());
-
-        // set our initial value
-        MetaDataValidator validator = property.getValidator();
-
-        if (validator != null) {
-            cbxRequired.setValue(validator.isRequired());
-            updateOptionFlag(validator.isRequired());
-        }
-
-        // add our change listener
-        cbxRequired.addListener(Events.Change, new Listener<BaseEvent>() {
-            @Override
-            public void handleEvent(final BaseEvent be) {
-                handleRequiredCheckboxChanged(cbxRequired.getValue());
-            }
-        });
-    }
-
-    private void handleRequiredCheckboxChanged(boolean value) {
-        // add rule to validator
-        MetaDataValidator validator = property.getValidator();
-
-        if (validator != null) {
-            validator.setRequired(value);
-        } else {
-            // safety check - this should always be true if our
-            if (value) {
-                validator = new MetaDataValidator();
-                validator.setRequired(value);
-                property.setValidator(validator);
-            }
-        }
-        
-        if(property.getDataObject() != null) {
-            property.getDataObject().setRequired(value);
-        }
-        
-       updateOptionFlag(value);
-    }
-
-    private void updateOptionFlag(boolean required) {
-        cbxOptionFlag.setEnabled(!required && cbxRequired.isEnabled());
-        cbxOptionFlag.setValue(!required);
-        property.setOmit_if_blank(!required);
-    }
-
-    /**
-     * Clears the default value panel and rebuilds its value field with the current property value.
-     * 
-     * @param category The category that determines what field to add to the default value panel.
-     */
-    private void updateDefaultValuePanel(PropertyTypeCategory category) {
-        pnlDefaultValue.removeAll();
-
-        switch (category) {
             case STRING:
-                pnlDefaultValue.add(new StringDefaultValuePanel(property.getValue()));
+                pnlPropertyTypeEditor = new StringPropertyEditorPanel(property);
                 break;
 
             case NUMBER:
-                pnlDefaultValue.add(new NumberDefaultValuePanel(property.getValue()));
-                break;
-
-            case BOOLEAN:
-                pnlDefaultValue.add(new BooleanDefaultValuePanel(property.getValue()));
+                pnlPropertyTypeEditor = new NumberPropertyEditorPanel(property);
                 break;
 
             default:
+                pnlPropertyTypeEditor = null;
                 break;
         }
 
-        pnlDefaultValue.layout();
-    }
+        if (containerMain != null && pnlPropertyTypeEditor != null) {
+            containerMain.add(pnlPropertyTypeEditor);
 
-    private void buildGUIEnabledCheckbox() {
-        cbxDisplayInGui = new CheckBox();
-        cbxDisplayInGui.setId(ID_DISP_GUI_CBX);
-        cbxDisplayInGui.setBoxLabel(I18N.DISPLAY.displayInGUI());
-        cbxDisplayInGui.setValue(property.isVisible());
-
-        cbxDisplayInGui.addListener(Events.Change, new Listener<BaseEvent>() {
-            @Override
-            public void handleEvent(final BaseEvent be) {
-                handleUICheckboxChanged(cbxDisplayInGui.getValue());
-            }
-        });
-    }
-
-    private void buildToolTipPanel() {
-        pnlToolTip = buildTextFieldContainer(
-                I18N.DISPLAY.toolTipText(),
-                buildTextField(ID_TOOL_TIP, property.getDescription(), 255, 480,
-                        new DescriptionEditKeyUpCommand()));
-    }
-
-    private void updateValidationPanelOnUIChange(boolean displayUI) {
-        // we do not enable the validation panel if the category is Boolean
-        if (displayUI) {
-            // get our category
-            PropertyTypeCategory category = getSelectedPropertyTypeCategory();
-            if (category == PropertyTypeCategory.BOOLEAN) {
-                pnlValidation.disable();
-            }
-        }
-    }
-
-    private void handleUICheckboxChanged(boolean checked) {
-        property.setVisible(checked);
-        setGuiWidgetsEnabled(checked);
-    }
-
-    private void setGuiWidgetsEnabled(boolean enabled) {
-        cbxRequired.setEnabled(enabled);
-        if (!enabled) {
-            cbxRequired.setValue(false);
-        }
-
-        pnlToolTip.setEnabled(enabled);
-        pnlWidget.setEnabled(enabled);
-
-        updateValidationPanelOnUIChange(enabled);
-    }
-
-    private void updatePropertyTypesToListBox() {
-        // reset our list box
-        listPropertyType.clear();
-
-        PropertyTypeCategory category = getSelectedPropertyTypeCategory();
-
-        String typeDest = property.getType();
-
-        int idx = 0; // keep track of index for setting selection
-        int idxSelected = 0;
-
-        List<PropertyType> types = propertyTypes.get(category.toString());
-
-        for (PropertyType type : types) {
-            // add our item to the listbox
-            listPropertyType.addItem(type.getDescription());
-
-            // is this our desired selection?
-            if (type.getName().equals(typeDest)) {
-                idxSelected = idx;
+            if (pnlPropertyTypeEditor instanceof PropertySubTypeEditorPanel) {
+                // update the PropertySubTypeEditorPanel with the correct list of widget-types.
+                ((PropertySubTypeEditorPanel)pnlPropertyTypeEditor)
+                        .updatePropertyTypesToListBox(propertyTypes.get(category.toString()));
             }
 
-            idx++;
+            layout();
         }
-
-        // set our selection
-        if (listPropertyType.getItemCount() > 0) {
-            listPropertyType.setSelectedIndex(idxSelected);
-        }
-
-        // force type change
-        handleWidgetTypeChange();
     }
 
     private String getCategoryFromType(final String propertyType) {
@@ -739,7 +277,7 @@ public class PropertyEditorPanel extends ContentPanel {
     }
 
     private void initPropertyTypes() {
-        propertyTypes = new HashMap<String, List<PropertyType>>();
+        propertyTypes = new FastMap<List<PropertyType>>();
 
         for (PropertyTypeCategory category : PropertyTypeCategory.values()) {
             propertyTypes.put(category.toString(), new ArrayList<PropertyType>());
@@ -768,9 +306,8 @@ public class PropertyEditorPanel extends ContentPanel {
                             list.add(typeProperty);
                         }
 
-                        // now that we've populated our property types list, select the correct
-                        // category,
-                        // which will init the correct widgets, including the property types list box
+                        // now that we've populated our property types list, select the correct category,
+                        // which will init the correct PropertyTypeEditorPanel.
                         initFromPropertyCategory();
                     } else {
                         ErrorHandler.post(I18N.DISPLAY.cantLoadWidgetTypes());
@@ -790,104 +327,16 @@ public class PropertyEditorPanel extends ContentPanel {
         });
     }
 
-    private LayoutContainer buildWidgetTypeDropdown() {
-        VerticalPanel ret = new VerticalPanel();
-
-        listPropertyType = new ListBox();
-        listPropertyType.getElement().setId(ID_ARG_TYPE);
-        listPropertyType.addChangeHandler(new ChangeHandler() {
-            @Override
-            public void onChange(ChangeEvent event) {
-                handleWidgetTypeChange();
-            }
-        });
-
-        populateWidgetTypeList();
-
-        ret.add(new Label(I18N.DISPLAY.typeOfFieldNeeded() + ": ")); //$NON-NLS-1$
-        ret.add(listPropertyType);
-
-        return ret;
-    }
-
-    private void buildPropertyLabel() {
-        pnlPropertyLabel = buildTextFieldContainer(I18N.DISPLAY.label(),
-                buildTextField(ID_PROP_LBL, property.getLabel(), 255, 255, new LabelEditKeyUpCommand()));
-    }
-
-    private void updatePanelsAfterWidgetTypeChange(final PropertyTypeCategory category,
-            boolean isSelectionWidget) {
-        pnlCommandLineOption.setEnabled(!isSelectionWidget);
-
-        updateDefaultValuePanel(category);
-        pnlDefaultValue.setEnabled(!isSelectionWidget);
-
-        pnlBottom.removeAll();
-
-        if (isSelectionWidget) {
-            pnlBottom.add(new ListboxEditorPanel(category, property));
-        } else {
-        	pnlValidation.enable();
-            pnlBottom.add(pnlValidation);
-        }
-
-        layout();
-    }
-
-    private void handleWidgetTypeChange() {
-        boolean isSelectionWidget = false;
-
-        PropertyTypeCategory category = getSelectedPropertyTypeCategory();
-
-        if (listPropertyType.getItemCount() > 0) {
-            List<PropertyType> types = propertyTypes.get(category.toString());
-
-            PropertyType type = types.get(listPropertyType.getSelectedIndex());
-
-            // TODO: find alternatives for hardcoding
-            String typeName = type.getName();
-            if (typeName.equalsIgnoreCase("selection") || typeName.equalsIgnoreCase("valueselection")) { //$NON-NLS-1$ //$NON-NLS-2$
-                isSelectionWidget = true;
-            }
-
-            property.setType(typeName);
-        }
-
-        updatePanelsAfterWidgetTypeChange(category, isSelectionWidget);
-    }
-
-    private void buildWidgetPanel() {
-        pnlWidget = new VerticalPanel();
-        pnlWidget.setLayout(new FitLayout());
-        pnlWidget.setSpacing(8);
-
-        pnlWidget.add(buildWidgetTypeDropdown());
-
-        pnlWidget.add(pnlBottom);
-    }
-
     private LayoutContainer buildPanel() {
         VerticalPanel ret = new VerticalPanel();
         ret.setLayout(new FitLayout());
         ret.setStyleAttribute("background-color", "#EDEDED"); //$NON-NLS-1$ //$NON-NLS-2$
         ret.setSpacing(8);
 
-        ret.add(pnlCommandLineOption);
-
         ret.add(buildPropertyTypeDropdown());
 
-        ret.add(pnlPropertyLabel);
-
-        ret.add(pnlDefaultValue);
-
-        ret.add(cbxDisplayInGui);
-        ret.add(cbxOptionFlag);
-        ret.add(cbxRequired);
-
-        ret.add(pnlToolTip);
-
-        if (containerPropertyTypeEditor != null) {
-            ret.add(containerPropertyTypeEditor);
+        if (pnlPropertyTypeEditor != null) {
+            ret.add(pnlPropertyTypeEditor);
         }
 
         return ret;
@@ -902,228 +351,6 @@ public class PropertyEditorPanel extends ContentPanel {
 
         containerMain = buildPanel();
         add(containerMain);
-    }
-
-    /**
-     * Determines if the string contains a double precision numeric value.
-     * 
-     * @param test string that may or may not contain a number
-     * @return true if the string contains a double; otherwise false.
-     */
-    private boolean isDouble(String test) {
-        boolean ret = false; // assume failure
-
-        try {
-            if (test != null) {
-                Double.parseDouble(test);
-
-                // if we get here, we know parseDouble succeeded
-                ret = true;
-            }
-        } catch (NumberFormatException nfe) {
-            // we are assuming false - setting the return value here would be redundant
-        }
-
-        return ret;
-    }
-
-    /**
-     * Determines if the string contains a number formatted as an integer value.
-     * 
-     * @param test string that may or may not contain an integer
-     * @return true if the string contains a number formatted as an integer; otherwise false.
-     */
-    private boolean isInt(String test) {
-        if (test == null) {
-            return false;
-        }
-
-        try {
-            Integer.parseInt(test);
-        } catch (NumberFormatException nfe) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private interface KeyUpCommand {
-        void handleNullInput();
-
-        void execute(String value);
-    }
-
-    private class FlagEditKeyUpCommand implements KeyUpCommand {
-        @Override
-        public void execute(String value) {
-            property.setName(value);
-
-            updateDataObjectFromProperty();
-            fireCommandLineArgumentChangeEvent();
-        }
-
-        @Override
-        public void handleNullInput() {
-            property.setName(DEFAULT_STRING);
-
-            updateDataObjectFromProperty();
-            fireCommandLineArgumentChangeEvent();
-        }
-    }
-
-    private class ValueEditKeyUpCommand implements KeyUpCommand {
-        @Override
-        public void execute(String value) {
-            property.setValue(value);
-            fireCommandLineArgumentChangeEvent();
-        }
-
-        @Override
-        public void handleNullInput() {
-            property.setValue(DEFAULT_STRING);
-            fireCommandLineArgumentChangeEvent();
-        }
-    }
-
-    /**
-     * Command for handling the entry of numeric values.
-     * 
-     * This command only handles KeyUp events.
-     */
-    private class NumberValueEditKeyUpCommand implements KeyUpCommand {
-        @Override
-        public void execute(String value) {
-            property.setValue(value);
-            fireCommandLineArgumentChangeEvent();
-        }
-
-        @Override
-        public void handleNullInput() {
-            property.setValue(DEFAULT_STRING);
-            fireCommandLineArgumentChangeEvent();
-        }
-    }
-
-    private class LabelEditKeyUpCommand implements KeyUpCommand {
-        @Override
-        public void execute(String value) {
-            if (value == null) {
-                value = ""; //$NON-NLS-1$
-            }
-            property.setLabel(value);
-
-            updateDataObjectFromProperty();
-            fireCommandLineArgumentChangeEvent();
-            firePropertyChangedEvent();
-        }
-
-        @Override
-        public void handleNullInput() {
-            property.setLabel(DEFAULT_STRING);
-
-            updateDataObjectFromProperty();
-            fireCommandLineArgumentChangeEvent();
-            firePropertyChangedEvent();
-        }
-    }
-
-    private class DescriptionEditKeyUpCommand implements KeyUpCommand {
-        @Override
-        public void execute(String value) {
-            property.setDescription(value);
-
-            updateDataObjectFromProperty();
-        }
-
-        @Override
-        public void handleNullInput() {
-            property.setDescription(DEFAULT_STRING);
-
-            updateDataObjectFromProperty();
-        }
-    }
-
-    private class StringDefaultValuePanel extends VerticalPanel {
-        private static final String ID_FLD_DEF_STR_VAL = "idFldDefStrVal"; //$NON-NLS-1$
-
-		public StringDefaultValuePanel(final String value) {
-            String caption = I18N.DISPLAY.defaultValueLabel();
-
-            TextField<String> field = buildTextField(ID_FLD_DEF_STR_VAL, value, 255, 255,
-                    new ValueEditKeyUpCommand());
-            
-            IPlantValidator.setRegexRestrictedArgValueChars(field, caption);
-
-            add(buildTextFieldContainer(caption, field));
-        }
-    }
-
-    private class BooleanDefaultValuePanel extends VerticalPanel {
-        public BooleanDefaultValuePanel(final String value) {
-            add(new Label(I18N.DISPLAY.defaultValue()));
-            add(buildBooleanListBox(value));
-        }
-
-        private ListBox buildBooleanListBox(final String value) {
-            final ListBox ret = new ListBox();
-            ret.setWidth("140px"); //$NON-NLS-1$
-            ret.addItem(I18N.DISPLAY.propertyEditorTrue());
-            ret.addItem(I18N.DISPLAY.propertyEditorFalse());
-
-            int idxSelected = 0;
-
-            if (!value.equals("true")) { //$NON-NLS-1$
-                property.setValue(DEFAULT_BOOLEAN);
-                idxSelected = 1;
-            }
-
-            ret.setSelectedIndex(idxSelected);
-
-            ret.addChangeHandler(new ChangeHandler() {
-                @Override
-                public void onChange(ChangeEvent arg0) {
-                    String text = ret.getItemText(ret.getSelectedIndex());
-
-                    text = (text.equals(I18N.DISPLAY.propertyEditorTrue())) ? "true" : "false"; //$NON-NLS-1$ //$NON-NLS-2$
-                    property.setValue(text);
-                }
-            });
-
-            return ret;
-        }
-    }
-
-    /**
-     * User interface for representing a default value that is a number.
-     */
-    private class NumberDefaultValuePanel extends VerticalPanel {
-        public NumberDefaultValuePanel(String value) {
-            add(buildNumberFieldContainer(I18N.DISPLAY.defaultValue(), parseNumberFromString(value), 64,
-                    new NumberValueEditKeyUpCommand(), false));
-        }
-
-        /**
-         * Parses value into an int or a double, depending on the format of the given string, or the
-         * default double value if the string cannot be parsed as a number.
-         * 
-         * @param value Number as a string to parse
-         * @return Either the int or double value of the given string
-         */
-        private Number parseNumberFromString(String value) {
-            Number numVal;
-
-            if (isInt(value)) {
-                numVal = Integer.parseInt(value);
-            } else if (isDouble(value)) {
-                numVal = Double.parseDouble(value);
-            } else {
-                // it's not an int or a double
-                numVal = null;
-                property.setValue(DEFAULT_STRING);
-            }
-
-            return numVal;
-        }
     }
 
     /**
@@ -1151,26 +378,6 @@ public class PropertyEditorPanel extends ContentPanel {
         @Override
         public String toString() {
             return getDisplay() + " " + getCategory(); //$NON-NLS-1$
-        }
-    }
-
-    /**
-     * A simple subclass of LayoutContainer that holds a label and a text field, and provides access to
-     * the field.
-     * 
-     * @author hariolf
-     * 
-     */
-    private static class TextFieldContainer extends LayoutContainer {
-        TextField<String> field;
-
-        private TextFieldContainer(Label label, TextField<String> field) {
-            this.field = field;
-            this.field.setId(label.getText());
-
-            setLayout(new FitLayout());
-            add(label);
-            add(this.field);
         }
     }
 }
