@@ -38,6 +38,8 @@ public class PropertyValidationEditorPanel extends PropertySubTypeEditorPanel {
     private void buildBottomPanel() {
         pnlValidationContainer = new VerticalPanel();
         pnlValidationContainer.setLayout(new FitLayout());
+        pnlValidationContainer.setBorders(true);
+        pnlValidationContainer.setSpacing(8);
     }
 
     @Override

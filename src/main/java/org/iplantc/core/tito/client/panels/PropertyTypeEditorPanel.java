@@ -67,7 +67,6 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
     }
 
     protected void init() {
-        setSize(450, 450);
         setLayout(new FitLayout());
     }
 
@@ -154,7 +153,7 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
         }
 
         if (pnlWidgets != null) {
-            pnlWidgets.setEnabled(enabled);
+            pnlWidgets.setVisible(enabled);
         }
     }
 
@@ -238,8 +237,7 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
     }
 
     protected TextFieldContainer buildToolTipFieldContainer() {
-        return buildTextFieldContainer(
-                I18N.DISPLAY.toolTipText(),
+        return buildTextFieldContainer(I18N.DISPLAY.toolTipText(),
                 buildTextField(ID_TOOL_TIP, 255, 480, new DescriptionEditKeyUpCommand()));
     }
 
@@ -342,6 +340,8 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
             this.field = field;
 
             setLayout(new FitLayout());
+            setStyleAttribute("padding", "4px 0px"); //$NON-NLS-1$ //$NON-NLS-2$
+
             add(label);
             add(this.field);
         }
