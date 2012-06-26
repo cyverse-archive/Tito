@@ -7,14 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.iplantc.core.metadata.client.property.Property;
 import org.iplantc.core.metadata.client.property.PropertyTypeCategory;
-import org.iplantc.core.metadata.client.property.groups.PropertyGroupContainer;
 import org.iplantc.core.metadata.client.validation.MetaDataRule;
 import org.iplantc.core.tito.client.I18N;
 import org.iplantc.core.tito.client.command.RuleCommand;
 import org.iplantc.core.tito.client.models.RuleType;
-import org.iplantc.core.tito.client.widgets.validation.FieldRefDropDown;
 import org.iplantc.core.tito.client.widgets.validation.NumberEditor;
 import org.iplantc.core.tito.client.widgets.validation.PropertyChangeListener;
 import org.iplantc.core.tito.client.widgets.validation.PropertyEditor;
@@ -52,12 +49,10 @@ import com.google.gwt.user.client.Command;
 public class ValidationEditDialog extends Dialog {
     private MetaDataRule rule;
     private MetaDataRule ruleCopy;
-    private PropertyTypeCategory category;
+    private final PropertyTypeCategory category;
     private EditRulePanel valuePanel;
     private LayoutContainer valuePanelContainer;
-    private Property property;
-    private RuleCommand onOkClick;
-    private PropertyGroupContainer pgContainer;
+    private final RuleCommand onOkClick;
     private RuleTypeDropDown ruleTypeDropDown;
     private Map<String, String> formats;
 
@@ -71,43 +66,14 @@ public class ValidationEditDialog extends Dialog {
      * @param showAboveBelowRules
      * @param onOkClick
      */
-    public ValidationEditDialog(MetaDataRule rule, Property property, PropertyTypeCategory category,
-            PropertyGroupContainer pgContainer, boolean showAboveBelowRules, RuleCommand onOkClick) {
-        this.property = property;
+    public ValidationEditDialog(MetaDataRule rule, PropertyTypeCategory category,
+            boolean showAboveBelowRules, RuleCommand onOkClick) {
         this.category = category;
-        this.pgContainer = pgContainer;
         this.onOkClick = onOkClick;
 
         this.rule = rule;
 
         init(showAboveBelowRules);
-    }
-
-    private MetaDataRule buildDefaultNumberMetadataRule() {
-        return new MetaDataRule("IntRange"); //$NON-NLS-1$
-    }
-
-    private MetaDataRule buildDefaultStringMetadataRule() {
-        return new MetaDataRule("MustContain"); //$NON-NLS-1$
-    }
-
-    private MetaDataRule buildDefaultMetaDataRule() {
-        MetaDataRule ret = null; // assume failure
-
-        switch (category) {
-            case NUMBER:
-                ret = buildDefaultNumberMetadataRule();
-                break;
-
-            case STRING:
-                ret = buildDefaultStringMetadataRule();
-                break;
-
-            default:
-                break;
-        }
-
-        return ret;
     }
 
     private void init(final boolean showAboveBelowRules) {
@@ -226,20 +192,6 @@ public class ValidationEditDialog extends Dialog {
             {
                 return (PropertyEditor<T>)new NumberEditor(value == null ? null : value.isNumber(), true);
             }
-        } else if ("List".equals(dataType)) { //$NON-NLS-1$
-            if (category == PropertyTypeCategory.STRING) {
-                JSONArray arr = (value == null) ? null : value.isArray();
-                return (PropertyEditor<T>)new EditableStringList(arr, null);
-            } else {
-                JSONArray arr = (value == null) ? null : value.isArray();
-                return (PropertyEditor<T>)new EditableNumberList(arr, null);
-            }
-        } else if ("FieldRef".equals(dataType)) { //$NON-NLS-1$
-            JSONString str = (value == null) ? null : value.isString();
-            FieldRefDropDown dropDown = new FieldRefDropDown(pgContainer, property,
-                    str == null ? new JSONString("") : str); //$NON-NLS-1$
-            dropDown.getEditorComponent().setEnabled(!dropDown.isEmpty());
-            return (PropertyEditor<T>)dropDown;
         } else {
             JSONString str = (value == null) ? null : value.isString();
             StringEditor editor = new StringEditor(str == null ? new JSONString("") : str); //$NON-NLS-1$
@@ -269,7 +221,7 @@ public class ValidationEditDialog extends Dialog {
     }
 
     private class EditRulePanel extends LayoutContainer {
-        private List<PropertyEditor<JSONValue>> editors;
+        private final List<PropertyEditor<JSONValue>> editors;
 
         /**
          * @param rule

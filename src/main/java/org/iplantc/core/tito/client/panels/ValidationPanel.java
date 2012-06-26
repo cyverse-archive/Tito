@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.iplantc.core.metadata.client.property.Property;
 import org.iplantc.core.metadata.client.property.PropertyTypeCategory;
-import org.iplantc.core.metadata.client.property.groups.PropertyGroupContainer;
 import org.iplantc.core.metadata.client.validation.MetaDataRule;
 import org.iplantc.core.metadata.client.validation.MetaDataValidator;
 import org.iplantc.core.tito.client.I18N;
@@ -33,8 +32,6 @@ import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.user.client.Element;
 
 public class ValidationPanel extends VerticalPanel {
-    final private PropertyGroupContainer container;
-
     final private Property property;
     private PropertyTypeCategory category;
 
@@ -44,8 +41,7 @@ public class ValidationPanel extends VerticalPanel {
     private Button btnEdit;
     private Button btnDelete;
 
-    public ValidationPanel(final PropertyGroupContainer container, final Property property) {
-        this.container = container;
+    public ValidationPanel(final Property property) {
         this.property = property;
 
         setLayout(new FitLayout());
@@ -156,7 +152,7 @@ public class ValidationPanel extends VerticalPanel {
         // TODO cache dialog?
         MetaDataRule selectedRule = gridRules.getSelectionModel().getSelectedItem().getRule();
 
-        ValidationEditDialog dlg = new ValidationEditDialog(selectedRule, property, category, container,
+        ValidationEditDialog dlg = new ValidationEditDialog(selectedRule, category,
                 !containsIntBetweenRule(), new RuleCommand() {
                     @Override
                     public void execute(MetaDataRule rule) {
@@ -225,7 +221,7 @@ public class ValidationPanel extends VerticalPanel {
 
     private void promptForNewRule() {
         // TODO cache dialog?
-        new ValidationEditDialog(null, property, category, container, !containsIntBetweenRule(),
+        new ValidationEditDialog(null, category, !containsIntBetweenRule(),
                 new RuleCommand() {
                     @Override
                     public void execute(MetaDataRule rule) {
