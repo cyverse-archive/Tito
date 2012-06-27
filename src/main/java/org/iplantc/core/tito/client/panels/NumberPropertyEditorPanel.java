@@ -56,8 +56,7 @@ public class NumberPropertyEditorPanel extends PropertyValidationEditorPanel {
 
         cbxOptionFlag.setValue(property.isOmit_if_blank());
         initRequiredCheckBox();
-
-        cbxDisplayInGui.setValue(property.isVisible());
+        initGuiEnabledCheckBox();
     }
 
     /**

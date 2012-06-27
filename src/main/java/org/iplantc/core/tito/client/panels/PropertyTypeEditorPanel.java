@@ -114,11 +114,23 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
                 });
     }
 
+    protected void initGuiEnabledCheckBox() {
+        boolean guiVisible = property.isVisible();
+
+        // set CheckBox value and force GUI Widgets Visible change
+        cbxDisplayInGui.setValue(guiVisible);
+        setGuiWidgetsVisible(guiVisible);
+    }
+
     protected void initRequiredCheckBox() {
         MetaDataValidator validator = property.getValidator();
 
         if (validator != null) {
-            cbxRequired.setValue(validator.isRequired());
+            boolean required = validator.isRequired();
+
+            // set CheckBox value and force Option Flag change
+            cbxRequired.setValue(required);
+            updateOptionFlag(required);
         }
     }
 
@@ -144,10 +156,10 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
 
     protected void updatePropertyVisible(boolean isVisible) {
         property.setVisible(isVisible);
-        setGuiWidgetsEnabled(isVisible);
+        setGuiWidgetsVisible(isVisible);
     }
 
-    private void setGuiWidgetsEnabled(boolean enabled) {
+    private void setGuiWidgetsVisible(boolean enabled) {
         if (cbxRequired != null && !enabled) {
             cbxRequired.setValue(false);
         }

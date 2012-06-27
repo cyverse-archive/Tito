@@ -52,8 +52,7 @@ public class StringPropertyEditorPanel extends PropertyValidationEditorPanel {
 
         cbxOptionFlag.setValue(property.isOmit_if_blank());
         initRequiredCheckBox();
-
-        cbxDisplayInGui.setValue(property.isVisible());
+        initGuiEnabledCheckBox();
     }
 
     /**

@@ -52,7 +52,7 @@ public class BooleanPropertyEditorPanel extends PropertySubTypeEditorPanel {
         initTextField(pnlPropertyLabel.getField(), property.getLabel());
         initTextField(pnlToolTip.getField(), property.getDescription());
 
-        cbxDisplayInGui.setValue(property.isVisible());
+        initGuiEnabledCheckBox();
     }
 
     /**
