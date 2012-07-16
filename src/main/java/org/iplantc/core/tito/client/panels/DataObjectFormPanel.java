@@ -102,7 +102,7 @@ public abstract class DataObjectFormPanel extends PropertyTypeEditorPanel {
     private void initMultiplicity(String multiplicity) {
         String label = multiplicity;
 
-        if (I18N.DISPLAY.multiplicityFolder().equals(multiplicity)) {
+        if (I18N.DISPLAY.multiplicityFolder().equalsIgnoreCase(multiplicity)) {
             label = I18N.DISPLAY.folder();
         }
 
