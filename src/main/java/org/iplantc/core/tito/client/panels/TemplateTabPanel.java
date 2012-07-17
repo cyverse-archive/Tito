@@ -428,7 +428,7 @@ public class TemplateTabPanel extends ContentPanel {
         @Override
         public void componentSelected(MenuEvent ce) {
             JSONObject json = toJson();
-            String print = prettyPrint(json.toString(), null, '\t');
+            String print = prettyPrint(json.toString(), null, 4);
             showJsonPreview(print);
         }
 
@@ -471,7 +471,6 @@ public class TemplateTabPanel extends ContentPanel {
         panel.setSize(400, 280);
         Dialog d = new Dialog();
         d.setHeading(I18N.DISPLAY.jsonPreview());
-        d.setResizable(false);
         d.setLayout(new FitLayout());
         d.add(panel);
         d.setSize(500, 350);
@@ -488,7 +487,7 @@ public class TemplateTabPanel extends ContentPanel {
      * @param space the char to used for formatting
      * @return the pretty print version of json
      */
-    private native String prettyPrint(String json, String replacer, char space) /*-{
+    private native String prettyPrint(String json, String replacer, int space) /*-{
 		return $wnd.JSON.stringify($wnd.JSON.parse(json), replacer, space);
     }-*/;
 
