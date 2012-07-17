@@ -7,6 +7,7 @@ import java.util.List;
 import org.iplantc.core.client.widgets.BoundedTextArea;
 import org.iplantc.core.client.widgets.BoundedTextField;
 import org.iplantc.core.client.widgets.utils.FormLabel;
+import org.iplantc.core.tito.client.Constants;
 import org.iplantc.core.tito.client.I18N;
 import org.iplantc.core.tito.client.dialogs.DCLookUpDialog;
 import org.iplantc.core.tito.client.events.ExecutableChangeEvent;
@@ -17,6 +18,7 @@ import org.iplantc.core.tito.client.models.Template;
 import org.iplantc.core.tito.client.utils.DeployedComponentSearchUtil;
 import org.iplantc.core.uicommons.client.events.EventBus;
 import org.iplantc.core.uicommons.client.models.DeployedComponent;
+import org.iplantc.core.uicommons.client.util.RegExp;
 
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -24,6 +26,7 @@ import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
+import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Html;
@@ -51,7 +54,7 @@ public class TemplateInfoEditorPanel extends ContentPanel {
     private static final String ID_FLD_DESC = "idFldDesc"; //$NON-NLS-1$
     private static final String ID_FLD_NAME = "idFldName"; //$NON-NLS-1$
 
-	private Template template;
+    private Template template;
 
     private FormData formData;
     private FormPanel panel;
@@ -227,6 +230,18 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         field.setEmptyText(I18N.DISPLAY.nameFieldEmptyText());
         field.setAllowBlank(false);
         field.setStyleAttribute("padding-bottom", "5px"); //$NON-NLS-1$ //$NON-NLS-2$
+        field.setAutoValidate(true);
+
+        // Set restricted characters in this field's regex validation.
+        String appNameRegex = Format.substitute(
+                "[^{0}{1}][^{1}]*", //$NON-NLS-1$
+                Constants.CLIENT.appNameRestrictedStartingChars(),
+                RegExp.escapeCharacterClassSet(Constants.CLIENT.appNameRestrictedChars()));
+
+        field.setRegex(appNameRegex);
+        field.getMessages().setRegexText(
+                I18N.ERROR.invalidAppNameMsg(Constants.CLIENT.appNameRestrictedStartingChars(),
+                        Constants.CLIENT.appNameRestrictedChars()));
 
         return field;
     }

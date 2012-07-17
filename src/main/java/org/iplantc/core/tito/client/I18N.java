@@ -1,5 +1,7 @@
 package org.iplantc.core.tito.client;
 
+import org.iplantc.core.uicommons.client.CommonUIErrorStrings;
+
 import com.google.gwt.core.client.GWT;
 
 /**
@@ -10,4 +12,6 @@ import com.google.gwt.core.client.GWT;
  */
 public class I18N {
     public static final DisplayStrings DISPLAY = (DisplayStrings)GWT.create(DisplayStrings.class);
+    public static final CommonUIErrorStrings ERROR = (CommonUIErrorStrings)GWT
+            .create(CommonUIErrorStrings.class);
 }
