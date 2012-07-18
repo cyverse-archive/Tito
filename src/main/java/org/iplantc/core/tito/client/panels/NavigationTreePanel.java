@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.iplantc.core.metadata.client.JSONMetaDataObject;
+import org.iplantc.core.metadata.client.property.DataObject;
 import org.iplantc.core.metadata.client.property.Property;
 import org.iplantc.core.metadata.client.property.groups.PropertyGroup;
 import org.iplantc.core.metadata.client.property.groups.PropertyGroupContainer;
@@ -64,7 +65,7 @@ public class NavigationTreePanel extends ContentPanel {
     private static final String ID_PROPERTY_GROUP_MENU_ITEM = "idAddGroupItem"; //$NON-NLS-1$
 
     // default type when a property is first created
-    private static final String DEFAULT_TYPE_PROPERTY = "FileInput"; //$NON-NLS-1$
+    private static final String DEFAULT_TYPE_PROPERTY = DataObject.INPUT_TYPE;
 
     private TreePanel<MetaDataTreeModel> tree;
     private Menu propertyMenu;
