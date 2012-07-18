@@ -7,7 +7,6 @@ import java.util.List;
 import org.iplantc.core.client.widgets.BoundedTextArea;
 import org.iplantc.core.client.widgets.BoundedTextField;
 import org.iplantc.core.client.widgets.utils.FormLabel;
-import org.iplantc.core.tito.client.Constants;
 import org.iplantc.core.tito.client.I18N;
 import org.iplantc.core.tito.client.dialogs.DCLookUpDialog;
 import org.iplantc.core.tito.client.events.ExecutableChangeEvent;
@@ -16,9 +15,9 @@ import org.iplantc.core.tito.client.events.TemplateNameChangeEvent;
 import org.iplantc.core.tito.client.events.ToolSelectedEvent;
 import org.iplantc.core.tito.client.models.Template;
 import org.iplantc.core.tito.client.utils.DeployedComponentSearchUtil;
+import org.iplantc.core.uiapplications.client.util.AnalysisUtil;
 import org.iplantc.core.uicommons.client.events.EventBus;
 import org.iplantc.core.uicommons.client.models.DeployedComponent;
-import org.iplantc.core.uicommons.client.util.RegExp;
 
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.BaseEvent;
@@ -26,7 +25,6 @@ import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
-import com.extjs.gxt.ui.client.util.Format;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Html;
@@ -233,15 +231,7 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         field.setAutoValidate(true);
 
         // Set restricted characters in this field's regex validation.
-        String appNameRegex = Format.substitute(
-                "[^{0}{1}][^{1}]*", //$NON-NLS-1$
-                Constants.CLIENT.appNameRestrictedStartingChars(),
-                RegExp.escapeCharacterClassSet(Constants.CLIENT.appNameRestrictedChars()));
-
-        field.setRegex(appNameRegex);
-        field.getMessages().setRegexText(
-                I18N.ERROR.invalidAppNameMsg(Constants.CLIENT.appNameRestrictedStartingChars(),
-                        Constants.CLIENT.appNameRestrictedChars()));
+        AnalysisUtil.setAppNameRegexValidation(field);
 
         return field;
     }
