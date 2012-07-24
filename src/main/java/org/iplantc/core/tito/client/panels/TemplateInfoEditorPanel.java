@@ -15,6 +15,7 @@ import org.iplantc.core.tito.client.events.TemplateNameChangeEvent;
 import org.iplantc.core.tito.client.events.ToolSelectedEvent;
 import org.iplantc.core.tito.client.models.Template;
 import org.iplantc.core.tito.client.utils.DeployedComponentSearchUtil;
+import org.iplantc.core.uiapplications.client.util.AnalysisUtil;
 import org.iplantc.core.uicommons.client.events.EventBus;
 import org.iplantc.core.uicommons.client.models.DeployedComponent;
 
@@ -55,7 +56,7 @@ public class TemplateInfoEditorPanel extends ContentPanel {
     private static final String ID_FLD_DESC = "idFldDesc"; //$NON-NLS-1$
     private static final String ID_FLD_NAME = "idFldName"; //$NON-NLS-1$
 
-	private Template template;
+    private Template template;
 
     private FormData formData;
     private FormPanel panel;
@@ -232,6 +233,10 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         field.setEmptyText(I18N.DISPLAY.nameFieldEmptyText());
         field.setAllowBlank(false);
         field.setStyleAttribute("padding-bottom", "5px"); //$NON-NLS-1$ //$NON-NLS-2$
+        field.setAutoValidate(true);
+
+        // Set restricted characters in this field's regex validation.
+        AnalysisUtil.setAppNameRegexValidation(field);
 
         return field;
     }

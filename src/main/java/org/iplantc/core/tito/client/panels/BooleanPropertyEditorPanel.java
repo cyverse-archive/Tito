@@ -1,5 +1,6 @@
 package org.iplantc.core.tito.client.panels;
 
+import org.iplantc.core.metadata.client.PropertyType;
 import org.iplantc.core.metadata.client.property.Property;
 import org.iplantc.core.tito.client.I18N;
 
@@ -121,6 +122,10 @@ public class BooleanPropertyEditorPanel extends PropertySubTypeEditorPanel {
 
     @Override
     protected void handleWidgetTypeChange() {
-        // intentionally do nothing, because Boolean types currently only have one sub-type.
+        if (propertyTypes != null) {
+            // Get the first sub-type, since Boolean types currently only have one sub-type.
+            PropertyType type = propertyTypes.get(0);
+            property.setType(type.getName());
+        }
     }
 }
