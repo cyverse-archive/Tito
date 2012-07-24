@@ -18,6 +18,7 @@ import org.iplantc.core.tito.client.utils.DeployedComponentSearchUtil;
 import org.iplantc.core.uicommons.client.events.EventBus;
 import org.iplantc.core.uicommons.client.models.DeployedComponent;
 
+import com.extjs.gxt.ui.client.Style.LayoutRegion;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -25,9 +26,9 @@ import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
-import com.extjs.gxt.ui.client.widget.HorizontalPanel;
 import com.extjs.gxt.ui.client.widget.Html;
 import com.extjs.gxt.ui.client.widget.Label;
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
@@ -35,8 +36,11 @@ import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
 import com.extjs.gxt.ui.client.widget.form.HiddenField;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.extjs.gxt.ui.client.widget.form.TextField;
+import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
+import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.HandlerRegistration;
 
 /**
@@ -179,8 +183,9 @@ public class TemplateInfoEditorPanel extends ContentPanel {
 
         initComponentField();
 
-        panel.add(buildComponentLabel(), formData);
-        panel.add(buildToolLookUpPanel(), formData);
+        // panel.add(buildComponentLabel(), formData);
+        dcCombo.setFieldLabel(I18N.DISPLAY.selectedTool());
+        panel.add(dcCombo, formData);
         panel.add(new Html("<br/>"), formData); //$NON-NLS-1$
         panel.add(nameField, formData);
 
@@ -235,6 +240,15 @@ public class TemplateInfoEditorPanel extends ContentPanel {
     private void initComponentField() {
         DeployedComponentSearchUtil util = new DeployedComponentSearchUtil();
         dcCombo = (ComboBox<DeployedComponent>)util.buildSearchField();
+
+        dcCombo.addListener(Events.TriggerClick, new Listener<BaseEvent>() {
+            @Override
+            public void handleEvent(BaseEvent be) {
+                GWT.log("This is the click");
+                showLookUpDialog();
+
+            }
+        });
     }
 
     private TextArea buildComponentDescriptionField() {
@@ -334,12 +348,14 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         EventBus.getInstance().fireEvent(event);
     }
 
-    private HorizontalPanel buildToolLookUpPanel() {
-        HorizontalPanel panel = new HorizontalPanel();
-        panel.setLayout(new FitLayout());
-        dcCombo.setWidth(640);
-        panel.setSpacing(5);
-        panel.add(dcCombo);
+    private LayoutContainer buildToolLookUpPanel() {
+
+        // HorizontalPanel panel = new HorizontalPanel();
+        // panel.setMonitorWindowResize(true);
+        // panel.setLayout(new FitLayout());
+        // dcCombo.setWidth(640);
+        // panel.setSpacing(5);
+        // panel.add(dcCombo);
         Button lookup = new Button(I18N.DISPLAY.browse(),
                 new SelectionListener<ButtonEvent>() {
                     @Override
@@ -347,11 +363,33 @@ public class TemplateInfoEditorPanel extends ContentPanel {
                         showLookUpDialog();
                     }
                 });
-        lookup.setId(ID_BTN_BROWSE);
-        panel.add(lookup);
-        panel.setBorders(true);
 
-        return panel;
+        lookup.setId(ID_BTN_BROWSE);
+        lookup.setAutoWidth(true);
+        dcCombo.setAutoWidth(true);
+        // panel.add(lookup);
+        // panel.setBorders(true);
+
+        LayoutContainer lc = new LayoutContainer();
+        BorderLayout layout = new BorderLayout();
+        lc.setLayout(layout);
+        // lc.setHeight(23);
+
+        lc.setAutoHeight(true);
+        lc.setAutoWidth(true);
+        lc.setBorders(true);
+        lc.setLayoutOnChange(true);
+        lc.setMonitorWindowResize(true);
+
+        BorderLayoutData centerLayoutData = new BorderLayoutData(LayoutRegion.CENTER);
+        // centerLayoutData.setMargins(new Margins(0, 0, 0, 5));
+        lc.add(dcCombo, centerLayoutData);
+
+        BorderLayoutData eastLayoutData = new BorderLayoutData(LayoutRegion.EAST);
+        // eastLayoutData.setMargins(new Margins(0, 5, 0, 0));
+        lc.add(lookup, eastLayoutData);
+
+        return lc;
     }
 
     private void showLookUpDialog() {
