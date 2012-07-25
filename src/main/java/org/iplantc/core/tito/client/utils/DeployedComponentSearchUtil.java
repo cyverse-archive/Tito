@@ -7,6 +7,7 @@ import org.iplantc.core.jsonutil.JsonUtil;
 import org.iplantc.core.tito.client.I18N;
 import org.iplantc.core.tito.client.events.ExecutableChangeEvent;
 import org.iplantc.core.tito.client.services.DeployedComponentSearchServiceFacade;
+import org.iplantc.core.tito.client.widgets.form.MyComboBox;
 import org.iplantc.core.uiapplications.client.models.Analysis;
 import org.iplantc.core.uicommons.client.ErrorHandler;
 import org.iplantc.core.uicommons.client.events.EventBus;
@@ -21,7 +22,6 @@ import com.extjs.gxt.ui.client.data.ListLoader;
 import com.extjs.gxt.ui.client.data.LoadEvent;
 import com.extjs.gxt.ui.client.data.ModelKeyProvider;
 import com.extjs.gxt.ui.client.data.RpcProxy;
-import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
@@ -31,7 +31,6 @@ import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.store.Store;
 import com.extjs.gxt.ui.client.store.StoreSorter;
-import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.ListModelPropertyEditor;
 import com.google.gwt.core.client.JsArray;
@@ -49,19 +48,13 @@ public class DeployedComponentSearchUtil {
     private String lastQueryText = "";
     private static final String ID_FLD_D_COMP = "idFldDComp";
 
-    private final class MyComboBox<D> extends ComboBox<DeployedComponent> {
-        @Override
-        protected void onTriggerClick(ComponentEvent ce) {
-            fireEvent(Events.TriggerClick, ce);
-        }
-    }
     /**
      * Builds a combo box for searching all DC, filtered by the user's combo text, and displayed in the
      * combo's drop-down list.
      * 
      * @return A combo box of DC models, remotely loaded and filtered by the user's combo text.
      */
-    public Component buildSearchField() {
+    public MyComboBox<DeployedComponent> buildSearchField() {
         final ListStore<DeployedComponent> store = buildStore();
 
         final ModelKeyProvider<DeployedComponent> storeKeyProvider = getModelKeyProvider();
@@ -81,15 +74,13 @@ public class DeployedComponentSearchUtil {
             }
         };
 
-        final ComboBox<DeployedComponent> combo = new MyComboBox<DeployedComponent>();
-        // combo.setWidth(300);
+        final MyComboBox<DeployedComponent> combo = new MyComboBox<DeployedComponent>();
         combo.setId(ID_FLD_D_COMP);
         combo.setItemSelector("div.search-item"); //$NON-NLS-1$
         combo.setTemplate(getTemplate());
         combo.setStore(store);
         combo.setPropertyEditor(propertyEditor);
         combo.setTriggerStyle("x-form-search-trigger");
-//        combo.setHideTrigger(true);
         combo.setEmptyText(I18N.DISPLAY.search());
         combo.setMinChars(3);
         combo.setFireChangeEventOnSetValue(true);

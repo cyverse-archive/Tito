@@ -15,11 +15,12 @@ import org.iplantc.core.tito.client.events.TemplateNameChangeEvent;
 import org.iplantc.core.tito.client.events.ToolSelectedEvent;
 import org.iplantc.core.tito.client.models.Template;
 import org.iplantc.core.tito.client.utils.DeployedComponentSearchUtil;
+import org.iplantc.core.tito.client.widgets.form.MyComboBox;
+import org.iplantc.core.tito.client.widgets.form.MyTriggerField;
 import org.iplantc.core.uiapplications.client.util.AnalysisUtil;
 import org.iplantc.core.uicommons.client.events.EventBus;
 import org.iplantc.core.uicommons.client.models.DeployedComponent;
 
-import com.extjs.gxt.ui.client.Style.LayoutRegion;
 import com.extjs.gxt.ui.client.Style.Scroll;
 import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
@@ -28,33 +29,33 @@ import com.extjs.gxt.ui.client.event.Listener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Html;
-import com.extjs.gxt.ui.client.widget.Label;
-import com.extjs.gxt.ui.client.widget.LayoutContainer;
-import com.extjs.gxt.ui.client.widget.button.Button;
-import com.extjs.gxt.ui.client.widget.form.ComboBox;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.FormPanel.LabelAlign;
 import com.extjs.gxt.ui.client.widget.form.HiddenField;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
 import com.extjs.gxt.ui.client.widget.form.TextField;
-import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
-import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.layout.FormData;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.HandlerRegistration;
 
 /**
  * 
  * A panel to enable editing for Template info
  * 
+ * 
  * @author sriram
- *
+ * 
  */
 public class TemplateInfoEditorPanel extends ContentPanel {
     private static final String ID_BTN_BROWSE = "idBtnBrowse"; //$NON-NLS-1$
     private static final String ID_FLD_DESC = "idFldDesc"; //$NON-NLS-1$
     private static final String ID_FLD_NAME = "idFldName"; //$NON-NLS-1$
+
+    // TODO JDS need to implement these styles in css
+    private static final String TRIGGER_DELETE_STYLE = "x-form-delete-trigger";
+    private static final String TRIGGER_ADD_STYLE = "x-form-add-trigger";
+    // private static final String TRIGGER_DELETE_STYLE = "x-form-clear-trigger";
+    // private static final String TRIGGER_ADD_STYLE = "x-form-search-trigger";
 
     private Template template;
 
@@ -63,14 +64,14 @@ public class TemplateInfoEditorPanel extends ContentPanel {
 
     private TextField<String> nameField;
     private TextField<String> descField;
-    private MultiTextFieldPanel refPanel;
     private HiddenField<String> idField;
     private HiddenField<String> idComponentField;
     private HiddenField<String> idtito;
     private DCLookUpDialog dialog;
-    private ComboBox<DeployedComponent> dcCombo;
+    private MyComboBox<DeployedComponent> dcCombo;
 
     private ArrayList<HandlerRegistration> handlers;
+    private ArrayList<MyTriggerField<String>> refTriggerList;
 
 
     /**
@@ -115,10 +116,7 @@ public class TemplateInfoEditorPanel extends ContentPanel {
 
         List<String> references = template.getReferences();
         if (references != null && !references.isEmpty()) {
-            refPanel.addFields(references);
-        }
-        else {
-            refPanel.addField();
+            addReferenceFields(references);
         }
         
         String id = template.getId();
@@ -147,6 +145,7 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         formData = new FormData("-20"); //$NON-NLS-1$
         addListeners();
 
+        refTriggerList = new ArrayList<MyTriggerField<String>>();
     }
 
     private void addListeners() {
@@ -163,6 +162,17 @@ public class TemplateInfoEditorPanel extends ContentPanel {
     }
 
     private void addFields() {
+
+        initIdFields();
+        panel.add(idField);
+        panel.add(idtito);
+        panel.add(idComponentField);
+
+        initComponentField();
+        dcCombo.setFieldLabel(I18N.DISPLAY.selectedTool());
+        panel.add(dcCombo, formData);
+        panel.add(new Html("<br/>"), formData); //$NON-NLS-1$
+
         nameField = buildNameTextField();
         // fire TemplateNameChange so the tree can be updated
         nameField.addListener(Events.OnKeyUp, new Listener<BaseEvent>() {
@@ -172,57 +182,34 @@ public class TemplateInfoEditorPanel extends ContentPanel {
                 EventBus.getInstance().fireEvent(e);
             }
         });
-
-        buildTemplateIdField();
-        panel.add(idField);
-
-        buildTitoIdField();
-        panel.add(idtito);
-
-        buildCompIdField();
-        panel.add(idComponentField);
-
-        initComponentField();
-
-        // panel.add(buildComponentLabel(), formData);
-        dcCombo.setFieldLabel(I18N.DISPLAY.selectedTool());
-        panel.add(dcCombo, formData);
-        panel.add(new Html("<br/>"), formData); //$NON-NLS-1$
         panel.add(nameField, formData);
-
         panel.add(new Html("<br/>"), formData); //$NON-NLS-1$
+
         descField = buildComponentDescriptionField();
         panel.add(descField, formData);
-        
         panel.add(new Html("<br/>"), formData); //$NON-NLS-1$
-        refPanel = buildRefPanel();
+
         panel.add(new FormLabel(I18N.DISPLAY.referencesLabel()), formData);
-        panel.add(refPanel, formData);
+        addReferenceField("", TRIGGER_ADD_STYLE);
+
+        // MyTriggerField<String> addTriggerField = new MyTriggerField<String>();
+        // addTriggerField.setFieldLabel("AddTriggerLabel");
+        //
+        // addTriggerField.addListener(Events.TriggerClick, addListener);
+        // panel.add(addTriggerField, new FormData("-20"));
+
     }
 
-    private Label buildComponentLabel() {
-        Label l = new Label(I18N.DISPLAY.selectedTool() + ":"); //$NON-NLS-1$
-
-        l.setStyleAttribute("color", "black"); //$NON-NLS-1$ //$NON-NLS-2$
-        l.setStyleAttribute("font-size", "11px"); //$NON-NLS-1$ //$NON-NLS-2$
-        l.setStyleAttribute("padding-bottom", "5px"); //$NON-NLS-1$ //$NON-NLS-2$
-
-        return l;
-    }
-
-    private void buildTemplateIdField() {
+    private void initIdFields() {
         idField = new HiddenField<String>();
         idField.setId(Template.ID);
-    }
-
-    private void buildTitoIdField() {
+        
         idtito = new HiddenField<String>();
         idtito.setId(Template.TITO_ID);
-    }
 
-    private void buildCompIdField() {
         idComponentField = new HiddenField<String>();
         idComponentField.setId(Template.COMPONENT_ID);
+        
     }
 
     private TextField<String> buildNameTextField() {
@@ -241,17 +228,15 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         return field;
     }
 
-    @SuppressWarnings("unchecked")
     private void initComponentField() {
         DeployedComponentSearchUtil util = new DeployedComponentSearchUtil();
-        dcCombo = (ComboBox<DeployedComponent>)util.buildSearchField();
+        dcCombo = util.buildSearchField();
+        dcCombo.setTriggerId(ID_BTN_BROWSE);
 
         dcCombo.addListener(Events.TriggerClick, new Listener<BaseEvent>() {
             @Override
             public void handleEvent(BaseEvent be) {
-                GWT.log("This is the click");
                 showLookUpDialog();
-
             }
         });
     }
@@ -267,12 +252,6 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         return field;
     }
 
-    private MultiTextFieldPanel buildRefPanel() {
-        MultiTextFieldPanel pnl = new MultiTextFieldPanel();
-        pnl.setWidth(750);
-        return pnl;
-    }
-    
     public Template getTemplate() {
         String id = idField.getValue();
         String name = nameField.getValue();
@@ -282,7 +261,7 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         if (dcCombo.getValue() != null) {
             comp = dcCombo.getValue().getName();
         }
-        List<String> references = refPanel.getValues();
+        List<String> references = getReferenceValues();
         String tito = idtito.getValue();
         String type = ""; //$NON-NLS-1$
 
@@ -330,7 +309,14 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         return template;
     }
 
-
+    private List<String> getReferenceValues() {
+        List<String> retList = new ArrayList<String>();
+        for (MyTriggerField<String> trigger : refTriggerList) {
+            String value = trigger.getValue();
+            retList.add(value == null ? "" : value);
+        }
+        return retList;
+    }
 
     private class DialogOkBtnSelectionListenerImpl extends SelectionListener<ButtonEvent> {
         @Override
@@ -353,56 +339,10 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         EventBus.getInstance().fireEvent(event);
     }
 
-    private LayoutContainer buildToolLookUpPanel() {
-
-        // HorizontalPanel panel = new HorizontalPanel();
-        // panel.setMonitorWindowResize(true);
-        // panel.setLayout(new FitLayout());
-        // dcCombo.setWidth(640);
-        // panel.setSpacing(5);
-        // panel.add(dcCombo);
-        Button lookup = new Button(I18N.DISPLAY.browse(),
-                new SelectionListener<ButtonEvent>() {
-                    @Override
-                    public void componentSelected(ButtonEvent ce) {
-                        showLookUpDialog();
-                    }
-                });
-
-        lookup.setId(ID_BTN_BROWSE);
-        lookup.setAutoWidth(true);
-        dcCombo.setAutoWidth(true);
-        // panel.add(lookup);
-        // panel.setBorders(true);
-
-        LayoutContainer lc = new LayoutContainer();
-        BorderLayout layout = new BorderLayout();
-        lc.setLayout(layout);
-        // lc.setHeight(23);
-
-        lc.setAutoHeight(true);
-        lc.setAutoWidth(true);
-        lc.setBorders(true);
-        lc.setLayoutOnChange(true);
-        lc.setMonitorWindowResize(true);
-
-        BorderLayoutData centerLayoutData = new BorderLayoutData(LayoutRegion.CENTER);
-        // centerLayoutData.setMargins(new Margins(0, 0, 0, 5));
-        lc.add(dcCombo, centerLayoutData);
-
-        BorderLayoutData eastLayoutData = new BorderLayoutData(LayoutRegion.EAST);
-        // eastLayoutData.setMargins(new Margins(0, 5, 0, 0));
-        lc.add(lookup, eastLayoutData);
-
-        return lc;
-    }
-
     private void showLookUpDialog() {
         dialog = new DCLookUpDialog(new DialogOkBtnSelectionListenerImpl(), idComponentField.getValue());
         dialog.show();
     }
-
-
 
     /**
      * Validates all input fields and highlights any invalid ones.
@@ -447,4 +387,66 @@ public class TemplateInfoEditorPanel extends ContentPanel {
 
         handlers.clear();
     }
+
+    private void addReferenceField(final String text, final String triggerStyle) {
+        MyTriggerField<String> referenceField = new MyTriggerField<String>();
+        referenceField.setValue(text);
+        referenceField.setHideLabel(true);
+        referenceField.setTriggerStyle(triggerStyle);
+        // Add the "add" listener
+        referenceField.addListener(Events.TriggerClick, new AddReferenceListener());
+        refTriggerList.add(referenceField);
+        panel.add(referenceField, formData);
+        panel.layout();
+    }
+
+    private void addReferenceFields(final List<String> references) {
+        int count = references.size();
+        boolean wasTriggerListEmpty = refTriggerList.isEmpty();
+        for (String text : references) {
+            /*
+             * If the trigger list was empty when we started, the last reference field we add should have
+             * an "add" trigger
+             */
+            if (wasTriggerListEmpty && count == 0) {
+                addReferenceField(text, TRIGGER_ADD_STYLE);
+            }
+            addReferenceField(text, TRIGGER_DELETE_STYLE);
+            count--;
+        }
+    }
+
+    private class AddReferenceListener implements Listener<BaseEvent> {
+        @Override
+        public void handleEvent(BaseEvent be) {
+            if (be.getSource() instanceof MyTriggerField<?>) {
+                @SuppressWarnings("unchecked")
+                MyTriggerField<String> currTrigger = (MyTriggerField<String>)be.getSource();
+                // Remove the AddReferenceListener and add the RemoveReferenceListener
+                currTrigger.removeAllListeners();
+                currTrigger.addListener(Events.TriggerClick, new RemoveReferenceListener());
+                // Reset the trigger style from "add" to "delete"
+                currTrigger.resetTriggerStyle(TRIGGER_DELETE_STYLE);
+
+                addReferenceField("", TRIGGER_ADD_STYLE);
+            }
+        }
+    }
+
+    private class RemoveReferenceListener implements Listener<BaseEvent> {
+        @Override
+        public void handleEvent(BaseEvent be) {
+            if (be.getSource() instanceof MyTriggerField<?>) {
+                @SuppressWarnings("unchecked")
+                MyTriggerField<String> triggerToBeRemoved = (MyTriggerField<String>)be.getSource();
+                triggerToBeRemoved.removeAllListeners();
+                // Remove trigger field from internal ref collection
+                refTriggerList.remove(triggerToBeRemoved);
+                triggerToBeRemoved.removeFromParent();
+                panel.layout();
+            }
+        }
+    };
+
+
 }
