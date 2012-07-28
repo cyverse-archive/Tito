@@ -20,6 +20,7 @@ import com.extjs.gxt.ui.client.widget.VerticalPanel;
 import com.extjs.gxt.ui.client.widget.form.CheckBox;
 import com.extjs.gxt.ui.client.widget.form.TextField;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.google.gwt.user.client.Element;
 
 public abstract class PropertyTypeEditorPanel extends VerticalPanel {
     public static final String DEFAULT_STRING = ""; //$NON-NLS-1$
@@ -230,10 +231,15 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
         return new TextFieldContainer(label, field);
     }
 
-    protected CheckBox buildCheckBox(String id, String label, Listener<BaseEvent> changeListener) {
-        CheckBox ret = new CheckBox();
+    protected CheckBox buildCheckBox(final String id, String label, Listener<BaseEvent> changeListener) {
+        CheckBox ret = new CheckBox() {
+            @Override
+            protected void onRender(Element target, int index) {
+                super.onRender(target, index);
+                getInputEl().setId(id);
+            }
+        };
 
-        ret.setId(id);
         ret.setBoxLabel(label);
 
         if (changeListener != null) {
