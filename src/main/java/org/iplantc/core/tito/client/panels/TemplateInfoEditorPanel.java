@@ -51,11 +51,8 @@ public class TemplateInfoEditorPanel extends ContentPanel {
     private static final String ID_FLD_DESC = "idFldDesc"; //$NON-NLS-1$
     private static final String ID_FLD_NAME = "idFldName"; //$NON-NLS-1$
 
-    // TODO JDS need to implement these styles in css
-    private static final String TRIGGER_DELETE_STYLE = "x-form-delete-trigger";
+    private static final String TRIGGER_DELETE_STYLE = "x-form-remove-trigger";
     private static final String TRIGGER_ADD_STYLE = "x-form-add-trigger";
-    // private static final String TRIGGER_DELETE_STYLE = "x-form-clear-trigger";
-    // private static final String TRIGGER_ADD_STYLE = "x-form-search-trigger";
 
     private Template template;
 
@@ -190,13 +187,10 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         panel.add(new Html("<br/>"), formData); //$NON-NLS-1$
 
         panel.add(new FormLabel(I18N.DISPLAY.referencesLabel()), formData);
-        addReferenceField("", TRIGGER_ADD_STYLE);
-
-        // MyTriggerField<String> addTriggerField = new MyTriggerField<String>();
-        // addTriggerField.setFieldLabel("AddTriggerLabel");
-        //
-        // addTriggerField.addListener(Events.TriggerClick, addListener);
-        // panel.add(addTriggerField, new FormData("-20"));
+        List<String> references = template.getReferences();
+        if ((references == null) || references.isEmpty()) {
+            addReferenceField("", TRIGGER_ADD_STYLE);
+        }
 
     }
 
@@ -393,26 +387,34 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         referenceField.setValue(text);
         referenceField.setHideLabel(true);
         referenceField.setTriggerStyle(triggerStyle);
-        // Add the "add" listener
-        referenceField.addListener(Events.TriggerClick, new AddReferenceListener());
+        if (triggerStyle.equals(TRIGGER_ADD_STYLE)) {
+            // Add the "add" listener
+            referenceField.addListener(Events.TriggerClick, new AddReferenceListener());
+        } else {
+            // Add the "remove" listener
+            referenceField.addListener(Events.TriggerClick, new RemoveReferenceListener());
+        }
         refTriggerList.add(referenceField);
         panel.add(referenceField, formData);
         panel.layout();
+        referenceField.focus();
     }
 
     private void addReferenceFields(final List<String> references) {
         int count = references.size();
         boolean wasTriggerListEmpty = refTriggerList.isEmpty();
         for (String text : references) {
+            count--;
             /*
              * If the trigger list was empty when we started, the last reference field we add should have
              * an "add" trigger
              */
             if (wasTriggerListEmpty && count == 0) {
                 addReferenceField(text, TRIGGER_ADD_STYLE);
+            } else {
+                addReferenceField(text, TRIGGER_DELETE_STYLE);
             }
-            addReferenceField(text, TRIGGER_DELETE_STYLE);
-            count--;
+
         }
     }
 
