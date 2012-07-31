@@ -72,7 +72,7 @@ public class PreviewDialog extends Dialog {
             @Override
             public void handleEvent(BaseEvent be) {
                 MessageBox.info(I18N.DISPLAY.previewDeployedDialogCaption(),
-                        I18N.DISPLAY.previewDeployedDialogText(), new JobLaunchListenerImpl());
+                        I18N.DISPLAY.previewDeployedDialogText(), new AnalysisLaunchListenerImpl());
             }
         });
 
@@ -152,7 +152,7 @@ public class PreviewDialog extends Dialog {
         hide();
     }
 
-    private class JobLaunchListenerImpl implements Listener<MessageBoxEvent> {
+    private class AnalysisLaunchListenerImpl implements Listener<MessageBoxEvent> {
         @Override
         public void handleEvent(MessageBoxEvent be) {
             doClose();
