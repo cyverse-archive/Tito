@@ -302,8 +302,16 @@ public class PropertyEditorPanel extends ContentPanel {
                             PropertyType typeProperty = new PropertyType(JsonUtil.getObjectAt(
                                     property_types, i));
 
-                            List<PropertyType> list = propertyTypes.get(typeProperty.getType());
-                            list.add(typeProperty);
+                            // Ensure that the PropertyType has a known value_type field before adding it
+                            // to propertyTypes.
+                            String valueType = typeProperty.getType();
+                            if (valueType != null && !valueType.isEmpty()) {
+                                List<PropertyType> list = propertyTypes.get(valueType);
+
+                                if (list != null) {
+                                    list.add(typeProperty);
+                                }
+                            }
                         }
 
                         // now that we've populated our property types list, select the correct category,
