@@ -18,8 +18,6 @@ import org.iplantc.core.tito.client.events.ExecutableChangeEvent;
 import org.iplantc.core.tito.client.events.ExecutableChangeEventHandler;
 import org.iplantc.core.tito.client.events.NavigationTreeDeleteEvent;
 import org.iplantc.core.tito.client.events.NavigationTreeDeleteEventHandler;
-import org.iplantc.core.tito.client.events.NewToolRequestSubmitEvent;
-import org.iplantc.core.tito.client.events.NewToolRequestSubmitEventHandler;
 import org.iplantc.core.tito.client.events.TemplateNameChangeEvent;
 import org.iplantc.core.tito.client.events.TemplateNameChangeEventHandler;
 import org.iplantc.core.tito.client.events.TemplateSaveEvent;
@@ -31,6 +29,7 @@ import org.iplantc.core.tito.client.models.Template;
 import org.iplantc.core.tito.client.services.EnumerationServices;
 import org.iplantc.core.tito.client.utils.PropertyUtil;
 import org.iplantc.core.tito.client.utils.SaveUtil;
+import org.iplantc.core.tito.client.windows.NewToolRequestWindow;
 import org.iplantc.core.uicommons.client.ErrorHandler;
 import org.iplantc.core.uicommons.client.events.EventBus;
 import org.iplantc.core.uicommons.client.util.ByteArrayComparer;
@@ -45,7 +44,6 @@ import com.extjs.gxt.ui.client.widget.Dialog;
 import com.extjs.gxt.ui.client.widget.MessageBox;
 import com.extjs.gxt.ui.client.widget.TabItem;
 import com.extjs.gxt.ui.client.widget.TabPanel;
-import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.menu.Menu;
@@ -80,7 +78,7 @@ public class TemplateTabPanel extends ContentPanel {
     private final ContentPanel pnlContents;
     private TemplateInfoEditorPanel templateInfo;
     private WidgetPanel pnlWidgetsdObj;
-    private Window newToolRequestWin;
+    private final NewToolRequestWindow newToolRequestWin;
 
     private final SaveUtil saveUtil;
     
@@ -102,6 +100,7 @@ public class TemplateTabPanel extends ContentPanel {
     public TemplateTabPanel(JSONObject json, boolean forceSave) {
         init();
 
+        newToolRequestWin = new NewToolRequestWindow();
         pnlContents = new ContentPanel();
         setSize(800, 600);
         pnlContents.setSize(800, 600);
@@ -204,8 +203,6 @@ public class TemplateTabPanel extends ContentPanel {
                 new TemplateNameChangeEventHandlerImpl()));
         handlers.add(bus.addHandler(ExecutableChangeEvent.TYPE, new ExecutableChangeEventHandlerImpl()));
         handlers.add(bus.addHandler(ToolSelectedEvent.TYPE, new ToolSelectedEventHandlerImpl()));
-        handlers.add(bus.addHandler(NewToolRequestSubmitEvent.TYPE,
-                new NewToolRequestSubmitEventHandlerImpl()));
         handlers.add(bus.addHandler(CommandLineArgumentChangeEvent.TYPE,
                 new CommandLineArgumentChangeEventHandlerImpl()));
         handlers.add(bus.addHandler(NavigationTreeDeleteEvent.TYPE,
@@ -309,27 +306,11 @@ public class TemplateTabPanel extends ContentPanel {
         newToolBtn.addSelectionListener(new SelectionListener<ButtonEvent>() {
             @Override
             public void componentSelected(ButtonEvent ce) {
-                showToolRequestDialog();
+                newToolRequestWin.show();
             }
         });
         newToolBtn.setId(ID_BTN_NEW_TOOL_BTN);
         return newToolBtn;
-    }
-
-    private void showToolRequestDialog() {
-        newToolRequestWin = new Window();
-
-        ToolRequestFormPanel requestForm = new ToolRequestFormPanel();
-        requestForm.getSubmitButton()
-                .addSelectionListener(new NewToolSelectionListenerImpl(requestForm));
-        requestForm.getCancelButton().addSelectionListener(new NewToolSelectionCancelListenerImpl());
-
-        newToolRequestWin.setHeading(I18N.DISPLAY.requestNewTool());
-        newToolRequestWin.setLayout(new FitLayout());
-        newToolRequestWin.setSize(500, 500);
-        newToolRequestWin.setResizable(false);
-        newToolRequestWin.add(requestForm);
-        newToolRequestWin.show();
     }
 
     private void displayPreview() {
@@ -586,37 +567,6 @@ public class TemplateTabPanel extends ContentPanel {
         return (templateHasName && templateHasInfo);
     }
 
-    private class NewToolSelectionListenerImpl extends SelectionListener<ButtonEvent> {
-        private final ToolRequestFormPanel requestForm;
-
-        public NewToolSelectionListenerImpl(ToolRequestFormPanel requestForm) {
-            this.requestForm = requestForm;
-        }
-
-        @Override
-        public void componentSelected(ButtonEvent ce) {
-            if (requestForm.validate()) {
-                requestForm.submit();
-            }
-        }
-    }
-
-    private class NewToolSelectionCancelListenerImpl extends SelectionListener<ButtonEvent> {
-        @Override
-        public void componentSelected(ButtonEvent ce) {
-            newToolRequestWin.hide();
-        }
-    }
-
-    private class NewToolRequestSubmitEventHandlerImpl implements NewToolRequestSubmitEventHandler {
-        @Override
-        public void onRequestComplete(NewToolRequestSubmitEvent event) {
-            if (newToolRequestWin != null) {
-                newToolRequestWin.hide();
-            }
-        }
-    }
-    
     /** Validates input fields and enables/disables the publish button. */
     private class CommandLineArgumentChangeEventHandlerImpl implements CommandLineArgumentChangeEventHandler {
         @Override
