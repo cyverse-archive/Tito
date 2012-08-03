@@ -100,6 +100,8 @@ public abstract class DataObjectFormPanel extends PropertyTypeEditorPanel {
         dataObject.setType(property.getType());
         dataObject.setOrder(property.getOrder());
         dataObject.setVisible(property.isVisible());
+        dataObject.setOutputFilename(property.getValue());
+
         if (property.getValidator() != null) {
             dataObject.setRequired(property.getValidator().isRequired());
         } else {

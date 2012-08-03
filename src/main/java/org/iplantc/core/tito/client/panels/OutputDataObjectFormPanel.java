@@ -227,7 +227,7 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
         outputFileNameField.setStyleAttribute("padding-bottom", "5px"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    private class OutputFilenameKeyUpCommand extends LabelEditKeyUpCommand {
+    private class OutputFilenameKeyUpCommand extends ValueEditKeyUpCommand {
         @Override
         public void execute(String value) {
             if (value != null) {
