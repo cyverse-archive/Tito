@@ -536,6 +536,13 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
     String cantLoadUserInfo();
 
     /**
+     * Localized error message to show when data for the Output Data Source drop-down couldn't be loaded.
+     * 
+     * @return string representing the text
+     */
+    String cantLoadDataSources();
+
+    /**
      * Text to show when no executable has been defined
      * 
      * @return string representing the text
@@ -678,4 +685,11 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
      * @return string representing the text
      */
     String searchToolTip();
+
+    /**
+     * Localized text for an Output Data Source label.
+     * 
+     * @return string representing the text
+     */
+    String dataSourceLabel();
 }

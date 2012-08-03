@@ -1,5 +1,7 @@
 package org.iplantc.core.tito.client.services;
 
+import org.iplantc.core.uicommons.client.DEServiceFacade;
+import org.iplantc.core.uicommons.client.models.DEProperties;
 import org.iplantc.de.shared.SharedAuthenticationValidatingServiceFacade;
 import org.iplantc.de.shared.services.BaseServiceCallWrapper.Type;
 import org.iplantc.de.shared.services.ServiceCallWrapper;
@@ -35,6 +37,12 @@ public class EnumerationServices {
         user = URL.encode(user);
         ServiceCallWrapper wrapper = new ServiceCallWrapper(Type.GET,
                 "org.iplantc.services.zoidberg.inprogress?user=" + user + "&summary=true"); //$NON-NLS-1$ //$NON-NLS-2$
+        callService(callback, wrapper);
+    }
+
+    public void getIntegrationAsSummary(String templateID, AsyncCallback<String> callback) {
+        ServiceCallWrapper wrapper = new ServiceCallWrapper(Type.GET,
+                "org.iplantc.services.zoidberg.inprogress?tito=" + templateID + "&summary=true"); //$NON-NLS-1$ //$NON-NLS-2$
         callService(callback, wrapper);
     }
 
@@ -89,14 +97,15 @@ public class EnumerationServices {
         callService(callback, wrapper);
     }
 
+    public void getDataSources(AsyncCallback<String> callback) {
+        String address = DEProperties.getInstance().getUnproctedMuleServiceBaseUrl()
+                + "get-workflow-elements/data-sources"; //$NON-NLS-1$
+
+        ServiceCallWrapper wrapper = new ServiceCallWrapper(address);
+        DEServiceFacade.getInstance().getServiceData(wrapper, callback);
+    }
+
     private void callService(AsyncCallback<String> callback, ServiceCallWrapper wrapper) {
         SharedAuthenticationValidatingServiceFacade.getInstance().getServiceData(wrapper, callback);
     }
-
-    public void getIntegrationAsSummary(String templateID, AsyncCallback<String> callback) {
-        ServiceCallWrapper wrapper = new ServiceCallWrapper(Type.GET,
-                "org.iplantc.services.zoidberg.inprogress?tito=" + templateID + "&summary=true"); //$NON-NLS-1$ //$NON-NLS-2$
-        callService(callback, wrapper);
-    }
-
 }
