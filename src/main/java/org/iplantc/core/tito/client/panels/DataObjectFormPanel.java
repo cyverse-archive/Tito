@@ -1,8 +1,5 @@
 package org.iplantc.core.tito.client.panels;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.iplantc.core.jsonutil.JsonUtil;
 import org.iplantc.core.metadata.client.property.DataObject;
 import org.iplantc.core.metadata.client.property.Property;
@@ -159,27 +156,23 @@ public abstract class DataObjectFormPanel extends PropertyTypeEditorPanel {
         multiplicityGroup.setStyleAttribute("padding-bottom", "5px"); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
-    private void buildInfoTypeComboBox(String label, List<InfoType> infoTypes) {
+    private void buildInfoTypeComboBox() {
         infoTypeField = new ComboBox<InfoType>();
         infoTypeField.setId(ID_INFO_TYPE_CBO);
         infoTypeField.setWidth(250);
         infoTypeField.setForceSelection(true);
-        infoTypeField.setFieldLabel(label);
-        infoTypeField.setDisplayField("description"); //$NON-NLS-1$
+        infoTypeField.setFieldLabel(I18N.DISPLAY.infoTypePrompt());
+        infoTypeField.setDisplayField(InfoType.DESCRIPTION);
         infoTypeField.setTriggerAction(TriggerAction.ALL);
         infoTypeField.setFireChangeEventOnSetValue(true);
         infoTypeField.setAllowBlank(false);
-        infoTypeField.setStyleAttribute("padding-bottom", "5px"); //$NON-NLS-1$ //$NON-NLS-2$
 
         // enable auto-complete
         infoTypeField.setEditable(true);
         infoTypeField.setTypeAhead(true);
         infoTypeField.setQueryDelay(1000);
 
-        ListStore<InfoType> store = new ListStore<InfoType>();
-        store.add(infoTypes);
-
-        infoTypeField.setStore(store);
+        infoTypeField.setStore(new ListStore<InfoType>());
         infoTypeField.addSelectionChangedListener(new SelectionChangedListener<InfoType>() {
             @Override
             public void selectionChanged(SelectionChangedEvent<InfoType> sce) {
@@ -201,7 +194,7 @@ public abstract class DataObjectFormPanel extends PropertyTypeEditorPanel {
         super.buildFields();
 
         buildMultiplicityRadio(getMultiplicityLabel());
-        buildInfoTypeComboBox(I18N.DISPLAY.infoTypePrompt(), new ArrayList<InfoType>());
+        buildInfoTypeComboBox();
     }
 
     @Override
@@ -269,20 +262,21 @@ public abstract class DataObjectFormPanel extends PropertyTypeEditorPanel {
 
             @Override
             public void onSuccess(String result) {
-                List<InfoType> types = new ArrayList<InfoType>();
-
                 JSONObject obj = JsonUtil.getObject(result);
                 JSONArray arr = JsonUtil.getArray(obj, "info_types"); //$NON-NLS-1$
 
                 if (arr != null) {
-                    JsArray<JsInfoType> jsInfoType = JsonUtil.asArrayOf(arr.toString());
-                    for (int i = 0; i < jsInfoType.length(); i++) {
-                        types.add(new InfoType(jsInfoType.get(i).getId(), jsInfoType.get(i).getName(),
-                                jsInfoType.get(i).getDescription()));
+                    ListStore<InfoType> store = infoTypeField.getStore();
+
+                    JsArray<JsInfoType> jsInfoTypeArray = JsonUtil.asArrayOf(arr.toString());
+                    for (int i = 0; i < jsInfoTypeArray.length(); i++) {
+                        JsInfoType jsInfoType = jsInfoTypeArray.get(i);
+
+                        store.add(new InfoType(jsInfoType.getId(), jsInfoType.getName(), jsInfoType
+                                .getDescription()));
                     }
 
-                    infoTypeField.getStore().add(types);
-                    infoTypeField.getStore().sort("description", SortDir.ASC); //$NON-NLS-1$
+                    store.sort(InfoType.DESCRIPTION, SortDir.ASC);
 
                     setInfoType();
                 } else {
