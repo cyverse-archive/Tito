@@ -153,10 +153,10 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
 
         add(cbxImplicitOutput);
 
-        add(new Label(comboDataSources.getFieldLabel() + ":")); //$NON-NLS-1$
-        add(comboDataSources);
         add(new Label(outputFileNameField.getFieldLabel() + ":")); //$NON-NLS-1$
         add(outputFileNameField);
+        add(new Label(comboDataSources.getFieldLabel() + ":")); //$NON-NLS-1$
+        add(comboDataSources);
 
         add(new Label(multiplicityGroup.getFieldLabel() + ":")); //$NON-NLS-1$
         add(multiplicityGroup);
