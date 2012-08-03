@@ -8,6 +8,7 @@ import org.iplantc.core.tito.client.I18N;
 import org.iplantc.core.tito.client.events.ExecutableChangeEvent;
 import org.iplantc.core.tito.client.services.DeployedComponentSearchServiceFacade;
 import org.iplantc.core.tito.client.widgets.form.MyComboBox;
+import org.iplantc.core.tito.client.windows.NewToolRequestWindow;
 import org.iplantc.core.uiapplications.client.models.Analysis;
 import org.iplantc.core.uicommons.client.ErrorHandler;
 import org.iplantc.core.uicommons.client.events.EventBus;
@@ -22,6 +23,7 @@ import com.extjs.gxt.ui.client.data.ListLoader;
 import com.extjs.gxt.ui.client.data.LoadEvent;
 import com.extjs.gxt.ui.client.data.ModelKeyProvider;
 import com.extjs.gxt.ui.client.data.RpcProxy;
+import com.extjs.gxt.ui.client.event.BaseEvent;
 import com.extjs.gxt.ui.client.event.Events;
 import com.extjs.gxt.ui.client.event.FieldEvent;
 import com.extjs.gxt.ui.client.event.Listener;
@@ -47,6 +49,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class DeployedComponentSearchUtil {
     private String lastQueryText = "";
     private static final String ID_FLD_D_COMP = "idFldDComp";
+    private static final String ID_INSTALLATION_REQUEST = "idRequestInstallationListViewEntry";
+
+    private final NewToolRequestWindow newToolRequestWin = new NewToolRequestWindow();
 
     /**
      * Builds a combo box for searching all DC, filtered by the user's combo text, and displayed in the
@@ -87,6 +92,7 @@ public class DeployedComponentSearchUtil {
         combo.setPropertyEditor(new ListModelPropertyEditor<DeployedComponent>(DeployedComponent.NAME));
 
         combo.addSelectionChangedListener(new SearchComboSelectionChangeListener());
+        combo.addListener(Events.Select, new SearchComboSelectionListener(combo));
 
         // Since we don't want our custom key provider's string to display after a user selects a search
         // result, reset the raw text field to the cached user query string after a selection is made.
@@ -121,6 +127,21 @@ public class DeployedComponentSearchUtil {
             @Override
             public void loaderLoad(LoadEvent le) {
                 store.sort(Analysis.NAME, SortDir.ASC);
+            }
+        });
+
+        store.addListener(Store.Sort, new Listener<BaseEvent>() {
+
+            @Override
+            public void handleEvent(BaseEvent be) {
+                DeployedComponent placeHolder = new DeployedComponent(ID_INSTALLATION_REQUEST,
+                        "zzzzzzzzzzzzzzzzzz",
+                        "type", "description", "attribution", "location", "version");
+                store.insert(placeHolder, 0);
+                /*
+                 * TODO JDS Need to figure out how to ensure this is at the bottom of the list. Currently
+                 * this is only at the bottom of the list because of the custom sorter.
+                 */
             }
         });
 
@@ -177,7 +198,7 @@ public class DeployedComponentSearchUtil {
     private String getTemplate() {
         StringBuilder template = new StringBuilder();
 
-        template.append("<tpl for=\".\"><div class=\"search-item\">"); //$NON-NLS-1$
+        template.append("<tpl for=\".\"><tpl if=\"id !='" + ID_INSTALLATION_REQUEST + "'\"><div class=\"search-item\">"); //$NON-NLS-1$
 
         template.append("<h3>"); //$NON-NLS-1$
         template.append("<b>{name}</b>"); //$NON-NLS-1$
@@ -189,6 +210,10 @@ public class DeployedComponentSearchUtil {
         template.append("<tpl if=\"description\"><p>{description}</p></tpl>"); //$NON-NLS-1$
         template.append("</h4>"); //$NON-NLS-1$
         template.append("</div></tpl>"); //$NON-NLS-1$
+
+        template.append("<tpl if=\"id =='" + ID_INSTALLATION_REQUEST + "'\"><div class=\"search-item request_tool_installation\">"); //$NON-NLS-1$
+        template.append("<b>" + I18N.DISPLAY.requestNewTool() + "</b>"); //$NON-NLS-1$
+        template.append("</div></tpl></tpl>"); //$NON-NLS-1$
 
         return template.toString();
     };
@@ -219,7 +244,11 @@ public class DeployedComponentSearchUtil {
         public void handleEvent(FieldEvent event) {
             @SuppressWarnings("unchecked")
             ComboBox<DeployedComponent> combo = (ComboBox<DeployedComponent>)event.getSource();
-            combo.setRawValue(combo.getValue().getName());
+            if (combo.getValue().getId().equals(ID_INSTALLATION_REQUEST)) {
+                combo.setRawValue("");
+            } else {
+                combo.setRawValue(combo.getValue().getName());
+            }
         }
     }
 
@@ -235,6 +264,24 @@ public class DeployedComponentSearchUtil {
                 EventBus.getInstance().fireEvent(event);
             }
         }
+    }
+
+    private final class SearchComboSelectionListener implements Listener<BaseEvent> {
+
+        private final MyComboBox<DeployedComponent> comboBox;
+
+        public SearchComboSelectionListener(MyComboBox<DeployedComponent> comboBox) {
+            this.comboBox = comboBox;
+        }
+
+        @Override
+        public void handleEvent(BaseEvent be) {
+            if ((be.getSource() == comboBox)
+                    && comboBox.getValue().getId().equals(ID_INSTALLATION_REQUEST)) {
+                newToolRequestWin.show();
+            }
+        }
+
     }
 
     private final class CustomStoreSorter extends StoreSorter<DeployedComponent> {

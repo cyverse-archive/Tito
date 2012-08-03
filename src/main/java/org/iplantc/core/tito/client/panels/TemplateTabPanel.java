@@ -29,7 +29,6 @@ import org.iplantc.core.tito.client.models.Template;
 import org.iplantc.core.tito.client.services.EnumerationServices;
 import org.iplantc.core.tito.client.utils.PropertyUtil;
 import org.iplantc.core.tito.client.utils.SaveUtil;
-import org.iplantc.core.tito.client.windows.NewToolRequestWindow;
 import org.iplantc.core.uicommons.client.ErrorHandler;
 import org.iplantc.core.uicommons.client.events.EventBus;
 import org.iplantc.core.uicommons.client.util.ByteArrayComparer;
@@ -78,7 +77,6 @@ public class TemplateTabPanel extends ContentPanel {
     private final ContentPanel pnlContents;
     private TemplateInfoEditorPanel templateInfo;
     private WidgetPanel pnlWidgetsdObj;
-    private final NewToolRequestWindow newToolRequestWin;
 
     private final SaveUtil saveUtil;
     
@@ -100,7 +98,7 @@ public class TemplateTabPanel extends ContentPanel {
     public TemplateTabPanel(JSONObject json, boolean forceSave) {
         init();
 
-        newToolRequestWin = new NewToolRequestWindow();
+        // newToolRequestWin = new NewToolRequestWindow();
         pnlContents = new ContentPanel();
         setSize(800, 600);
         pnlContents.setSize(800, 600);
@@ -213,7 +211,6 @@ public class TemplateTabPanel extends ContentPanel {
         ToolBar tool = new ToolBar();
 
         tool.add(buildPublishButton());
-        tool.add(buildNewToolRequestButton());
         tool.add(buildCmdLineOrderButton());
         tool.add(buildPreviewMenu());
 
@@ -298,19 +295,6 @@ public class TemplateTabPanel extends ContentPanel {
         btnPreview.setMenu(menuPreview);
 
         return btnPreview;
-    }
-
-    private Button buildNewToolRequestButton() {
-        Button newToolBtn = new Button(I18N.DISPLAY.requestNewTool());
-        newToolBtn.setIcon(AbstractImagePrototype.create(Resources.ICONS.add()));
-        newToolBtn.addSelectionListener(new SelectionListener<ButtonEvent>() {
-            @Override
-            public void componentSelected(ButtonEvent ce) {
-                newToolRequestWin.show();
-            }
-        });
-        newToolBtn.setId(ID_BTN_NEW_TOOL_BTN);
-        return newToolBtn;
     }
 
     private void displayPreview() {
