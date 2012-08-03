@@ -108,8 +108,6 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
         super.init();
 
         property.setType(DataObject.OUTPUT_TYPE);
-        property.setVisible(false);
-        property.setOmit_if_blank(true);
     }
 
     /**
@@ -122,6 +120,9 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
         buildImplicitOutputCheckbox();
         buildDataSourcesComboBox();
         buildOutputFileNameField();
+
+        buildGuiEnabledCheckbox();
+        buildWidgetsPanel();
     }
 
     /**
@@ -137,6 +138,8 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
             cbxImplicitOutput.setValue(obj.isImplicit());
             initTextField(outputFileNameField, obj.getOutputFilename());
         }
+
+        initGuiEnabledCheckBox();
     }
 
     /**
@@ -145,6 +148,8 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
     @Override
     protected void addFields() {
         super.addFields();
+
+        add(pnlPropertyLabel);
 
         add(cbxImplicitOutput);
 
@@ -157,6 +162,14 @@ public class OutputDataObjectFormPanel extends DataObjectFormPanel {
         add(multiplicityGroup);
         add(new Label(infoTypeField.getFieldLabel() + ":")); //$NON-NLS-1$
         add(infoTypeField);
+
+        add(cbxDisplayInGui);
+        pnlWidgets.add(cbxOptionFlag);
+        pnlWidgets.add(cbxRequired);
+
+        pnlWidgets.add(pnlToolTip);
+
+        add(pnlWidgets);
     }
 
     private void buildImplicitOutputCheckbox() {
