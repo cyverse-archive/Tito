@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.iplantc.core.metadata.client.property.DataObject;
 import org.iplantc.core.metadata.client.property.Property;
 import org.iplantc.core.metadata.client.property.PropertyData;
 import org.iplantc.core.tito.client.I18N;
@@ -144,15 +143,6 @@ public class CommandLineOrderingGridPanel extends ContentPanel {
         // populate the unordered and ordered grids.
         unorderedGrid.reconfigure(unorderedListStore, unorderedGrid.getColumnModel());
         orderedGrid.reconfigure(orderedListStore, orderedGrid.getColumnModel());
-    }
-    
-    private boolean dataObjectImplicit(DataObject dataObj) {
-    	boolean isImplicit = false;
-    	if(dataObj != null) {
-    		isImplicit = dataObj.isImplicit();
-    	}
-    	
-    	return isImplicit;
     }
 
     /**
