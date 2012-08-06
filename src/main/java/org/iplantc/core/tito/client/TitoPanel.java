@@ -70,7 +70,11 @@ public class TitoPanel extends LayoutContainer {
     }
 
     public boolean isDirty() {
-    	return pnlAppTemplate.templateChanged();
+        if (pnlAppTemplate != null) {
+            return pnlAppTemplate.templateChanged();
+        }
+
+        return false;
     }
 
     public void load(final String id) {
