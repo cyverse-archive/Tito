@@ -60,6 +60,7 @@ public class BooleanPropertyEditorPanel extends PropertySubTypeEditorPanel {
         add(cbxDisplayInGui);
 
         pnlWidgets.add(pnlToolTip);
+        add(pnlWidgets);
     }
 
     private void initBooleanListBox(final ListBox field, final String value) {
