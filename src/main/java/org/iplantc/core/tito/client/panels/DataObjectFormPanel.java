@@ -42,8 +42,6 @@ public abstract class DataObjectFormPanel extends PropertyTypeEditorPanel {
     protected RadioGroup multiplicityGroup;
     protected ComboBox<InfoType> infoTypeField;
     protected Grid<FileFormat> formatField;
-    protected TextFieldContainer pnlPropertyLabel;
-    protected TextFieldContainer pnlToolTip;
 
     /**
      * Create a new instance of DataObjectFormPanel
@@ -206,8 +204,6 @@ public abstract class DataObjectFormPanel extends PropertyTypeEditorPanel {
     protected void buildFields() {
         super.buildFields();
 
-        pnlPropertyLabel = buildLabelFieldContainer();
-        pnlToolTip = buildToolTipFieldContainer();
         buildOptionalFlagCheckbox();
         buildRequiredCheckBox();
 

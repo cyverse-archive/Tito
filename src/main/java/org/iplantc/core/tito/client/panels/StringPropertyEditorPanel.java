@@ -10,9 +10,6 @@ import com.extjs.gxt.ui.client.widget.form.TextField;
 public class StringPropertyEditorPanel extends PropertyValidationEditorPanel {
     private static final String ID_FLD_DEF_STR_VAL = "idFldDefStrVal"; //$NON-NLS-1$
 
-    private TextFieldContainer pnlPropertyLabel;
-    private TextFieldContainer pnlToolTip;
-
     public StringPropertyEditorPanel(Property property) {
         super(property, PropertyTypeCategory.STRING);
     }
@@ -24,9 +21,7 @@ public class StringPropertyEditorPanel extends PropertyValidationEditorPanel {
     protected void buildFields() {
         super.buildFields();
 
-        pnlPropertyLabel = buildLabelFieldContainer();
         pnlDefaultValue = buildDefaultValueContainer();
-        pnlToolTip = buildToolTipFieldContainer();
 
         buildGuiEnabledCheckbox();
         buildOptionalFlagCheckbox();
@@ -46,9 +41,7 @@ public class StringPropertyEditorPanel extends PropertyValidationEditorPanel {
 
         TextField<String> fieldDefaultValue = ((TextFieldContainer)pnlDefaultValue).getField();
 
-        initTextField(pnlPropertyLabel.getField(), property.getLabel());
         initTextField(fieldDefaultValue, property.getValue());
-        initTextField(pnlToolTip.getField(), property.getDescription());
 
         cbxOptionFlag.setValue(property.isOmit_if_blank());
         initRequiredCheckBox();

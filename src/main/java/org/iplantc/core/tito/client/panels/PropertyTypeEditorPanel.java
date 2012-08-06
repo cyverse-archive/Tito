@@ -35,6 +35,8 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
     protected final Property property;
 
     protected TextFieldContainer pnlCommandLineOption;
+    protected TextFieldContainer pnlPropertyLabel;
+    protected TextFieldContainer pnlToolTip;
     protected VerticalPanel pnlWidgets;
     protected CheckBox cbxDisplayInGui;
     protected CheckBox cbxOptionFlag;
@@ -51,6 +53,8 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
 
     protected void buildFields() {
         buildCommandLineOptionPanel();
+        pnlPropertyLabel = buildLabelFieldContainer();
+        pnlToolTip = buildToolTipFieldContainer();
     }
 
     protected void addFields() {
@@ -65,6 +69,9 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
 
         initTextField(field, property.getName());
         field.focus();
+
+        initTextField(pnlPropertyLabel.getField(), property.getLabel());
+        initTextField(pnlToolTip.getField(), property.getDescription());
     }
 
     protected void init() {

@@ -18,8 +18,6 @@ public class BooleanPropertyEditorPanel extends PropertySubTypeEditorPanel {
     private static final String ID_FLD_BOOLEAN_VAL = "idFldBoolean"; //$NON-NLS-1$
 
     private BooleanDefaultValuePanel pnlDefaultValue;
-    private TextFieldContainer pnlPropertyLabel;
-    private TextFieldContainer pnlToolTip;
 
     public BooleanPropertyEditorPanel(Property property) {
         super(property);
@@ -34,9 +32,6 @@ public class BooleanPropertyEditorPanel extends PropertySubTypeEditorPanel {
 
         pnlDefaultValue = new BooleanDefaultValuePanel();
 
-        pnlPropertyLabel = buildLabelFieldContainer();
-        pnlToolTip = buildToolTipFieldContainer();
-
         buildGuiEnabledCheckbox();
         buildWidgetsPanel();
     }
@@ -49,9 +44,6 @@ public class BooleanPropertyEditorPanel extends PropertySubTypeEditorPanel {
         super.initFieldValues();
 
         initBooleanListBox(pnlDefaultValue.getListBox(), property.getValue());
-
-        initTextField(pnlPropertyLabel.getField(), property.getLabel());
-        initTextField(pnlToolTip.getField(), property.getDescription());
 
         initGuiEnabledCheckBox();
     }

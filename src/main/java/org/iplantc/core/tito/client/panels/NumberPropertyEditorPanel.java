@@ -14,9 +14,6 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 public class NumberPropertyEditorPanel extends PropertyValidationEditorPanel {
     private static final String ID_FIELD_NUM = "idFieldNum"; //$NON-NLS-1$
 
-    private TextFieldContainer pnlPropertyLabel;
-    private TextFieldContainer pnlToolTip;
-
     public NumberPropertyEditorPanel(Property property) {
         super(property, PropertyTypeCategory.NUMBER);
     }
@@ -28,9 +25,7 @@ public class NumberPropertyEditorPanel extends PropertyValidationEditorPanel {
     protected void buildFields() {
         super.buildFields();
 
-        pnlPropertyLabel = buildLabelFieldContainer();
         pnlDefaultValue = buildDefaultValueContainer();
-        pnlToolTip = buildToolTipFieldContainer();
 
         buildGuiEnabledCheckbox();
         buildOptionalFlagCheckbox();
@@ -50,9 +45,6 @@ public class NumberPropertyEditorPanel extends PropertyValidationEditorPanel {
 
         NumberField fieldDefaultValue = ((NumberFieldContainer)pnlDefaultValue).getField();
         fieldDefaultValue.setValue(parseNumberFromString(property.getValue()));
-
-        initTextField(pnlPropertyLabel.getField(), property.getLabel());
-        initTextField(pnlToolTip.getField(), property.getDescription());
 
         cbxOptionFlag.setValue(property.isOmit_if_blank());
         initRequiredCheckBox();
