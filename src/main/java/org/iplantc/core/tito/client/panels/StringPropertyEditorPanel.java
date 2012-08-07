@@ -75,6 +75,6 @@ public class StringPropertyEditorPanel extends PropertyValidationEditorPanel {
                 new ValueEditKeyUpCommand());
         IPlantValidator.setRegexRestrictedArgValueChars(field, caption);
 
-        return buildTextFieldContainer(caption, field);
+        return new TextFieldContainer(caption, field);
     }
 }

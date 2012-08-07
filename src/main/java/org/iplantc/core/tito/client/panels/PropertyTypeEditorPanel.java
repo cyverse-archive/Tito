@@ -84,7 +84,7 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
         TextField<String> field = buildTextField(ID_FLD_CMD_L_OPTN, 255, 128, new FlagEditKeyUpCommand());
         IPlantValidator.setRegexRestrictedCmdLineChars(field, caption);
 
-        pnlCommandLineOption = buildTextFieldContainer(caption, field);
+        pnlCommandLineOption = new TextFieldContainer(caption, field);
     }
 
     protected void buildWidgetsPanel() {
@@ -233,11 +233,6 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
         return ret;
     }
 
-    protected TextFieldContainer buildTextFieldContainer(final String caption, TextField<String> field) {
-        Label label = new Label(caption + ":"); //$NON-NLS-1$
-        return new TextFieldContainer(label, field);
-    }
-
     protected CheckBox buildCheckBox(final String id, String label, Listener<BaseEvent> changeListener) {
         CheckBox ret = new CheckBox() {
             @Override
@@ -257,12 +252,12 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
     }
 
     protected TextFieldContainer buildLabelFieldContainer() {
-        return buildTextFieldContainer(I18N.DISPLAY.label(),
+        return new TextFieldContainer(I18N.DISPLAY.label(),
                 buildTextField(ID_PROP_LBL, 255, 255, new LabelEditKeyUpCommand()));
     }
 
     protected TextFieldContainer buildToolTipFieldContainer() {
-        return buildTextFieldContainer(I18N.DISPLAY.toolTipText(),
+        return new TextFieldContainer(I18N.DISPLAY.toolTipText(),
                 buildTextField(ID_TOOL_TIP, 255, 480, new DescriptionEditKeyUpCommand()));
     }
 
@@ -360,19 +355,29 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
      */
     protected static class TextFieldContainer extends LayoutContainer {
         private final TextField<String> field;
+        private final Label label;
 
-        protected TextFieldContainer(Label label, TextField<String> field) {
+        protected TextFieldContainer(String caption, TextField<String> field) {
             this.field = field;
+            this.label = new Label(caption + ":"); //$NON-NLS-1$
 
             setLayout(new FitLayout());
             setStyleAttribute("padding", "4px 0px"); //$NON-NLS-1$ //$NON-NLS-2$
 
-            add(label);
+            add(this.label);
             add(this.field);
         }
 
         protected TextField<String> getField() {
             return field;
+        }
+
+        protected Label getLabel() {
+            return label;
+        }
+
+        protected void setLabel(String caption) {
+            label.setText(caption + ":"); //$NON-NLS-1$
         }
     }
 
