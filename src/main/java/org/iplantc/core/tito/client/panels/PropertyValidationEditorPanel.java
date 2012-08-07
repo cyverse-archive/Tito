@@ -75,8 +75,14 @@ public class PropertyValidationEditorPanel extends PropertySubTypeEditorPanel {
         pnlValidationContainer.add(pnlPropertyTypeList);
 
         if (isSelectionWidget) {
+            // Selection types should not be hidden in the GUI, since they are not required to define
+            // default values needed for hidden parameters.
+            cbxDisplayInGui.setValue(true);
+            cbxDisplayInGui.setEnabled(false);
+
             pnlValidationContainer.add(pnlListBoxEditor);
         } else {
+            cbxDisplayInGui.setEnabled(true);
             pnlValidationContainer.add(pnlValidation);
         }
 
