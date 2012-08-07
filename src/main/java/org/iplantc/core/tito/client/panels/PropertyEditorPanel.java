@@ -151,7 +151,7 @@ public class PropertyEditorPanel extends ContentPanel {
         boolean resetDefault = true;
 
         String propertyType = property.getType();
-        List<PropertyType> types = propertyTypes.get(category.toString());
+        List<PropertyType> types = propertyTypes.get(category.getValueType());
 
         for (PropertyType type : types) {
             if (type.getName().equals(propertyType)) {
@@ -227,7 +227,7 @@ public class PropertyEditorPanel extends ContentPanel {
             if (pnlPropertyTypeEditor instanceof PropertySubTypeEditorPanel) {
                 // update the PropertySubTypeEditorPanel with the correct list of widget-types.
                 ((PropertySubTypeEditorPanel)pnlPropertyTypeEditor)
-                        .updatePropertyTypesToListBox(propertyTypes.get(category.toString()));
+                        .updatePropertyTypesToListBox(propertyTypes.get(category.getValueType()));
             }
 
             layout();
@@ -236,10 +236,10 @@ public class PropertyEditorPanel extends ContentPanel {
 
     private String getCategoryFromType(final String propertyType) {
         if (DataObject.INPUT_TYPE.equals(propertyType)) {
-            return PropertyTypeCategory.INPUT.toString();
+            return PropertyTypeCategory.INPUT.getValueType();
         }
         if (DataObject.OUTPUT_TYPE.equals(propertyType)) {
-            return PropertyTypeCategory.OUTPUT.toString();
+            return PropertyTypeCategory.OUTPUT.getValueType();
         }
 
         String ret = ""; // assume failure //$NON-NLS-1$
@@ -280,7 +280,7 @@ public class PropertyEditorPanel extends ContentPanel {
         propertyTypes = new FastMap<List<PropertyType>>();
 
         for (PropertyTypeCategory category : PropertyTypeCategory.values()) {
-            propertyTypes.put(category.toString(), new ArrayList<PropertyType>());
+            propertyTypes.put(category.getValueType(), new ArrayList<PropertyType>());
         }
     }
 
