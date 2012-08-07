@@ -2,6 +2,7 @@ package org.iplantc.core.tito.client.utils;
 
 import org.iplantc.core.metadata.client.property.DataObject;
 import org.iplantc.core.metadata.client.property.Property;
+import org.iplantc.core.metadata.client.property.PropertyTypeCategory;
 
 /**
  * Utility class for Property metadata models.
@@ -28,6 +29,10 @@ public class PropertyUtil {
         String propertyType = prop.getType();
 
         if (TYPE_STATIC_TEXT.equals(propertyType)) {
+            return false;
+        }
+
+        if (PropertyTypeCategory.ENV.getValueType().equals(propertyType)) {
             return false;
         }
 

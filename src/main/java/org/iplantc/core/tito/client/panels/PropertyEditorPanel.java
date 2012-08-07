@@ -216,6 +216,10 @@ public class PropertyEditorPanel extends ContentPanel {
                 pnlPropertyTypeEditor = new NumberPropertyEditorPanel(property);
                 break;
 
+            case ENV:
+                pnlPropertyTypeEditor = new EnvironmentVariablePropertyEditorPanel(property);
+                break;
+
             default:
                 pnlPropertyTypeEditor = null;
                 break;

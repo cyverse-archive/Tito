@@ -121,12 +121,12 @@ public class CommandLineOrderingGridPanel extends ContentPanel {
         for (Property property : propertyList) {
             PropertyData propData = new PropertyData(property);
 
-            if (propData.getOrder() < 0) {
-                if (PropertyUtil.orderingRequired(propData.getProperty())) {
-            		unorderedListStore.add(propData);
-            	}
-            } else {
-                listOrderedPropertyData.add(propData);
+            if (PropertyUtil.orderingRequired(property)) {
+                if (propData.getOrder() < 0) {
+                    unorderedListStore.add(propData);
+                } else {
+                    listOrderedPropertyData.add(propData);
+                }
             }
         }
 

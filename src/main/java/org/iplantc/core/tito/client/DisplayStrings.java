@@ -692,4 +692,11 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
      * @return string representing the text
      */
     String dataSourceLabel();
+
+    /**
+     * Localized text for an Environment Variable name label.
+     * 
+     * @return string representing the text
+     */
+    String environmentVariableName();
 }
