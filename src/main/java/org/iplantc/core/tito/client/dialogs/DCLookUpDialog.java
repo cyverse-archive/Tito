@@ -53,8 +53,6 @@ public class DCLookUpDialog extends Dialog {
     private RowExpander expander;
     private TextField<String> filter;
     private String currentSelection;
-    private final NewToolRequestWindow newToolRequestWin;
-
 
     public DCLookUpDialog(SelectionListener<ButtonEvent> DialogOkBtnSelectionListenerImpl,
             String currentSelection) {
@@ -63,7 +61,6 @@ public class DCLookUpDialog extends Dialog {
         setButtons(Dialog.OKCANCEL);
 
         Button bntOk = setOkButtonListener(DialogOkBtnSelectionListenerImpl);
-        newToolRequestWin = new NewToolRequestWindow();
 
         initDialog(bntOk);
 
@@ -145,7 +142,7 @@ public class DCLookUpDialog extends Dialog {
         newToolBtn.addSelectionListener(new SelectionListener<ButtonEvent>() {
             @Override
             public void componentSelected(ButtonEvent ce) {
-                newToolRequestWin.show();
+                new NewToolRequestWindow().show();
             }
         });
         newToolBtn.setId(ID_BTN_NEW_TOOL_BTN);

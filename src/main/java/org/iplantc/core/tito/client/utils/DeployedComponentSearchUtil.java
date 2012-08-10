@@ -51,8 +51,6 @@ public class DeployedComponentSearchUtil {
     private static final String ID_FLD_D_COMP = "idFldDComp";
     private static final String ID_INSTALLATION_REQUEST = "idRequestInstallationListViewEntry";
 
-    private final NewToolRequestWindow newToolRequestWin = new NewToolRequestWindow();
-
     /**
      * Builds a combo box for searching all DC, filtered by the user's combo text, and displayed in the
      * combo's drop-down list.
@@ -278,7 +276,7 @@ public class DeployedComponentSearchUtil {
         public void handleEvent(BaseEvent be) {
             if ((be.getSource() == comboBox)
                     && comboBox.getValue().getId().equals(ID_INSTALLATION_REQUEST)) {
-                newToolRequestWin.show();
+                new NewToolRequestWindow().show();
             }
         }
 
