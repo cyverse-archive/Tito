@@ -8,6 +8,7 @@ import org.iplantc.core.tito.client.services.DeployedComponentSearchServiceFacad
 import org.iplantc.core.tito.client.services.EnumerationServices;
 import org.iplantc.core.tito.client.utils.DeployedComponentSearchUtil;
 import org.iplantc.core.tito.client.utils.DeployedComponentSorter;
+import org.iplantc.core.tito.client.windows.NewToolRequestWindow;
 import org.iplantc.core.uicommons.client.ErrorHandler;
 import org.iplantc.core.uicommons.client.images.Resources;
 import org.iplantc.core.uicommons.client.models.DeployedComponent;
@@ -31,6 +32,7 @@ import com.extjs.gxt.ui.client.widget.grid.ColumnModel;
 import com.extjs.gxt.ui.client.widget.grid.Grid;
 import com.extjs.gxt.ui.client.widget.grid.RowExpander;
 import com.extjs.gxt.ui.client.widget.layout.FitLayout;
+import com.extjs.gxt.ui.client.widget.toolbar.FillToolItem;
 import com.extjs.gxt.ui.client.widget.toolbar.ToolBar;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
@@ -44,12 +46,14 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype;
  */
 public class DCLookUpDialog extends Dialog {
 
-    private static final String ID_SEARCH_FLD = "idSearchFld";
-    private static final String ID_SEARCH_BTN = "idSearchBtn";
+    private static final String ID_SEARCH_FLD = "idSearchFld"; //$NON-NLS-1$
+    private static final String ID_SEARCH_BTN = "idSearchBtn"; //$NON-NLS-1$
+    private static final String ID_BTN_NEW_TOOL_BTN = "idBtnNewToolBtn"; //$NON-NLS-1$
     private Grid<DeployedComponent> grid;
     private RowExpander expander;
     private TextField<String> filter;
     private String currentSelection;
+    private final NewToolRequestWindow newToolRequestWin;
 
 
     public DCLookUpDialog(SelectionListener<ButtonEvent> DialogOkBtnSelectionListenerImpl,
@@ -59,6 +63,7 @@ public class DCLookUpDialog extends Dialog {
         setButtons(Dialog.OKCANCEL);
 
         Button bntOk = setOkButtonListener(DialogOkBtnSelectionListenerImpl);
+        newToolRequestWin = new NewToolRequestWindow();
 
         initDialog(bntOk);
 
@@ -89,6 +94,8 @@ public class DCLookUpDialog extends Dialog {
         ToolBar tool = new ToolBar();
         tool.add(buildFilterField());
         tool.add(buildSearchButton());
+        tool.add(new FillToolItem());
+        tool.add(buildNewToolRequestMenuItem());
         return tool;
     }
 
@@ -130,6 +137,19 @@ public class DCLookUpDialog extends Dialog {
         filter.setId(ID_SEARCH_FLD);
         filter.setWidth(350);
         return filter;
+    }
+
+    private Button buildNewToolRequestMenuItem() {
+        Button newToolBtn = new Button(org.iplantc.core.tito.client.I18N.DISPLAY.requestNewTool());
+        newToolBtn.setIcon(AbstractImagePrototype.create(Resources.ICONS.add()));
+        newToolBtn.addSelectionListener(new SelectionListener<ButtonEvent>() {
+            @Override
+            public void componentSelected(ButtonEvent ce) {
+                newToolRequestWin.show();
+            }
+        });
+        newToolBtn.setId(ID_BTN_NEW_TOOL_BTN);
+        return newToolBtn;
     }
 
     private void initGridSelectionModel(final Button btnOk) {
