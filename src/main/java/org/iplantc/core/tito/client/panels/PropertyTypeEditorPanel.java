@@ -131,15 +131,22 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
     }
 
     protected void initRequiredCheckBox() {
+        boolean required = isRequired();
+
+        // set CheckBox value and force Option Flag change
+        cbxRequired.setValue(required);
+        updateOptionFlag(required);
+    }
+
+    protected boolean isRequired() {
+        boolean required = false;
+
         MetaDataValidator validator = property.getValidator();
-
         if (validator != null) {
-            boolean required = validator.isRequired();
-
-            // set CheckBox value and force Option Flag change
-            cbxRequired.setValue(required);
-            updateOptionFlag(required);
+            required = validator.isRequired();
         }
+
+        return required;
     }
 
     protected void updatePropertyName(String value) {

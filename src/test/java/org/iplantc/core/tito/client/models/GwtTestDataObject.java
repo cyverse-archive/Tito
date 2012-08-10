@@ -27,7 +27,7 @@ public class GwtTestDataObject extends GWTTestCase {
         assertEquals(-1, Integer.parseInt(jsonObj.get(DataObject.ORDER).toString()));
         assertEquals("", JsonUtil.trim(jsonObj.get(DataObject.CMD_SWITCH).toString())); //$NON-NLS-1$
         assertEquals("", JsonUtil.trim(jsonObj.get(DataObject.OUTPUT_FILENAME).toString())); //$NON-NLS-1$
-        assertEquals(true, jsonObj.get(DataObject.REQUIRED).isBoolean().booleanValue());
+        assertEquals(false, jsonObj.get(DataObject.REQUIRED).isBoolean().booleanValue());
         JSONArray arr = jsonObj.get(DataObject.FORMAT_ID).isArray();
         assertEquals(0, arr.size());
     }

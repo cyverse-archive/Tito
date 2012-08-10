@@ -83,6 +83,18 @@ public abstract class DataObjectFormPanel extends PropertyTypeEditorPanel {
         initRequiredCheckBox();
     }
 
+    @Override
+    protected boolean isRequired() {
+        boolean required = super.isRequired();
+
+        DataObject obj = getDataObject();
+        if (obj != null) {
+            required |= obj.isRequired();
+        }
+
+        return required;
+    }
+
     private void updateDataObjectFromProperty() {
         DataObject dataObject = property.getDataObject();
 
@@ -102,8 +114,6 @@ public abstract class DataObjectFormPanel extends PropertyTypeEditorPanel {
 
         if (property.getValidator() != null) {
             dataObject.setRequired(property.getValidator().isRequired());
-        } else {
-            dataObject.setRequired(false);
         }
     }
 
