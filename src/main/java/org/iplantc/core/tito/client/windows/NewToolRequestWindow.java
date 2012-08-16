@@ -27,7 +27,7 @@ public class NewToolRequestWindow extends Window {
         requestForm.getCancelButton().addSelectionListener(new NewToolSelectionCancelListenerImpl(this));
         this.setHeading(I18N.DISPLAY.requestNewTool());
         this.setLayout(new FitLayout());
-        this.setSize(500, 500);
+        this.setSize(500, 575);
         this.setResizable(false);
         this.add(requestForm);
 
