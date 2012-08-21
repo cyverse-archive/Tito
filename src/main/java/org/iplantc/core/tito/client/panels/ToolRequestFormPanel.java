@@ -124,7 +124,7 @@ public class ToolRequestFormPanel extends LayoutContainer {
         form.setEncoding(Encoding.MULTIPART);
         form.setAction(Constants.CLIENT.newToolRequest());
         form.setMethod(Method.POST);
-        form.setSize(490, 470);
+        form.setSize(490, 550);
         form.setHeaderVisible(false);
         form.setBodyBorder(false);
         formData = new FormData("95%"); //$NON-NLS-1$
@@ -256,6 +256,7 @@ public class ToolRequestFormPanel extends LayoutContainer {
 
     private TextArea buildTextArea(String label, boolean allowBlank, String name, int maxLength) {
         TextArea field = new BoundedTextArea();
+        field.setHeight(120);
 
         field.setMaxLength(maxLength);
         field.setName(name);
