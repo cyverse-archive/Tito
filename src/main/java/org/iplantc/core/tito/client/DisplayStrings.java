@@ -207,13 +207,6 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
      */
     String multiplicityMany();
 
-    /**
-     * Text when an invalid name is entered
-     * 
-     * @return string representing the text
-     */
-    String nameValidationMsg();
-
     String editTemplate();
 
     String noComponents();
@@ -230,11 +223,7 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
 
     String infoType();
 
-    String requestNewTool();
-
     String jsonPreview();
-
-    String newToolRequestError();
 
     String groupName();
 
@@ -303,37 +292,7 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
 
     String defaultValueLabel();
 
-    String link();
-
     String srcBin();
-
-    String srcLinkPrompt();
-
-    String toolDesc();
-
-    String version();
-
-    String docLink();
-
-    String upldTestData();
-
-    String cmdLineRun();
-
-    String addnlData();
-
-    String comments();
-
-    String contactTab();
-
-    String toolTab();
-
-    String otherTab();
-
-    String submitRequest();
-
-    String submitting();
-
-    String inValidUrl();
 
     /**
      * Localized text for a publishing error message with an optional second line of additional details.
@@ -350,10 +309,6 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
     String previewSubmit();
 
     String values();
-
-    String toolName();
-
-    String requestConfirmMsg();
 
     String msgTemplateDelete();
 
@@ -571,13 +526,6 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
     String booleanValue();
 
     /**
-     * Localized text for multi threaded
-     * 
-     * @return string representing the text
-     */
-    String isMultiThreaded();
-
-    /**
      * Localized text for the Template Summary grid.
      * 
      * @return string representing the text
@@ -699,4 +647,6 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
      * @return string representing the text
      */
     String environmentVariableName();
+
+    String requestNewTool();
 }

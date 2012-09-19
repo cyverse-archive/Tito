@@ -8,7 +8,7 @@ import org.iplantc.core.tito.client.services.DeployedComponentSearchServiceFacad
 import org.iplantc.core.tito.client.services.EnumerationServices;
 import org.iplantc.core.tito.client.utils.DeployedComponentSearchUtil;
 import org.iplantc.core.tito.client.utils.DeployedComponentSorter;
-import org.iplantc.core.tito.client.windows.NewToolRequestWindow;
+import org.iplantc.core.uiapplications.client.views.windows.NewToolRequestWindow;
 import org.iplantc.core.uicommons.client.ErrorHandler;
 import org.iplantc.core.uicommons.client.images.Resources;
 import org.iplantc.core.uicommons.client.models.DeployedComponent;
