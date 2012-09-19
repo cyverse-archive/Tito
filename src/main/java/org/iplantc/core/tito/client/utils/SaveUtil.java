@@ -10,7 +10,7 @@ import org.iplantc.core.tito.client.events.TemplateSaveEvent;
 import org.iplantc.core.tito.client.models.Template;
 import org.iplantc.core.tito.client.panels.CommandLineOrderingGridPanel;
 import org.iplantc.core.tito.client.services.EnumerationServices;
-import org.iplantc.core.uiapplications.client.events.AnalysisGroupCountUpdateEvent;
+import org.iplantc.core.uiapplications.client.events.AppGroupCountUpdateEvent;
 import org.iplantc.core.uiapplications.client.events.AppSearchResultSelectedEvent;
 import org.iplantc.core.uicommons.client.ErrorHandler;
 import org.iplantc.core.uicommons.client.events.EventBus;
@@ -67,7 +67,7 @@ public class SaveUtil {
             Info.display(I18N.DISPLAY.save(), name + " " + I18N.DISPLAY.saved());
             if (titoId == null || titoId.isEmpty()) {
                 org.iplantc.core.uicommons.client.events.EventBus.getInstance().fireEvent(
-                        new AnalysisGroupCountUpdateEvent(true, null));
+                        new AppGroupCountUpdateEvent(true, null));
             }
         }
 
