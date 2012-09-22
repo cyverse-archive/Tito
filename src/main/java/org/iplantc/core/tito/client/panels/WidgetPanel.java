@@ -344,7 +344,7 @@ public class WidgetPanel extends ContentPanel {
         // build the cmd line from the executable name and all properties
         ArrayList<PropertyData> arguments = new ArrayList<PropertyData>();
         for (Property property : west.getPropertyGroupContainer().getProperties()) {
-            if (property.getOrder() > 0) {
+            if (property.getOrder() >= 0) {
                 arguments.add(new PropertyData(property));
             }
         }
