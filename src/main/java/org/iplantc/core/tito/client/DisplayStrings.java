@@ -344,7 +344,19 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
 
     String noParams();
 
-    String publishOrderingWarning();
+    /**
+     * Localized text for a user warning about saving Apps with unordered properties.
+     * 
+     * @return string representing the text
+     */
+    String saveUnorderedWarning();
+
+    /**
+     * Localized text for a user warning about saving Apps with default ordered properties.
+     * 
+     * @return string representing the text
+     */
+    String saveDefaultOrderWarning();
 
     String listBoxFormatNotice();
 

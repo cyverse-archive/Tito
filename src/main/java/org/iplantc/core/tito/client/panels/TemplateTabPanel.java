@@ -230,12 +230,29 @@ public class TemplateTabPanel extends ContentPanel {
             @Override
             public void componentSelected(ButtonEvent ce) {
                 // check if any parameters are still unordered
-                if (isOrdered()) {
-                    // the user has already ordered their parameters.
-                    save();
+                boolean hasDefaultOrdering = false;
+
+                for (Property param : pnlWidgetsdObj.getProperties()) {
+                    if (PropertyUtil.orderingRequired(param)) {
+                        if (param.getOrder() < 0) {
+                            // Display an unordered warning to the user before saving.
+                            confirmUnorderedSave(I18N.DISPLAY.saveUnorderedWarning());
+
+                            return;
+                        }
+
+                        if (param.getOrder() == 0) {
+                            hasDefaultOrdering = true;
+                        }
+                    }
+                }
+
+                if (hasDefaultOrdering) {
+                    // Display a default order warning to the user before saving.
+                    confirmUnorderedSave(I18N.DISPLAY.saveDefaultOrderWarning());
                 } else {
-                    // Display a warning to the user before publishing.
-                    confirmUnorderedPublish();
+                    // the user has ordered all of their parameters.
+                    save();
                 }
             }
         });
@@ -243,18 +260,8 @@ public class TemplateTabPanel extends ContentPanel {
         return btnSave;
     }
 
-    private boolean isOrdered() {
-        for (Property param : pnlWidgetsdObj.getProperties()) {
-            if (param.getOrder() < 0 && PropertyUtil.orderingRequired(param)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private void confirmUnorderedPublish() {
-        MessageBox.confirm(I18N.DISPLAY.publish(), I18N.DISPLAY.publishOrderingWarning(),
+    private void confirmUnorderedSave(String warning) {
+        MessageBox.confirm(I18N.DISPLAY.publish(), warning,
                 new Listener<MessageBoxEvent>() {
                     @Override
                     public void handleEvent(MessageBoxEvent be) {
