@@ -2,7 +2,6 @@ package org.iplantc.core.tito.client.panels;
 
 import org.iplantc.core.metadata.client.PropertyType;
 import org.iplantc.core.metadata.client.property.Property;
-import org.iplantc.core.metadata.client.property.PropertyTypeCategory;
 
 import com.extjs.gxt.ui.client.widget.LayoutContainer;
 import com.extjs.gxt.ui.client.widget.VerticalPanel;
@@ -10,16 +9,13 @@ import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.user.client.ui.ListBox;
 
 public class PropertyValidationEditorPanel extends PropertySubTypeEditorPanel {
-    protected final PropertyTypeCategory category;
     protected LayoutContainer pnlDefaultValue;
     protected VerticalPanel pnlValidationContainer;
     protected ValidationPanel pnlValidation;
     protected ListboxEditorPanel pnlListBoxEditor;
 
-    public PropertyValidationEditorPanel(Property property, PropertyTypeCategory category) {
+    public PropertyValidationEditorPanel(Property property) {
         super(property);
-
-        this.category = category;
     }
 
     /**
@@ -32,7 +28,6 @@ public class PropertyValidationEditorPanel extends PropertySubTypeEditorPanel {
         buildBottomPanel();
 
         pnlValidation = new ValidationPanel(property);
-        pnlListBoxEditor = new ListboxEditorPanel(category, property);
     }
 
     private void buildBottomPanel() {

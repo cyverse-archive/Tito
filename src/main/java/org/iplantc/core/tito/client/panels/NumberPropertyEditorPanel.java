@@ -15,7 +15,7 @@ public class NumberPropertyEditorPanel extends PropertyValidationEditorPanel {
     private static final String ID_FIELD_NUM = "idFieldNum"; //$NON-NLS-1$
 
     public NumberPropertyEditorPanel(Property property) {
-        super(property, PropertyTypeCategory.NUMBER);
+        super(property);
     }
 
     /**
@@ -26,6 +26,7 @@ public class NumberPropertyEditorPanel extends PropertyValidationEditorPanel {
         super.buildFields();
 
         pnlDefaultValue = buildDefaultValueContainer();
+        pnlListBoxEditor = new NumberListboxEditorPanel(property);
 
         buildGuiEnabledCheckbox();
         buildOptionalFlagCheckbox();

@@ -5,20 +5,18 @@ import java.util.List;
 
 import org.iplantc.core.jsonutil.JsonUtil;
 import org.iplantc.core.metadata.client.property.Property;
-import org.iplantc.core.metadata.client.property.PropertyTypeCategory;
 import org.iplantc.core.metadata.client.validation.MetaDataRule;
 import org.iplantc.core.metadata.client.validation.MetaDataValidator;
-import org.iplantc.core.tito.client.dialogs.validation.EditableNumberList;
-import org.iplantc.core.tito.client.dialogs.validation.EditableStringList;
+import org.iplantc.core.tito.client.dialogs.validation.BasicEditableList;
 
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.Command;
 
-public class ListboxEditorPanel extends AbstractListPropertyEditorPanel {
-    public ListboxEditorPanel(final PropertyTypeCategory category, final Property property) {
-        super(property, category);
+public abstract class ListboxEditorPanel extends AbstractListPropertyEditorPanel {
+    public ListboxEditorPanel(final Property property) {
+        super(property);
     }
 
     private JSONArray parseMustContainValues() {
@@ -48,14 +46,21 @@ public class ListboxEditorPanel extends AbstractListPropertyEditorPanel {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void allocateList(final PropertyTypeCategory category) {
-        JSONArray values = parseMustContainValues();
-        UpdatePropertyWithList updateCmd = new UpdatePropertyWithList();
-
-        list = (category == PropertyTypeCategory.NUMBER) ? new EditableNumberList(values, updateCmd)
-                : new EditableStringList(values, updateCmd);
+    protected void allocateList() {
+        list = buildList(parseMustContainValues());
     }
+
+    /**
+     * Build the BasicEditableList with the given JSON values.
+     * 
+     * @param values MustContain rule arguments.
+     * @return A BasicEditableList populated with the given values.
+     */
+    protected abstract BasicEditableList buildList(JSONArray values);
 
     /**
      * A command class to update property when list (must contain) is edited
@@ -63,7 +68,7 @@ public class ListboxEditorPanel extends AbstractListPropertyEditorPanel {
      * @author sriram
      * 
      */
-    private class UpdatePropertyWithList implements Command {
+    protected class UpdatePropertyWithList implements Command {
         @Override
         public void execute() {
             MetaDataRule ruleMustContain = null;

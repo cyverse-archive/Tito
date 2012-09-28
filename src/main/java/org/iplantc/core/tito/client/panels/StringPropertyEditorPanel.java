@@ -11,7 +11,7 @@ public class StringPropertyEditorPanel extends PropertyValidationEditorPanel {
     private static final String ID_FLD_DEF_STR_VAL = "idFldDefStrVal"; //$NON-NLS-1$
 
     public StringPropertyEditorPanel(Property property) {
-        super(property, PropertyTypeCategory.STRING);
+        super(property);
     }
 
     /**
@@ -22,6 +22,7 @@ public class StringPropertyEditorPanel extends PropertyValidationEditorPanel {
         super.buildFields();
 
         pnlDefaultValue = buildDefaultValueContainer();
+        pnlListBoxEditor = new StringListboxEditorPanel(property);
 
         buildGuiEnabledCheckbox();
         buildOptionalFlagCheckbox();
