@@ -49,20 +49,20 @@ public class EditableNumberList extends BasicEditableList {
         store.removeAll();
 
         for (int i = 0; i < arr.size(); i++) {
-            JSONObject obj = arr.get(i).isObject();
+            JSONObject obj = JsonUtil.getObjectAt(arr, i);
 
-            Number display;
+            Number display = JsonUtil.getNumber(obj, MetaDataRule.DISPLAY);
             String name = JsonUtil.getString(obj, MetaDataRule.NAME);
             String value = JsonUtil.getString(obj, MetaDataRule.VALUE);
-            JSONNumber jsonNumber = obj.get(MetaDataRule.DISPLAY).isNumber();
             boolean isDefault = JsonUtil.getBoolean(obj, MetaDataRule.IS_DEFAULT, false);
 
-            try {
-                // initialize the GridRow with an int if the original value is an int
-                display = Integer.parseInt(jsonNumber.toString());
-            } catch (Exception e) {
-                // The string didn't parse as an int, so set value as a double instead.
-                display = jsonNumber.doubleValue();
+            if (display != null) {
+                try {
+                    // Initialize the GridRow with an Integer if the original value is an Integer.
+                    display = new Integer(JsonUtil.getRawValueAsString(obj.get(MetaDataRule.DISPLAY)));
+                } catch (Exception e) {
+                    // The string didn't parse as an Integer, so continue to use Double instead.
+                }
             }
 
             store.add(new GridRow(display, name, value, isDefault));
@@ -84,8 +84,10 @@ public class EditableNumberList extends BasicEditableList {
         for (int i = 0; i < store.getCount(); i++) {
             GridRow row = store.getAt(i);
 
+            Number display = row.getNumberItem();
+
             obj = new JSONObject();
-            obj.put(MetaDataRule.DISPLAY, new JSONNumber(row.getNumberItem().doubleValue()));
+            obj.put(MetaDataRule.DISPLAY, display == null ? null : new JSONNumber(display.doubleValue()));
             obj.put(MetaDataRule.NAME, new JSONString(row.getName()));
             obj.put(MetaDataRule.VALUE, new JSONString(row.getStringValue()));
             obj.put(MetaDataRule.IS_DEFAULT, JSONBoolean.getInstance(row.isDefault()));
