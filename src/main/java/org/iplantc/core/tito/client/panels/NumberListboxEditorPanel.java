@@ -12,7 +12,7 @@ import com.google.gwt.json.client.JSONArray;
  * @author psarando
  * 
  */
-public class NumberListboxEditorPanel extends ListboxEditorPanel {
+public class NumberListboxEditorPanel extends ListEditorPanel {
 
     /**
      * @param property

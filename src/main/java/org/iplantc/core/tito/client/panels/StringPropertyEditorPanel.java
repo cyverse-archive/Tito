@@ -22,7 +22,7 @@ public class StringPropertyEditorPanel extends PropertyValidationEditorPanel {
         super.buildFields();
 
         pnlDefaultValue = buildDefaultValueContainer();
-        pnlListBoxEditor = new StringListboxEditorPanel(property);
+        pnlListEditor = new StringListboxEditorPanel(property);
 
         buildGuiEnabledCheckbox();
         buildOptionalFlagCheckbox();

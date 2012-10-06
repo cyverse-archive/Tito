@@ -12,7 +12,7 @@ public class PropertyValidationEditorPanel extends PropertySubTypeEditorPanel {
     protected LayoutContainer pnlDefaultValue;
     protected VerticalPanel pnlValidationContainer;
     protected ValidationPanel pnlValidation;
-    protected ListboxEditorPanel pnlListBoxEditor;
+    protected ListEditorPanel pnlListEditor;
 
     public PropertyValidationEditorPanel(Property property) {
         super(property);
@@ -75,7 +75,7 @@ public class PropertyValidationEditorPanel extends PropertySubTypeEditorPanel {
             cbxDisplayInGui.setValue(true);
             cbxDisplayInGui.setEnabled(false);
 
-            pnlValidationContainer.add(pnlListBoxEditor);
+            pnlValidationContainer.add(pnlListEditor);
         } else {
             cbxDisplayInGui.setEnabled(true);
             pnlValidationContainer.add(pnlValidation);

@@ -12,7 +12,7 @@ import com.google.gwt.json.client.JSONArray;
  * @author psarando
  * 
  */
-public class StringListboxEditorPanel extends ListboxEditorPanel {
+public class StringListboxEditorPanel extends ListEditorPanel {
 
     /**
      * @param property
@@ -25,5 +25,4 @@ public class StringListboxEditorPanel extends ListboxEditorPanel {
     protected BasicEditableList buildList(JSONArray values) {
         return new EditableStringList(values, new UpdatePropertyWithList());
     }
-
 }
