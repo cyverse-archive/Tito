@@ -48,7 +48,8 @@ public class PropertyValidationEditorPanel extends PropertySubTypeEditorPanel {
 
             // TODO: find alternatives for hardcoding
             String typeName = type.getName();
-            if (typeName.equalsIgnoreCase("selection") || typeName.equalsIgnoreCase("valueselection")) { //$NON-NLS-1$ //$NON-NLS-2$
+            if (typeName.equalsIgnoreCase("selection") || typeName.equalsIgnoreCase("valueselection") //$NON-NLS-1$ //$NON-NLS-2$
+                    || typeName.equalsIgnoreCase("TreeSelection")) { //$NON-NLS-1$
                 isSelectionWidget = true;
             }
 

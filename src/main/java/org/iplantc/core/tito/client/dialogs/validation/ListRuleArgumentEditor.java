@@ -20,12 +20,15 @@ import com.sencha.gxt.core.client.dom.XElement;
 import com.sencha.gxt.core.client.util.Point;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.TreeStore;
+import com.sencha.gxt.data.shared.event.StoreHandlers;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.BeforeStartEditEvent;
 import com.sencha.gxt.widget.core.client.event.BeforeStartEditEvent.BeforeStartEditHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
+import com.sencha.gxt.widget.core.client.event.ViewReadyEvent;
+import com.sencha.gxt.widget.core.client.event.ViewReadyEvent.ViewReadyHandler;
 import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
@@ -35,6 +38,12 @@ import com.sencha.gxt.widget.core.client.toolbar.FillToolItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 import com.sencha.gxt.widget.core.client.treegrid.TreeGrid;
 
+/**
+ * A container with a TreeGrid editor and button toolbar for editing hierarchical list selectors.
+ * 
+ * @author psarando
+ * 
+ */
 public class ListRuleArgumentEditor extends VerticalLayoutContainer {
 
     private final ListRuleArgumentFactory factory = GWT.create(ListRuleArgumentFactory.class);
@@ -42,10 +51,17 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
     private int countGroupLabel = 1;
     private int countArgLabel = 1;
 
-    public ListRuleArgumentEditor() {
+    public ListRuleArgumentEditor(ListRuleArgumentGroup root) {
         init();
+        setValues(root);
     }
 
+    public void addStoreHandlers(StoreHandlers<ListRuleArgument> handlers) {
+        if (handlers != null && treeEditor != null) {
+            // TODO clean up handlers?
+            treeEditor.getStore().addStoreHandlers(handlers);
+        }
+    }
     private void init() {
         setHeight(200);
         setBorders(true);
@@ -75,6 +91,22 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         treeEditor = new TreeGrid<ListRuleArgument>(buildStore(), cm, displayConfig);
         treeEditor.getView().setAutoExpandColumn(displayConfig);
         treeEditor.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+
+        // These settings ensure that empty groups still display with a group icon.
+        treeEditor.setAutoExpand(true);
+        treeEditor.addViewReadyHandler(new ViewReadyHandler() {
+            @Override
+            public void onViewReady(ViewReadyEvent event) {
+                TreeStore<ListRuleArgument> store = treeEditor.getTreeStore();
+
+                for (ListRuleArgument arg : store.getAll()) {
+                    if (arg instanceof ListRuleArgumentGroup) {
+                        treeEditor.setLeaf(arg, false);
+                        store.update(arg);
+                    }
+                }
+            }
+        });
         
         GridInlineEditing<ListRuleArgument> editing = new GridInlineEditing<ListRuleArgument>(treeEditor);
         editing.addEditor(displayConfig, new TextField());
@@ -464,5 +496,79 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         argString.setDisplay(I18N.DISPLAY.newPropertyLabel(countArgLabel++));
 
         return argString;
+    }
+
+    /**
+     * Resets the editor with the values in the given root group.
+     * 
+     * @param root
+     */
+    public void setValues(ListRuleArgumentGroup root) {
+        TreeStore<ListRuleArgument> store = treeEditor.getTreeStore();
+        store.clear();
+
+        if (root != null) {
+            if (root.getGroups() != null) {
+                for (ListRuleArgumentGroup group : root.getGroups()) {
+                    store.add(group);
+
+                    treeEditor.setLeaf(group, false);
+                    store.update(group);
+
+                    addChildrenToStore(group);
+                }
+            }
+            if (root.getArguments() != null) {
+                for (ListRuleArgument ruleArg : root.getArguments()) {
+                    store.add(ruleArg);
+                }
+            }
+        }
+    }
+
+    private void addChildrenToStore(ListRuleArgumentGroup parent) {
+        if (parent != null) {
+            TreeStore<ListRuleArgument> store = treeEditor.getTreeStore();
+
+            if (parent.getGroups() != null) {
+                for (ListRuleArgumentGroup child : parent.getGroups()) {
+                    store.add(parent, child);
+
+                    treeEditor.setLeaf(child, false);
+                    store.update(child);
+
+                    addChildrenToStore(child);
+                }
+            }
+            if (parent.getArguments() != null) {
+                for (ListRuleArgument child : parent.getArguments()) {
+                    store.add(parent, child);
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns a group of values added by the editor.
+     * 
+     * @return A root group containing the groups and args added by the editor.
+     */
+    public ListRuleArgumentGroup getValues() {
+        List<ListRuleArgumentGroup> groups = new ArrayList<ListRuleArgumentGroup>();
+        List<ListRuleArgument> arguments = new ArrayList<ListRuleArgument>();
+
+        for (ListRuleArgument ruleArg : treeEditor.getTreeStore().getRootItems()) {
+            if (ruleArg instanceof ListRuleArgumentGroup) {
+                groups.add((ListRuleArgumentGroup)ruleArg);
+            } else {
+                arguments.add(ruleArg);
+            }
+        }
+
+        ListRuleArgumentGroup root = factory.group().as();
+        root.setGroups(groups);
+        root.setArguments(arguments);
+
+        return root;
     }
 }
