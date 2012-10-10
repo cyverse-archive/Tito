@@ -510,12 +510,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         if (root != null) {
             if (root.getGroups() != null) {
                 for (ListRuleArgumentGroup group : root.getGroups()) {
-                    store.add(group);
-
-                    treeEditor.setLeaf(group, false);
-                    store.update(group);
-
-                    addChildrenToStore(group);
+                    addGroupToStore(null, group);
                 }
             }
             if (root.getArguments() != null) {
@@ -526,23 +521,28 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         }
     }
 
-    private void addChildrenToStore(ListRuleArgumentGroup parent) {
-        if (parent != null) {
+    private void addGroupToStore(ListRuleArgumentGroup parent, ListRuleArgumentGroup group) {
+        if (group != null) {
             TreeStore<ListRuleArgument> store = treeEditor.getTreeStore();
 
-            if (parent.getGroups() != null) {
-                for (ListRuleArgumentGroup child : parent.getGroups()) {
-                    store.add(parent, child);
+            if (parent != null) {
+                store.add(parent, group);
+            } else {
+                store.add(group);
+            }
 
-                    treeEditor.setLeaf(child, false);
-                    store.update(child);
+            treeEditor.setLeaf(group, false);
+            store.update(group);
 
-                    addChildrenToStore(child);
+            if (group.getGroups() != null) {
+                for (ListRuleArgumentGroup child : group.getGroups()) {
+                    addGroupToStore(group, child);
                 }
             }
-            if (parent.getArguments() != null) {
-                for (ListRuleArgument child : parent.getArguments()) {
-                    store.add(parent, child);
+
+            if (group.getArguments() != null) {
+                for (ListRuleArgument child : group.getArguments()) {
+                    store.add(group, child);
                 }
             }
         }
