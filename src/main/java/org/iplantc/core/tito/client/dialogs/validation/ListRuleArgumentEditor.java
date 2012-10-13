@@ -20,7 +20,6 @@ import com.sencha.gxt.cell.core.client.form.CheckBoxCell;
 import com.sencha.gxt.core.client.Style.SelectionMode;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.core.client.dom.XElement;
-import com.sencha.gxt.core.client.util.Point;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.TreeStore;
 import com.sencha.gxt.data.shared.event.StoreAddEvent;
@@ -44,7 +43,6 @@ import com.sencha.gxt.widget.core.client.form.CheckBox;
 import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
-import com.sencha.gxt.widget.core.client.grid.GridView;
 import com.sencha.gxt.widget.core.client.grid.editing.GridInlineEditing;
 import com.sencha.gxt.widget.core.client.toolbar.FillToolItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
@@ -202,14 +200,6 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
                         if (!(value && isSingleSelection && isGroup)) {
                             setDefaultValue(object, value);
                         }
-
-                        GridView<ListRuleArgument> treeView = treeEditor.getView();
-                        Point scrollState = treeView.getScrollState();
-
-                        treeView.refresh(false);
-
-                        treeView.getScroller().setScrollLeft(scrollState.getX());
-                        treeView.getScroller().setScrollTop(scrollState.getY());
                     }
 
                     @Override
@@ -225,12 +215,15 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         return defaultConfig;
     }
 
-    public void setDefaultValue(ListRuleArgument object, Boolean value) {
+    private void setDefaultValue(ListRuleArgument object, Boolean value) {
         if (object == null) {
             return;
         }
 
+        TreeStore<ListRuleArgument> store = treeEditor.getTreeStore();
+
         object.setDefault(value);
+        store.update(object);
 
         if (object instanceof ListRuleArgumentGroup) {
             ListRuleArgumentGroup group = (ListRuleArgumentGroup)object;
@@ -251,10 +244,10 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         }
 
         if (!value) {
-            TreeStore<ListRuleArgument> store = treeEditor.getTreeStore();
             for (ListRuleArgument parent = store.getParent(object); parent != null; parent = store
                     .getParent(parent)) {
                 parent.setDefault(value);
+                store.update(parent);
             }
         }
     }
