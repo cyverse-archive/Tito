@@ -12,6 +12,9 @@ import org.iplantc.core.tito.client.services.EnumerationServices;
 import org.iplantc.core.uicommons.client.ErrorHandler;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.sencha.gxt.cell.core.client.form.CheckBoxCell;
 import com.sencha.gxt.core.client.Style.SelectionMode;
@@ -20,7 +23,15 @@ import com.sencha.gxt.core.client.dom.XElement;
 import com.sencha.gxt.core.client.util.Point;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.TreeStore;
+import com.sencha.gxt.data.shared.event.StoreAddEvent;
+import com.sencha.gxt.data.shared.event.StoreClearEvent;
+import com.sencha.gxt.data.shared.event.StoreDataChangeEvent;
+import com.sencha.gxt.data.shared.event.StoreFilterEvent;
 import com.sencha.gxt.data.shared.event.StoreHandlers;
+import com.sencha.gxt.data.shared.event.StoreRecordChangeEvent;
+import com.sencha.gxt.data.shared.event.StoreRemoveEvent;
+import com.sencha.gxt.data.shared.event.StoreSortEvent;
+import com.sencha.gxt.data.shared.event.StoreUpdateEvent;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.BeforeStartEditEvent;
@@ -29,6 +40,7 @@ import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 import com.sencha.gxt.widget.core.client.event.ViewReadyEvent;
 import com.sencha.gxt.widget.core.client.event.ViewReadyEvent.ViewReadyHandler;
+import com.sencha.gxt.widget.core.client.form.CheckBox;
 import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
@@ -48,6 +60,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
 
     private final ListRuleArgumentFactory factory = GWT.create(ListRuleArgumentFactory.class);
     private TreeGrid<ListRuleArgument> treeEditor;
+    private CheckBox forceSingleSelection;
     private int countGroupLabel = 1;
     private int countArgLabel = 1;
 
@@ -56,12 +69,66 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         setValues(root);
     }
 
-    public void addStoreHandlers(StoreHandlers<ListRuleArgument> handlers) {
-        if (handlers != null && treeEditor != null) {
-            // TODO clean up handlers?
-            treeEditor.getStore().addStoreHandlers(handlers);
+    public void addUpdateCommand(final Command cmdUpdate) {
+        // TODO clean up handlers?
+        if (cmdUpdate != null) {
+            if (forceSingleSelection != null) {
+                forceSingleSelection.addChangeHandler(new ChangeHandler() {
+
+                    @Override
+                    public void onChange(ChangeEvent event) {
+                        cmdUpdate.execute();
+                    }
+                });
+            }
+
+            if (treeEditor != null) {
+                treeEditor.getStore().addStoreHandlers(new StoreHandlers<ListRuleArgument>() {
+
+                    @Override
+                    public void onSort(StoreSortEvent<ListRuleArgument> event) {
+                        // do nothing, sorting the grid does not sort the store.
+                    }
+
+                    @Override
+                    public void onRecordChange(StoreRecordChangeEvent<ListRuleArgument> event) {
+                        cmdUpdate.execute();
+                    }
+
+                    @Override
+                    public void onDataChange(StoreDataChangeEvent<ListRuleArgument> event) {
+                        cmdUpdate.execute();
+                    }
+
+                    @Override
+                    public void onUpdate(StoreUpdateEvent<ListRuleArgument> event) {
+                        cmdUpdate.execute();
+                    }
+
+                    @Override
+                    public void onClear(StoreClearEvent<ListRuleArgument> event) {
+                        cmdUpdate.execute();
+                    }
+
+                    @Override
+                    public void onFilter(StoreFilterEvent<ListRuleArgument> event) {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onRemove(StoreRemoveEvent<ListRuleArgument> event) {
+                        cmdUpdate.execute();
+                    }
+
+                    @Override
+                    public void onAdd(StoreAddEvent<ListRuleArgument> event) {
+                        cmdUpdate.execute();
+                    }
+                });
+            }
         }
     }
+
     private void init() {
         setHeight(200);
         setBorders(true);
@@ -128,7 +195,13 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
 
                     @Override
                     public void setValue(ListRuleArgument object, Boolean value) {
-                        setDefaultValue(object, value);
+                        // Do not allow a group to be checked if SingleSelection is enabled.
+                        boolean isSingleSelection = forceSingleSelection.getValue();
+                        boolean isGroup = object instanceof ListRuleArgumentGroup;
+
+                        if (!(value && isSingleSelection && isGroup)) {
+                            setDefaultValue(object, value);
+                        }
 
                         GridView<ListRuleArgument> treeView = treeEditor.getView();
                         Point scrollState = treeView.getScrollState();
@@ -325,12 +398,42 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
     private ToolBar buildToolBar() {
         ToolBar buttonBar = new ToolBar();
 
+        buttonBar.add(buildForceSingleSelectionButton());
         buttonBar.add(buildAddGroupButton());
         buttonBar.add(buildAddArgumentButton());
         buttonBar.add(new FillToolItem());
         buttonBar.add(buildDeleteButton());
 
         return buttonBar;
+    }
+
+    private CheckBox buildForceSingleSelectionButton() {
+        forceSingleSelection = new CheckBox();
+
+        forceSingleSelection.setBoxLabel("Force Single Selection");
+        forceSingleSelection.addChangeHandler(new ChangeHandler() {
+
+            @Override
+            public void onChange(ChangeEvent event) {
+                if (forceSingleSelection.getValue()) {
+                    List<ListRuleArgument> checked = new ArrayList<ListRuleArgument>();
+
+                    for (ListRuleArgument ruleArg : treeEditor.getTreeStore().getAll()) {
+                        if (ruleArg.isDefault() && !(ruleArg instanceof ListRuleArgumentGroup)) {
+                            checked.add(ruleArg);
+                        }
+                    }
+
+                    if (checked.size() > 1) {
+                        for (ListRuleArgument ruleArg : checked) {
+                            setDefaultValue(ruleArg, false);
+                        }
+                    }
+                }
+            }
+        });
+
+        return forceSingleSelection;
     }
 
     private TextButton buildAddGroupButton() {
@@ -508,11 +611,14 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         store.clear();
 
         if (root != null) {
+            forceSingleSelection.setValue(root.isSingleSelect());
+
             if (root.getGroups() != null) {
                 for (ListRuleArgumentGroup group : root.getGroups()) {
                     addGroupToStore(null, group);
                 }
             }
+
             if (root.getArguments() != null) {
                 for (ListRuleArgument ruleArg : root.getArguments()) {
                     store.add(ruleArg);
@@ -568,6 +674,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         ListRuleArgumentGroup root = factory.group().as();
         root.setGroups(groups);
         root.setArguments(arguments);
+        root.setSingleSelect(forceSingleSelection.getValue());
 
         return root;
     }
