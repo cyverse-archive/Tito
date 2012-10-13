@@ -197,9 +197,23 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
                         boolean isSingleSelection = forceSingleSelection.getValue();
                         boolean isGroup = object instanceof ListRuleArgumentGroup;
 
-                        if (!(value && isSingleSelection && isGroup)) {
-                            setDefaultValue(object, value);
+                        if (value && isSingleSelection) {
+                            if (isGroup) {
+                                // Do not allow a group to be checked if SingleSelection is enabled.
+                                return;
+                            }
+
+                            // If the user is checking an argument, uncheck all other arguments.
+                            TreeStore<ListRuleArgument> store = treeEditor.getTreeStore();
+                            for (ListRuleArgument ruleArg : store.getAll()) {
+                                if (ruleArg.isDefault()) {
+                                    ruleArg.setDefault(false);
+                                    store.update(ruleArg);
+                                }
+                            }
                         }
+
+                        setDefaultValue(object, value);
                     }
 
                     @Override
