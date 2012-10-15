@@ -56,6 +56,12 @@ import com.sencha.gxt.widget.core.client.treegrid.TreeGrid;
  */
 public class ListRuleArgumentEditor extends VerticalLayoutContainer {
 
+    private static final String LIST_RULE_ARG_NAME = "name"; //$NON-NLS-1$
+    private static final String LIST_RULE_ARG_VALUE = "value"; //$NON-NLS-1$
+    private static final String LIST_RULE_ARG_DISPLAY = "display"; //$NON-NLS-1$
+    private static final String LIST_RULE_ARG_DESCRIPTION = "description"; //$NON-NLS-1$
+    private static final String LIST_RULE_ARG_IS_DEFAULT = "isDefault"; //$NON-NLS-1$
+
     private final ListRuleArgumentFactory factory = GWT.create(ListRuleArgumentFactory.class);
     private TreeGrid<ListRuleArgument> treeEditor;
     private CheckBox forceSingleSelection;
@@ -218,7 +224,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
 
                     @Override
                     public String getPath() {
-                        return "isDefault"; //$NON-NLS-1$
+                        return LIST_RULE_ARG_IS_DEFAULT;
                     }
                 });
 
@@ -282,7 +288,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
 
                     @Override
                     public String getPath() {
-                        return "display"; //$NON-NLS-1$
+                        return LIST_RULE_ARG_DISPLAY;
                     }
                 });
 
@@ -307,7 +313,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
 
                     @Override
                     public String getPath() {
-                        return "name"; //$NON-NLS-1$
+                        return LIST_RULE_ARG_NAME;
                     }
                 });
 
@@ -332,7 +338,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
 
                     @Override
                     public String getPath() {
-                        return "value"; //$NON-NLS-1$
+                        return LIST_RULE_ARG_VALUE;
                     }
                 });
 
@@ -357,7 +363,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
 
                     @Override
                     public String getPath() {
-                        return "description"; //$NON-NLS-1$
+                        return LIST_RULE_ARG_DESCRIPTION;
                     }
                 });
 
@@ -390,11 +396,9 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
 
                 if (arg instanceof ListRuleArgumentGroup) {
                     int colIndex = event.getEditCell().getCol();
-                    ColumnConfig<ListRuleArgument, String> editingCol = treeEditor.getColumnModel()
-                            .getColumn(colIndex);
+                    String colPath = treeEditor.getColumnModel().getColumn(colIndex).getPath();
 
-                    // TODO allow tooltips
-                    if (!treeEditor.getTreeColumn().equals(editingCol)) {
+                    if (LIST_RULE_ARG_NAME.equals(colPath) || LIST_RULE_ARG_VALUE.equals(colPath)) {
                         event.setCancelled(true);
                     }
                 }
