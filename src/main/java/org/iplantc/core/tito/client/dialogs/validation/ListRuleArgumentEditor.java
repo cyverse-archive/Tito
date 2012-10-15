@@ -421,7 +421,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
     private CheckBox buildForceSingleSelectionButton() {
         forceSingleSelection = new CheckBox();
 
-        forceSingleSelection.setBoxLabel("Force Single Selection");
+        forceSingleSelection.setBoxLabel(I18N.DISPLAY.singleSelectionOnly());
         forceSingleSelection.addChangeHandler(new ChangeHandler() {
 
             @Override
@@ -448,7 +448,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
     }
 
     private TextButton buildAddGroupButton() {
-        TextButton ret = new TextButton("Add Group", Resources.ICONS.add());
+        TextButton ret = new TextButton(I18N.DISPLAY.addGroup(), Resources.ICONS.add());
 
         ret.addSelectHandler(new SelectHandler() {
             @Override
@@ -472,7 +472,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
     }
 
     private TextButton buildAddArgumentButton() {
-        TextButton ret = new TextButton("Add Argument", Resources.ICONS.add());
+        TextButton ret = new TextButton(I18N.DISPLAY.addArgument(), Resources.ICONS.add());
 
         ret.addSelectHandler(new SelectHandler() {
             @Override

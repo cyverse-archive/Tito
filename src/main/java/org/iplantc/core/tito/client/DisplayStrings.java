@@ -711,4 +711,25 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
      * @return string representing the text
      */
     String environmentVariableName();
+
+    /**
+     * Localized text for the hierarchical list editor Single Selection option label.
+     * 
+     * @return string representing the text
+     */
+    String singleSelectionOnly();
+
+    /**
+     * Localized text for the hierarchical list editor Add Group option.
+     * 
+     * @return string representing the text
+     */
+    String addGroup();
+
+    /**
+     * Localized text for the hierarchical list editor Add Argument option.
+     * 
+     * @return string representing the text
+     */
+    String addArgument();
 }
