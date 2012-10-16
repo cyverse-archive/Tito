@@ -12,7 +12,7 @@ public class PropertyValidationEditorPanel extends PropertySubTypeEditorPanel {
     protected LayoutContainer pnlDefaultValue;
     protected VerticalPanel pnlValidationContainer;
     protected ValidationPanel pnlValidation;
-    protected ListboxEditorPanel pnlListBoxEditor;
+    protected ListEditorPanel pnlListEditor;
 
     public PropertyValidationEditorPanel(Property property) {
         super(property);
@@ -48,7 +48,8 @@ public class PropertyValidationEditorPanel extends PropertySubTypeEditorPanel {
 
             // TODO: find alternatives for hardcoding
             String typeName = type.getName();
-            if (typeName.equalsIgnoreCase("selection") || typeName.equalsIgnoreCase("valueselection")) { //$NON-NLS-1$ //$NON-NLS-2$
+            if (typeName.equalsIgnoreCase("selection") || typeName.equalsIgnoreCase("valueselection") //$NON-NLS-1$ //$NON-NLS-2$
+                    || typeName.equalsIgnoreCase("TreeSelection")) { //$NON-NLS-1$
                 isSelectionWidget = true;
             }
 
@@ -75,7 +76,7 @@ public class PropertyValidationEditorPanel extends PropertySubTypeEditorPanel {
             cbxDisplayInGui.setValue(true);
             cbxDisplayInGui.setEnabled(false);
 
-            pnlValidationContainer.add(pnlListBoxEditor);
+            pnlValidationContainer.add(pnlListEditor);
         } else {
             cbxDisplayInGui.setEnabled(true);
             pnlValidationContainer.add(pnlValidation);
