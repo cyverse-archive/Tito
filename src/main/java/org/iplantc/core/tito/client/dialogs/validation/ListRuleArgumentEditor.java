@@ -17,6 +17,7 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.sencha.gxt.cell.core.client.form.CheckBoxCell;
+import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.Style.SelectionMode;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.core.client.dom.XElement;
@@ -31,6 +32,13 @@ import com.sencha.gxt.data.shared.event.StoreRecordChangeEvent;
 import com.sencha.gxt.data.shared.event.StoreRemoveEvent;
 import com.sencha.gxt.data.shared.event.StoreSortEvent;
 import com.sencha.gxt.data.shared.event.StoreUpdateEvent;
+import com.sencha.gxt.dnd.core.client.DND.Feedback;
+import com.sencha.gxt.dnd.core.client.DndDragStartEvent;
+import com.sencha.gxt.dnd.core.client.DndDragStartEvent.DndDragStartHandler;
+import com.sencha.gxt.dnd.core.client.DndDropEvent;
+import com.sencha.gxt.dnd.core.client.DndDropEvent.DndDropHandler;
+import com.sencha.gxt.dnd.core.client.TreeGridDragSource;
+import com.sencha.gxt.dnd.core.client.TreeGridDropTarget;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.BeforeStartEditEvent;
@@ -43,6 +51,7 @@ import com.sencha.gxt.widget.core.client.form.CheckBox;
 import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
+import com.sencha.gxt.widget.core.client.grid.RowNumberer;
 import com.sencha.gxt.widget.core.client.grid.editing.GridInlineEditing;
 import com.sencha.gxt.widget.core.client.toolbar.FillToolItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
@@ -65,6 +74,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
     private final ListRuleArgumentFactory factory = GWT.create(ListRuleArgumentFactory.class);
     private TreeGrid<ListRuleArgument> treeEditor;
     private CheckBox forceSingleSelection;
+    private ListRuleArgumentGroup dragParent;
     private int countGroupLabel = 1;
     private int countArgLabel = 1;
 
@@ -144,6 +154,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
     }
 
     private void initTreeEditor() {
+        RowNumberer<ListRuleArgument> numberer = buildRowNumbererColumn();
         ColumnConfig<ListRuleArgument, Boolean> defaultConfig = buildIsDefaultConfig();
         ColumnConfig<ListRuleArgument, String> displayConfig = buildDisplayConfig();
         ColumnConfig<ListRuleArgument, String> nameConfig = buildNameConfig();
@@ -151,6 +162,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         ColumnConfig<ListRuleArgument, String> descriptionConfig = buildDescriptionConfig();
 
         List<ColumnConfig<ListRuleArgument, ?>> cmList = new ArrayList<ColumnConfig<ListRuleArgument, ?>>();
+        cmList.add(numberer);
         cmList.add(defaultConfig);
         cmList.add(displayConfig);
         cmList.add(nameConfig);
@@ -179,6 +191,8 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
             }
         });
         
+        numberer.initPlugin(treeEditor);
+
         GridInlineEditing<ListRuleArgument> editing = new GridInlineEditing<ListRuleArgument>(treeEditor);
         editing.addEditor(displayConfig, new TextField());
         editing.addEditor(nameConfig, new TextField());
@@ -186,6 +200,8 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         editing.addEditor(descriptionConfig, new TextField());
 
         addInlineEditingHandlers(editing);
+
+        initDragNDrop();
     }
 
     private ColumnConfig<ListRuleArgument, Boolean> buildIsDefaultConfig() {
@@ -231,6 +247,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         defaultConfig.setHeader(I18N.DISPLAY.defaultVal());
         defaultConfig.setWidth(50);
         defaultConfig.setCell(new CheckBoxCell());
+        defaultConfig.setSortable(false);
 
         return defaultConfig;
     }
@@ -293,6 +310,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
                 });
 
         displayConfig.setHeader(I18N.DISPLAY.display());
+        displayConfig.setSortable(false);
 
         return displayConfig;
     }
@@ -318,6 +336,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
                 });
 
         nameConfig.setHeader(I18N.DISPLAY.parameter());
+        nameConfig.setSortable(false);
 
         return nameConfig;
     }
@@ -343,6 +362,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
                 });
 
         valueConfig.setHeader(I18N.DISPLAY.values());
+        valueConfig.setSortable(false);
 
         return valueConfig;
     }
@@ -368,6 +388,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
                 });
 
         descriptionConfig.setHeader(I18N.DISPLAY.toolTipText());
+        descriptionConfig.setSortable(false);
 
         return descriptionConfig;
     }
@@ -404,6 +425,113 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
                 }
             }
         });
+    }
+
+    private RowNumberer<ListRuleArgument> buildRowNumbererColumn() {
+        IdentityValueProvider<ListRuleArgument> identity = new IdentityValueProvider<ListRuleArgument>();
+        RowNumberer<ListRuleArgument> numberer = new RowNumberer<ListRuleArgument>(identity);
+
+        return numberer;
+    }
+
+    private void initDragNDrop() {
+        TreeGridDragSource<ListRuleArgument> dragSource = new TreeGridDragSource<ListRuleArgument>(
+                treeEditor);
+        dragSource.addDragStartHandler(new DndDragStartHandler() {
+
+            @Override
+            public void onDragStart(DndDragStartEvent event) {
+                ListRuleArgument selection = getDragSelection((List<?>)event.getData());
+                if (selection != null) {
+                    dragParent = (ListRuleArgumentGroup)treeEditor.getTreeStore().getParent(selection);
+                } else {
+                    dragParent = null;
+                }
+            }
+        });
+
+        TreeGridDropTarget<ListRuleArgument> target = new TreeGridDropTarget<ListRuleArgument>(
+                treeEditor);
+        target.setAllowSelfAsSource(true);
+        target.setFeedback(Feedback.BOTH);
+        target.addDropHandler(new DndDropHandler() {
+
+            @Override
+            public void onDrop(DndDropEvent event) {
+                ListRuleArgument selection = getDragSelection((List<?>)event.getData());
+                if (selection == null) {
+                    return;
+                }
+
+                TreeStore<ListRuleArgument> store = treeEditor.getTreeStore();
+                ListRuleArgumentGroup newParent = (ListRuleArgumentGroup)store.getParent(selection);
+
+                if (dragParent != null && newParent != dragParent) {
+                    if (selection instanceof ListRuleArgumentGroup) {
+                        dragParent.getGroups().remove(selection);
+                    } else {
+                        dragParent.getArguments().remove(selection);
+                    }
+
+                    // Updating the store may not be needed for the grid, but it calls any update
+                    // commands added to store handlers.
+                    store.update(dragParent);
+                }
+
+                if (newParent != null) {
+                    // Reorder the new parent's children to match the store's order.
+                    List<ListRuleArgumentGroup> groups = newParent.getGroups();
+                    if (groups == null) {
+                        groups = new ArrayList<ListRuleArgumentGroup>();
+                        newParent.setGroups(groups);
+                    } else {
+                        groups.clear();
+                    }
+
+                    List<ListRuleArgument> arguments = newParent.getArguments();
+                    if (arguments == null) {
+                        arguments = new ArrayList<ListRuleArgument>();
+                        newParent.setArguments(arguments);
+                    } else {
+                        arguments.clear();
+                    }
+
+                    for (ListRuleArgument arg : store.getChildren(newParent)) {
+                        if (arg instanceof ListRuleArgumentGroup) {
+                            groups.add((ListRuleArgumentGroup)arg);
+                        } else {
+                            arguments.add(arg);
+                        }
+                    }
+
+                    // Updating the store may not be needed for the grid, but it calls any update
+                    // commands added to store handlers.
+                    store.update(newParent);
+                }
+            }
+        });
+    }
+
+    /**
+     * A helper method for getting the selected item from a drag-start or drop event.
+     * 
+     * @param items
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private ListRuleArgument getDragSelection(List<?> items) {
+        if (items == null || items.isEmpty()) {
+            return null;
+        }
+
+        ListRuleArgument selection;
+        if (items.get(0) instanceof TreeStore.TreeNode) {
+            selection = ((TreeStore.TreeNode<ListRuleArgument>)items.get(0)).getData();
+        } else {
+            selection = (ListRuleArgument)items.get(0);
+        }
+
+        return selection;
     }
 
     private ToolBar buildToolBar() {
