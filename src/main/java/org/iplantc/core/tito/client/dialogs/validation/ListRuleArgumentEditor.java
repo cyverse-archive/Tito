@@ -20,6 +20,7 @@ import com.sencha.gxt.cell.core.client.form.CheckBoxCell;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.Style.SelectionMode;
 import com.sencha.gxt.core.client.ValueProvider;
+import com.sencha.gxt.core.client.dom.XDOM;
 import com.sencha.gxt.core.client.dom.XElement;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.TreeStore;
@@ -202,6 +203,16 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         addInlineEditingHandlers(editing);
 
         initDragNDrop();
+
+        updateGxt3XdomZindex();
+    }
+
+    /**
+     * TODO PSAR temp. solution for zindex incompatibility between GXT 2.x
+     * {@link com.extjs.gxt.ui.client.widget.WindowManager} and GXT 3.x feedback proxy and grid menus.
+     */
+    private void updateGxt3XdomZindex() {
+        XDOM.getTopZIndex(com.extjs.gxt.ui.client.core.XDOM.getTopZIndex());
     }
 
     private ColumnConfig<ListRuleArgument, Boolean> buildIsDefaultConfig() {
@@ -441,6 +452,8 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
 
             @Override
             public void onDragStart(DndDragStartEvent event) {
+                updateGxt3XdomZindex();
+
                 ListRuleArgument selection = getDragSelection((List<?>)event.getData());
                 if (selection != null) {
                     dragParent = (ListRuleArgumentGroup)treeEditor.getTreeStore().getParent(selection);
