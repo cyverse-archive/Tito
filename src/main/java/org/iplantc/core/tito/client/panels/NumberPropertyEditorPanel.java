@@ -47,7 +47,7 @@ public class NumberPropertyEditorPanel extends PropertyValidationEditorPanel {
         NumberField fieldDefaultValue = ((NumberFieldContainer)pnlDefaultValue).getField();
         fieldDefaultValue.setValue(parseNumberFromString(property.getValue()));
 
-        cbxOptionFlag.setValue(property.isOmit_if_blank());
+        cbxOptionFlag.setValue(property.isOmitIfBlank());
         initRequiredCheckBox();
         initGuiEnabledCheckBox();
     }

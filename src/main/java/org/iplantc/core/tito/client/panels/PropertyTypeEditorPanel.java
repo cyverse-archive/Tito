@@ -166,7 +166,7 @@ public abstract class PropertyTypeEditorPanel extends VerticalPanel {
     }
 
     protected void updatePropertyOmitIfBlank(boolean value) {
-        property.setOmit_if_blank(value);
+        property.setOmitIfBlank(value);
     }
 
     protected void updatePropertyVisible(boolean isVisible) {

@@ -49,7 +49,7 @@ public class StringPropertyEditorPanel extends PropertyValidationEditorPanel {
 
         initTextField(fieldDefaultValue, property.getValue());
 
-        cbxOptionFlag.setValue(property.isOmit_if_blank());
+        cbxOptionFlag.setValue(property.isOmitIfBlank());
         initRequiredCheckBox();
         initGuiEnabledCheckBox();
     }

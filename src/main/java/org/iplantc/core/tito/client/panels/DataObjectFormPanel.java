@@ -79,7 +79,7 @@ public abstract class DataObjectFormPanel extends PropertyTypeEditorPanel {
             initTextField(pnlToolTip.getField(), obj.getDescription());
         }
 
-        cbxOptionFlag.setValue(property.isOmit_if_blank());
+        cbxOptionFlag.setValue(property.isOmitIfBlank());
         initRequiredCheckBox();
     }
 
