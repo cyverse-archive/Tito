@@ -6,6 +6,7 @@ import java.util.List;
 import org.iplantc.core.metadata.client.validation.ListRuleArgument;
 import org.iplantc.core.metadata.client.validation.ListRuleArgumentFactory;
 import org.iplantc.core.metadata.client.validation.ListRuleArgumentGroup;
+import org.iplantc.core.metadata.client.validation.ListRuleArgumentGroup.CheckCascade;
 import org.iplantc.core.tito.client.I18N;
 import org.iplantc.core.tito.client.images.Resources;
 import org.iplantc.core.tito.client.services.EnumerationServices;
@@ -14,14 +15,18 @@ import org.iplantc.core.uicommons.client.ErrorHandler;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.sencha.gxt.cell.core.client.form.CheckBoxCell;
+import com.sencha.gxt.cell.core.client.form.ComboBoxCell.TriggerAction;
 import com.sencha.gxt.core.client.IdentityValueProvider;
 import com.sencha.gxt.core.client.Style.SelectionMode;
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.core.client.dom.XDOM;
 import com.sencha.gxt.core.client.dom.XElement;
+import com.sencha.gxt.data.shared.LabelProvider;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
 import com.sencha.gxt.data.shared.TreeStore;
 import com.sencha.gxt.data.shared.event.StoreAddEvent;
@@ -42,19 +47,19 @@ import com.sencha.gxt.dnd.core.client.TreeGridDragSource;
 import com.sencha.gxt.dnd.core.client.TreeGridDropTarget;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
-import com.sencha.gxt.widget.core.client.event.BeforeStartEditEvent;
-import com.sencha.gxt.widget.core.client.event.BeforeStartEditEvent.BeforeStartEditHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 import com.sencha.gxt.widget.core.client.event.ViewReadyEvent;
 import com.sencha.gxt.widget.core.client.event.ViewReadyEvent.ViewReadyHandler;
 import com.sencha.gxt.widget.core.client.form.CheckBox;
+import com.sencha.gxt.widget.core.client.form.SimpleComboBox;
 import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.RowNumberer;
 import com.sencha.gxt.widget.core.client.grid.editing.GridInlineEditing;
 import com.sencha.gxt.widget.core.client.toolbar.FillToolItem;
+import com.sencha.gxt.widget.core.client.toolbar.LabelToolItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 import com.sencha.gxt.widget.core.client.treegrid.TreeGrid;
 
@@ -75,6 +80,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
     private final ListRuleArgumentFactory factory = GWT.create(ListRuleArgumentFactory.class);
     private TreeGrid<ListRuleArgument> treeEditor;
     private CheckBox forceSingleSelection;
+    private SimpleComboBox<CheckCascade> cascade;
     private ListRuleArgumentGroup dragParent;
     private int countGroupLabel = 1;
     private int countArgLabel = 1;
@@ -92,6 +98,16 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
 
                     @Override
                     public void onChange(ChangeEvent event) {
+                        cmdUpdate.execute();
+                    }
+                });
+            }
+
+            if (cascade != null) {
+                cascade.addValueChangeHandler(new ValueChangeHandler<CheckCascade>() {
+
+                    @Override
+                    public void onValueChange(ValueChangeEvent<CheckCascade> event) {
                         cmdUpdate.execute();
                     }
                 });
@@ -200,8 +216,6 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         editing.addEditor(valueConfig, new TextField());
         editing.addEditor(descriptionConfig, new TextField());
 
-        addInlineEditingHandlers(editing);
-
         initDragNDrop();
 
         updateGxt3XdomZindex();
@@ -226,13 +240,10 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
 
                     @Override
                     public void setValue(ListRuleArgument object, Boolean value) {
-                        // Do not allow a group to be checked if SingleSelection is enabled.
-                        boolean isSingleSelection = forceSingleSelection.getValue();
-                        boolean isGroup = object instanceof ListRuleArgumentGroup;
-
-                        if (value && isSingleSelection) {
-                            if (isGroup) {
-                                // Do not allow a group to be checked if SingleSelection is enabled.
+                        if (value && isSingleSelect()) {
+                            if ((object instanceof ListRuleArgumentGroup) && isCascadeToChildren()) {
+                                // Do not allow a group to be checked if SingleSelection is enabled and
+                                // selections cascade to children.
                                 return;
                             }
 
@@ -273,7 +284,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         object.setDefault(value);
         store.update(object);
 
-        if (object instanceof ListRuleArgumentGroup) {
+        if ((object instanceof ListRuleArgumentGroup) && isCascadeToChildren()) {
             ListRuleArgumentGroup group = (ListRuleArgumentGroup)object;
 
             List<ListRuleArgumentGroup> groups = group.getGroups();
@@ -291,7 +302,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
             }
         }
 
-        if (!value) {
+        if (!value && isCascadeToChildren()) {
             for (ListRuleArgument parent = store.getParent(object); parent != null; parent = store
                     .getParent(parent)) {
                 parent.setDefault(value);
@@ -418,26 +429,6 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         return store;
     }
 
-    private void addInlineEditingHandlers(GridInlineEditing<ListRuleArgument> editing) {
-        // TODO clean up handlers?
-        editing.addBeforeStartEditHandler(new BeforeStartEditHandler<ListRuleArgument>() {
-
-            @Override
-            public void onBeforeStartEdit(BeforeStartEditEvent<ListRuleArgument> event) {
-                ListRuleArgument arg = treeEditor.getStore().get(event.getEditCell().getRow());
-
-                if (arg instanceof ListRuleArgumentGroup) {
-                    int colIndex = event.getEditCell().getCol();
-                    String colPath = treeEditor.getColumnModel().getColumn(colIndex).getPath();
-
-                    if (LIST_RULE_ARG_NAME.equals(colPath) || LIST_RULE_ARG_VALUE.equals(colPath)) {
-                        event.setCancelled(true);
-                    }
-                }
-            }
-        });
-    }
-
     private RowNumberer<ListRuleArgument> buildRowNumbererColumn() {
         IdentityValueProvider<ListRuleArgument> identity = new IdentityValueProvider<ListRuleArgument>();
         RowNumberer<ListRuleArgument> numberer = new RowNumberer<ListRuleArgument>(identity);
@@ -550,16 +541,20 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
     private ToolBar buildToolBar() {
         ToolBar buttonBar = new ToolBar();
 
-        buttonBar.add(buildForceSingleSelectionButton());
+        buttonBar.setHorizontalSpacing(4);
+
         buttonBar.add(buildAddGroupButton());
         buttonBar.add(buildAddArgumentButton());
+        buttonBar.add(new LabelToolItem(I18N.DISPLAY.checkCascade() + ": ")); //$NON-NLS-1$
+        buttonBar.add(buildCascadeOptions());
+        buttonBar.add(buildForceSingleSelectionFlag());
         buttonBar.add(new FillToolItem());
         buttonBar.add(buildDeleteButton());
 
         return buttonBar;
     }
 
-    private CheckBox buildForceSingleSelectionButton() {
+    private CheckBox buildForceSingleSelectionFlag() {
         forceSingleSelection = new CheckBox();
 
         forceSingleSelection.setBoxLabel(I18N.DISPLAY.singleSelectionOnly());
@@ -567,7 +562,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
 
             @Override
             public void onChange(ChangeEvent event) {
-                if (forceSingleSelection.getValue()) {
+                if (isSingleSelect()) {
                     List<ListRuleArgument> checked = new ArrayList<ListRuleArgument>();
 
                     for (ListRuleArgument ruleArg : treeEditor.getTreeStore().getAll()) {
@@ -588,8 +583,42 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         return forceSingleSelection;
     }
 
+    private boolean isSingleSelect() {
+        return forceSingleSelection.getValue();
+    }
+
+    private SimpleComboBox<CheckCascade> buildCascadeOptions() {
+        cascade = new SimpleComboBox<CheckCascade>(new LabelProvider<CheckCascade>() {
+
+            @Override
+            public String getLabel(CheckCascade item) {
+                return item.getDisplay();
+            }
+        });
+
+        cascade.setWidth(80);
+        cascade.setTriggerAction(TriggerAction.ALL);
+        cascade.setEditable(false);
+
+        cascade.add(CheckCascade.TRI);
+        cascade.add(CheckCascade.PARENTS);
+        cascade.add(CheckCascade.CHILDREN);
+        cascade.add(CheckCascade.NONE);
+
+        cascade.setValue(CheckCascade.TRI);
+
+        return cascade;
+    }
+
+    private boolean isCascadeToChildren() {
+        return cascade.getValue() == CheckCascade.TRI || cascade.getValue() == CheckCascade.CHILDREN;
+    }
+
     private TextButton buildAddGroupButton() {
-        TextButton ret = new TextButton(I18N.DISPLAY.addGroup(), Resources.ICONS.add());
+        TextButton ret = new TextButton();
+
+        ret.setToolTip(I18N.DISPLAY.addGroup());
+        ret.setIcon(Resources.ICONS.folderAdd());
 
         ret.addSelectHandler(new SelectHandler() {
             @Override
@@ -613,7 +642,10 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
     }
 
     private TextButton buildAddArgumentButton() {
-        TextButton ret = new TextButton(I18N.DISPLAY.addArgument(), Resources.ICONS.add());
+        TextButton ret = new TextButton();
+
+        ret.setToolTip(I18N.DISPLAY.addArgument());
+        ret.setIcon(Resources.ICONS.add());
 
         ret.addSelectHandler(new SelectHandler() {
             @Override
@@ -637,7 +669,10 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
     }
 
     private TextButton buildDeleteButton() {
-        TextButton ret = new TextButton(I18N.DISPLAY.delete(), Resources.ICONS.cancel());
+        TextButton ret = new TextButton();
+
+        ret.setToolTip(I18N.DISPLAY.delete());
+        ret.setIcon(Resources.ICONS.cancel());
 
         ret.addSelectHandler(new SelectHandler() {
             @Override
@@ -765,6 +800,10 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         if (root != null) {
             forceSingleSelection.setValue(root.isSingleSelect());
 
+            if (root.getSelectionCascade() != null) {
+                cascade.setValue(root.getSelectionCascade());
+            }
+
             if (root.getGroups() != null) {
                 for (ListRuleArgumentGroup group : root.getGroups()) {
                     addGroupToStore(null, group);
@@ -826,7 +865,8 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         ListRuleArgumentGroup root = factory.group().as();
         root.setGroups(groups);
         root.setArguments(arguments);
-        root.setSingleSelect(forceSingleSelection.getValue());
+        root.setSingleSelect(isSingleSelect());
+        root.setSelectionCascade(cascade.getValue());
 
         return root;
     }

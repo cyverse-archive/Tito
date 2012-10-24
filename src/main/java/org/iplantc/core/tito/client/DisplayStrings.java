@@ -732,4 +732,11 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
      * @return string representing the text
      */
     String addArgument();
+
+    /**
+     * Localized text for the hierarchical list editor Check Cascade config.
+     * 
+     * @return string representing the text
+     */
+    String checkCascade();
 }
