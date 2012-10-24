@@ -78,4 +78,12 @@ public interface Icons extends ClientBundle {
      */
     @Source("copy.png")
     ImageResource copy();
+
+    /**
+     * Image resource for a Folder Add icon.
+     * 
+     * @return image.
+     */
+    @Source("folder_add.png")
+    ImageResource folderAdd();
 }
