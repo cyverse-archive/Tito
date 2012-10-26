@@ -26,7 +26,7 @@ public class NumberPropertyEditorPanel extends PropertyValidationEditorPanel {
         super.buildFields();
 
         pnlDefaultValue = buildDefaultValueContainer();
-        pnlListBoxEditor = new NumberListboxEditorPanel(property);
+        pnlListEditor = new NumberListboxEditorPanel(property);
 
         buildGuiEnabledCheckbox();
         buildOptionalFlagCheckbox();
@@ -47,7 +47,7 @@ public class NumberPropertyEditorPanel extends PropertyValidationEditorPanel {
         NumberField fieldDefaultValue = ((NumberFieldContainer)pnlDefaultValue).getField();
         fieldDefaultValue.setValue(parseNumberFromString(property.getValue()));
 
-        cbxOptionFlag.setValue(property.isOmit_if_blank());
+        cbxOptionFlag.setValue(property.isOmitIfBlank());
         initRequiredCheckBox();
         initGuiEnabledCheckBox();
     }

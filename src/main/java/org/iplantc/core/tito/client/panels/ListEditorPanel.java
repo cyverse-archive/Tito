@@ -7,16 +7,44 @@ import org.iplantc.core.jsonutil.JsonUtil;
 import org.iplantc.core.metadata.client.property.Property;
 import org.iplantc.core.metadata.client.validation.MetaDataRule;
 import org.iplantc.core.metadata.client.validation.MetaDataValidator;
-import org.iplantc.core.tito.client.dialogs.validation.BasicEditableList;
+import org.iplantc.core.tito.client.widgets.validation.ListEditor;
 
+import com.extjs.gxt.ui.client.widget.LayoutContainer;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.ui.Widget;
 
-public abstract class ListboxEditorPanel extends AbstractListPropertyEditorPanel {
-    public ListboxEditorPanel(final Property property) {
-        super(property);
+/**
+ * An abstract class for all special list property editing requirements.
+ * 
+ * @author sriram
+ * 
+ */
+public abstract class ListEditorPanel extends LayoutContainer {
+    protected final Property property;
+    protected ListEditor list;
+
+    public ListEditorPanel(final Property property) {
+        this.property = property;
+
+        setLayout(new FitLayout());
+        allocateList();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void onRender(Element parent, int pos) {
+        super.onRender(parent, pos);
+
+        if (list != null) {
+            add((Widget)list);
+        }
     }
 
     private JSONArray parseMustContainValues() {
@@ -47,9 +75,8 @@ public abstract class ListboxEditorPanel extends AbstractListPropertyEditorPanel
     }
 
     /**
-     * {@inheritDoc}
+     * Init the BasicEditableList for this category
      */
-    @Override
     protected void allocateList() {
         list = buildList(parseMustContainValues());
     }
@@ -60,7 +87,7 @@ public abstract class ListboxEditorPanel extends AbstractListPropertyEditorPanel
      * @param values MustContain rule arguments.
      * @return A BasicEditableList populated with the given values.
      */
-    protected abstract BasicEditableList buildList(JSONArray values);
+    protected abstract ListEditor buildList(JSONArray values);
 
     /**
      * A command class to update property when list (must contain) is edited

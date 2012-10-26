@@ -9,6 +9,8 @@ import com.extjs.gxt.ui.client.widget.form.TextField;
 
 public class StringPropertyEditorPanel extends PropertyValidationEditorPanel {
     private static final String ID_FLD_DEF_STR_VAL = "idFldDefStrVal"; //$NON-NLS-1$
+    private StringListboxEditorPanel pnlListBoxEditor;
+    private TreeListEditorPanel pnlTreeListEditor;
 
     public StringPropertyEditorPanel(Property property) {
         super(property);
@@ -23,6 +25,9 @@ public class StringPropertyEditorPanel extends PropertyValidationEditorPanel {
 
         pnlDefaultValue = buildDefaultValueContainer();
         pnlListBoxEditor = new StringListboxEditorPanel(property);
+        pnlTreeListEditor = new TreeListEditorPanel(property);
+
+        setListEditorPanel();
 
         buildGuiEnabledCheckbox();
         buildOptionalFlagCheckbox();
@@ -44,7 +49,7 @@ public class StringPropertyEditorPanel extends PropertyValidationEditorPanel {
 
         initTextField(fieldDefaultValue, property.getValue());
 
-        cbxOptionFlag.setValue(property.isOmit_if_blank());
+        cbxOptionFlag.setValue(property.isOmitIfBlank());
         initRequiredCheckBox();
         initGuiEnabledCheckBox();
     }
@@ -77,5 +82,22 @@ public class StringPropertyEditorPanel extends PropertyValidationEditorPanel {
         IPlantValidator.setRegexRestrictedArgValueChars(field, caption);
 
         return new TextFieldContainer(caption, field);
+    }
+
+    private void setListEditorPanel() {
+        if ("TreeSelection".equalsIgnoreCase(property.getType())) { //$NON-NLS-1$
+            pnlListEditor = pnlTreeListEditor;
+        } else {
+            pnlListEditor = pnlListBoxEditor;
+        }
+    }
+
+    @Override
+    protected void updatePanelsAfterWidgetTypeChange(boolean isSelectionWidget) {
+        if (isSelectionWidget) {
+            setListEditorPanel();
+        }
+
+        super.updatePanelsAfterWidgetTypeChange(isSelectionWidget);
     }
 }

@@ -11,8 +11,7 @@ import org.iplantc.core.client.widgets.validator.IPlantValidator;
 import org.iplantc.core.tito.client.I18N;
 import org.iplantc.core.tito.client.utils.PanelHelper;
 import org.iplantc.core.tito.client.widgets.BoundedNumberField;
-import org.iplantc.core.tito.client.widgets.validation.PropertyChangeListener;
-import org.iplantc.core.tito.client.widgets.validation.PropertyEditor;
+import org.iplantc.core.tito.client.widgets.validation.ListEditor;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.SelectionMode;
@@ -26,7 +25,6 @@ import com.extjs.gxt.ui.client.event.SelectionChangedEvent;
 import com.extjs.gxt.ui.client.event.SelectionChangedListener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.store.ListStore;
-import com.extjs.gxt.ui.client.widget.Component;
 import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.form.Radio;
@@ -52,7 +50,7 @@ import com.google.gwt.user.client.Command;
  * @author sriram
  * 
  */
-public abstract class BasicEditableList extends ContentPanel implements PropertyEditor<JSONArray> {
+public abstract class BasicEditableList extends ContentPanel implements ListEditor {
     private Button btnDelete;
     protected EditorGrid<GridRow> grid;
     protected Button btnAdd;
@@ -91,39 +89,6 @@ public abstract class BasicEditableList extends ContentPanel implements Property
     
     private void compose() {
         add(buildGrid());
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.iplantc.js.integrate.client.widgets.validation.PropertyEditor#validate()
-     */
-    @Override
-    public boolean validate() {
-        // TODO implement me!!!
-        return true;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.iplantc.js.integrate.client.widgets.validation.PropertyEditor#getEditorComponent ()
-     */
-    @Override
-    public Component getEditorComponent() {
-        return this;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.iplantc.js.integrate.client.widgets.validation.PropertyEditor#addChangeListener
-     * (org.iplantc.js.integrate.client.widgets.validation.PropertyChangeListener)
-     */
-    @Override
-    public void addChangeListener(PropertyChangeListener<JSONArray> listener) {
-        // TODO Auto-generated method stub
-
     }
 
     /**

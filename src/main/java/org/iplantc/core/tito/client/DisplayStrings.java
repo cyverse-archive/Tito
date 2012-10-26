@@ -207,6 +207,13 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
      */
     String multiplicityMany();
 
+    /**
+     * Text when an invalid name is entered
+     * 
+     * @return string representing the text
+     */
+    String nameValidationMsg();
+
     String editTemplate();
 
     String noComponents();
@@ -223,7 +230,11 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
 
     String infoType();
 
+    String requestNewTool();
+
     String jsonPreview();
+
+    String newToolRequestError();
 
     String groupName();
 
@@ -292,7 +303,37 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
 
     String defaultValueLabel();
 
+    String link();
+
     String srcBin();
+
+    String srcLinkPrompt();
+
+    String toolDesc();
+
+    String version();
+
+    String docLink();
+
+    String upldTestData();
+
+    String cmdLineRun();
+
+    String addnlData();
+
+    String comments();
+
+    String contactTab();
+
+    String toolTab();
+
+    String otherTab();
+
+    String submitRequest();
+
+    String submitting();
+
+    String inValidUrl();
 
     /**
      * Localized text for a publishing error message with an optional second line of additional details.
@@ -309,6 +350,10 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
     String previewSubmit();
 
     String values();
+
+    String toolName();
+
+    String requestConfirmMsg();
 
     String msgTemplateDelete();
 
@@ -538,6 +583,13 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
     String booleanValue();
 
     /**
+     * Localized text for multi threaded
+     * 
+     * @return string representing the text
+     */
+    String isMultiThreaded();
+
+    /**
      * Localized text for the Template Summary grid.
      * 
      * @return string representing the text
@@ -660,5 +712,31 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
      */
     String environmentVariableName();
 
-    String requestNewTool();
+    /**
+     * Localized text for the hierarchical list editor Single Selection option label.
+     * 
+     * @return string representing the text
+     */
+    String singleSelectionOnly();
+
+    /**
+     * Localized text for the hierarchical list editor Add Group option.
+     * 
+     * @return string representing the text
+     */
+    String addGroup();
+
+    /**
+     * Localized text for the hierarchical list editor Add Argument option.
+     * 
+     * @return string representing the text
+     */
+    String addArgument();
+
+    /**
+     * Localized text for the hierarchical list editor Check Cascade config.
+     * 
+     * @return string representing the text
+     */
+    String checkCascade();
 }

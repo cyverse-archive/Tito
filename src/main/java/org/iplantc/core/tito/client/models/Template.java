@@ -23,10 +23,6 @@ import com.google.gwt.json.client.JSONString;
  */
 public class Template {
 
-    /**
-	 * 
-	 */
-    private static final long serialVersionUID = 1L;
     public static final String ID = "id"; //$NON-NLS-1$
     public static final String NAME = "name"; //$NON-NLS-1$
     public static final String DESCRIPTION = "description"; //$NON-NLS-1$
@@ -37,7 +33,7 @@ public class Template {
     public static final String TITO_ID = "tito"; //$NON-NLS-1$
     public static final String LAST_EDITED_DATE = "edited_date"; //$NON-NLS-1$
     public static final String PUBLISHED_DATE = "published_date"; //$NON-NLS-1$
-    public static final String REFERENCES = "refs"; //$NON-NLS-1$
+    public static final String REFERENCES = "references"; //$NON-NLS-1$
     public static final String GROUPS = "groups"; //$NON-NLS-1$
 
     private String id;
@@ -115,7 +111,7 @@ public class Template {
         setTitoId(JsonUtil.getString(json, TITO_ID));
         setDateEdited(JsonUtil.getString(json, LAST_EDITED_DATE));
         setDatePublished(JsonUtil.getString(json, PUBLISHED_DATE));
-        setReferences(JsonUtil.buildStringList(JsonUtil.getArray(json, REFERENCES)));
+        parseReferences(json);
 
         setContainer(parseContainer(json));
 
@@ -130,6 +126,17 @@ public class Template {
         }
 
         return null;
+    }
+
+    private void parseReferences(JSONObject json) {
+        JSONArray refs = JsonUtil.getArray(json, REFERENCES);
+
+        if (refs == null) {
+            // look for old version of the references key.
+            refs = JsonUtil.getArray(json, "refs"); //$NON-NLS-1$
+        }
+
+        setReferences(JsonUtil.buildStringList(refs));
     }
 
     private void parseDataObjects(JSONObject json) {
