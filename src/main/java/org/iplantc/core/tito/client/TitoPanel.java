@@ -77,6 +77,12 @@ public class TitoPanel extends LayoutContainer {
         return false;
     }
 
+    public void save() {
+        if (pnlAppTemplate != null) {
+            pnlAppTemplate.save();
+        }
+    }
+
     public void load(final String id) {
         EnumerationServices services = new EnumerationServices();
         services.getIntegrationById(id, new AsyncCallback<String>() {
