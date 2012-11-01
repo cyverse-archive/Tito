@@ -720,6 +720,13 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
     String singleSelectionOnly();
 
     /**
+     * Localized text for the hierarchical list editor Single Selection option's tool tip.
+     * 
+     * @return string representing the text
+     */
+    String singleSelectionOnlyToolTip();
+
+    /**
      * Localized text for the hierarchical list editor Add Group option.
      * 
      * @return string representing the text
@@ -739,4 +746,11 @@ public interface DisplayStrings extends CommonUIDisplayStrings {
      * @return string representing the text
      */
     String checkCascade();
+
+    /**
+     * Localized text for the hierarchical list editor Check Cascade config's tool tip.
+     * 
+     * @return string representing the text
+     */
+    String checkCascadeToolTip();
 }
