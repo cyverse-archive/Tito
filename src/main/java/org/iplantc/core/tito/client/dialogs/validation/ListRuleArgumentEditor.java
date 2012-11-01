@@ -545,7 +545,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
 
         buttonBar.add(buildAddGroupButton());
         buttonBar.add(buildAddArgumentButton());
-        buttonBar.add(new LabelToolItem(I18N.DISPLAY.checkCascade() + ": ")); //$NON-NLS-1$
+        buttonBar.add(buildCheckCascadeLabel());
         buttonBar.add(buildCascadeOptions());
         buttonBar.add(buildForceSingleSelectionFlag());
         buttonBar.add(new FillToolItem());
@@ -580,11 +580,20 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
             }
         });
 
+        forceSingleSelection.setToolTip(I18N.DISPLAY.singleSelectionOnlyToolTip());
+
         return forceSingleSelection;
     }
 
     private boolean isSingleSelect() {
         return forceSingleSelection.getValue();
+    }
+
+    private LabelToolItem buildCheckCascadeLabel() {
+        LabelToolItem labelCheckCascade = new LabelToolItem(I18N.DISPLAY.checkCascade() + ": "); //$NON-NLS-1$
+        labelCheckCascade.setToolTip(I18N.DISPLAY.checkCascadeToolTip());
+
+        return labelCheckCascade;
     }
 
     private SimpleComboBox<CheckCascade> buildCascadeOptions() {
@@ -596,6 +605,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
             }
         });
 
+        cascade.setToolTip(I18N.DISPLAY.checkCascadeToolTip());
         cascade.setWidth(80);
         cascade.setTriggerAction(TriggerAction.ALL);
         cascade.setEditable(false);
