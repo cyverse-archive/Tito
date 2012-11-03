@@ -47,10 +47,10 @@ import com.sencha.gxt.dnd.core.client.TreeGridDragSource;
 import com.sencha.gxt.dnd.core.client.TreeGridDropTarget;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
+import com.sencha.gxt.widget.core.client.event.ExpandItemEvent;
+import com.sencha.gxt.widget.core.client.event.ExpandItemEvent.ExpandItemHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
-import com.sencha.gxt.widget.core.client.event.ViewReadyEvent;
-import com.sencha.gxt.widget.core.client.event.ViewReadyEvent.ViewReadyHandler;
 import com.sencha.gxt.widget.core.client.form.CheckBox;
 import com.sencha.gxt.widget.core.client.form.SimpleComboBox;
 import com.sencha.gxt.widget.core.client.form.TextField;
@@ -192,17 +192,17 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         treeEditor.getView().setAutoExpandColumn(displayConfig);
         treeEditor.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
-        // These settings ensure that empty groups still display with a group icon.
-        treeEditor.setAutoExpand(true);
-        treeEditor.addViewReadyHandler(new ViewReadyHandler() {
-            @Override
-            public void onViewReady(ViewReadyEvent event) {
-                TreeStore<ListRuleArgument> store = treeEditor.getTreeStore();
+        // This handler ensures that empty groups still display with a group icon.
+        treeEditor.addExpandHandler(new ExpandItemHandler<ListRuleArgument>() {
 
-                for (ListRuleArgument arg : store.getAll()) {
-                    if (arg instanceof ListRuleArgumentGroup) {
-                        treeEditor.setLeaf(arg, false);
-                        store.update(arg);
+            @Override
+            public void onExpand(ExpandItemEvent<ListRuleArgument> event) {
+                ListRuleArgumentGroup parent = (ListRuleArgumentGroup)event.getItem();
+
+                if (parent.getGroups() != null) {
+                    for (ListRuleArgumentGroup group : parent.getGroups()) {
+                        treeEditor.setLeaf(group, false);
+                        treeEditor.refresh(group);
                     }
                 }
             }
@@ -728,7 +728,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         addRuleArgument(selectedGroup, group);
 
         treeEditor.setLeaf(group, false);
-        treeEditor.getTreeStore().update(group);
+        treeEditor.refresh(group);
     }
 
     private void addArgument(String uuid) {
@@ -817,6 +817,9 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
             if (root.getGroups() != null) {
                 for (ListRuleArgumentGroup group : root.getGroups()) {
                     addGroupToStore(null, group);
+
+                    treeEditor.setLeaf(group, false);
+                    treeEditor.refresh(group);
                 }
             }
 
@@ -837,9 +840,6 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
             } else {
                 store.add(group);
             }
-
-            treeEditor.setLeaf(group, false);
-            store.update(group);
 
             if (group.getGroups() != null) {
                 for (ListRuleArgumentGroup child : group.getGroups()) {
