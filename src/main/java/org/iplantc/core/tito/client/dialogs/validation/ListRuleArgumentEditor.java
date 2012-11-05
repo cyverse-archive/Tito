@@ -240,6 +240,8 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
 
                     @Override
                     public void setValue(ListRuleArgument object, Boolean value) {
+                        TreeStore<ListRuleArgument> store = treeEditor.getTreeStore();
+
                         if (value && isSingleSelect()) {
                             if ((object instanceof ListRuleArgumentGroup) && isCascadeToChildren()) {
                                 // Do not allow a group to be checked if SingleSelection is enabled and
@@ -248,7 +250,6 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
                             }
 
                             // If the user is checking an argument, uncheck all other arguments.
-                            TreeStore<ListRuleArgument> store = treeEditor.getTreeStore();
                             for (ListRuleArgument ruleArg : store.getAll()) {
                                 if (ruleArg.isDefault()) {
                                     ruleArg.setDefault(false);
@@ -257,7 +258,18 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
                             }
                         }
 
+                        // Set the default value on this item, cascading to its children if necessary.
                         setDefaultValue(object, value);
+
+                        // Cascade the default value to this item's parents, if necessary.
+                        if (!value && isCascadeToChildren()) {
+                            for (ListRuleArgument parent = store.getParent(object);
+                                    parent != null;
+                                    parent = store.getParent(parent)) {
+                                parent.setDefault(value);
+                                store.update(parent);
+                            }
+                        }
                     }
 
                     @Override
@@ -279,10 +291,8 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
             return;
         }
 
-        TreeStore<ListRuleArgument> store = treeEditor.getTreeStore();
-
         object.setDefault(value);
-        store.update(object);
+        treeEditor.getTreeStore().update(object);
 
         if ((object instanceof ListRuleArgumentGroup) && isCascadeToChildren()) {
             ListRuleArgumentGroup group = (ListRuleArgumentGroup)object;
@@ -299,14 +309,6 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
                 for (ListRuleArgument child : children) {
                     setDefaultValue(child, value);
                 }
-            }
-        }
-
-        if (!value && isCascadeToChildren()) {
-            for (ListRuleArgument parent = store.getParent(object); parent != null; parent = store
-                    .getParent(parent)) {
-                parent.setDefault(value);
-                store.update(parent);
             }
         }
     }
