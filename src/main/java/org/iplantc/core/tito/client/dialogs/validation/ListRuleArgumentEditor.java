@@ -47,10 +47,10 @@ import com.sencha.gxt.dnd.core.client.TreeGridDragSource;
 import com.sencha.gxt.dnd.core.client.TreeGridDropTarget;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
+import com.sencha.gxt.widget.core.client.event.ExpandItemEvent;
+import com.sencha.gxt.widget.core.client.event.ExpandItemEvent.ExpandItemHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
-import com.sencha.gxt.widget.core.client.event.ViewReadyEvent;
-import com.sencha.gxt.widget.core.client.event.ViewReadyEvent.ViewReadyHandler;
 import com.sencha.gxt.widget.core.client.form.CheckBox;
 import com.sencha.gxt.widget.core.client.form.SimpleComboBox;
 import com.sencha.gxt.widget.core.client.form.TextField;
@@ -192,17 +192,17 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         treeEditor.getView().setAutoExpandColumn(displayConfig);
         treeEditor.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
-        // These settings ensure that empty groups still display with a group icon.
-        treeEditor.setAutoExpand(true);
-        treeEditor.addViewReadyHandler(new ViewReadyHandler() {
-            @Override
-            public void onViewReady(ViewReadyEvent event) {
-                TreeStore<ListRuleArgument> store = treeEditor.getTreeStore();
+        // This handler ensures that empty groups still display with a group icon.
+        treeEditor.addExpandHandler(new ExpandItemHandler<ListRuleArgument>() {
 
-                for (ListRuleArgument arg : store.getAll()) {
-                    if (arg instanceof ListRuleArgumentGroup) {
-                        treeEditor.setLeaf(arg, false);
-                        store.update(arg);
+            @Override
+            public void onExpand(ExpandItemEvent<ListRuleArgument> event) {
+                ListRuleArgumentGroup parent = (ListRuleArgumentGroup)event.getItem();
+
+                if (parent.getGroups() != null) {
+                    for (ListRuleArgumentGroup group : parent.getGroups()) {
+                        treeEditor.setLeaf(group, false);
+                        treeEditor.refresh(group);
                     }
                 }
             }
@@ -240,6 +240,8 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
 
                     @Override
                     public void setValue(ListRuleArgument object, Boolean value) {
+                        TreeStore<ListRuleArgument> store = treeEditor.getTreeStore();
+
                         if (value && isSingleSelect()) {
                             if ((object instanceof ListRuleArgumentGroup) && isCascadeToChildren()) {
                                 // Do not allow a group to be checked if SingleSelection is enabled and
@@ -248,7 +250,6 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
                             }
 
                             // If the user is checking an argument, uncheck all other arguments.
-                            TreeStore<ListRuleArgument> store = treeEditor.getTreeStore();
                             for (ListRuleArgument ruleArg : store.getAll()) {
                                 if (ruleArg.isDefault()) {
                                     ruleArg.setDefault(false);
@@ -257,7 +258,18 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
                             }
                         }
 
+                        // Set the default value on this item, cascading to its children if necessary.
                         setDefaultValue(object, value);
+
+                        // Cascade the default value to this item's parents, if necessary.
+                        if (!value && isCascadeToChildren()) {
+                            for (ListRuleArgument parent = store.getParent(object);
+                                    parent != null;
+                                    parent = store.getParent(parent)) {
+                                parent.setDefault(value);
+                                store.update(parent);
+                            }
+                        }
                     }
 
                     @Override
@@ -279,10 +291,8 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
             return;
         }
 
-        TreeStore<ListRuleArgument> store = treeEditor.getTreeStore();
-
         object.setDefault(value);
-        store.update(object);
+        treeEditor.getTreeStore().update(object);
 
         if ((object instanceof ListRuleArgumentGroup) && isCascadeToChildren()) {
             ListRuleArgumentGroup group = (ListRuleArgumentGroup)object;
@@ -299,14 +309,6 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
                 for (ListRuleArgument child : children) {
                     setDefaultValue(child, value);
                 }
-            }
-        }
-
-        if (!value && isCascadeToChildren()) {
-            for (ListRuleArgument parent = store.getParent(object); parent != null; parent = store
-                    .getParent(parent)) {
-                parent.setDefault(value);
-                store.update(parent);
             }
         }
     }
@@ -545,7 +547,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
 
         buttonBar.add(buildAddGroupButton());
         buttonBar.add(buildAddArgumentButton());
-        buttonBar.add(new LabelToolItem(I18N.DISPLAY.checkCascade() + ": ")); //$NON-NLS-1$
+        buttonBar.add(buildCheckCascadeLabel());
         buttonBar.add(buildCascadeOptions());
         buttonBar.add(buildForceSingleSelectionFlag());
         buttonBar.add(new FillToolItem());
@@ -580,11 +582,20 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
             }
         });
 
+        forceSingleSelection.setToolTip(I18N.DISPLAY.singleSelectionOnlyToolTip());
+
         return forceSingleSelection;
     }
 
     private boolean isSingleSelect() {
         return forceSingleSelection.getValue();
+    }
+
+    private LabelToolItem buildCheckCascadeLabel() {
+        LabelToolItem labelCheckCascade = new LabelToolItem(I18N.DISPLAY.checkCascade() + ": "); //$NON-NLS-1$
+        labelCheckCascade.setToolTip(I18N.DISPLAY.checkCascadeToolTip());
+
+        return labelCheckCascade;
     }
 
     private SimpleComboBox<CheckCascade> buildCascadeOptions() {
@@ -596,6 +607,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
             }
         });
 
+        cascade.setToolTip(I18N.DISPLAY.checkCascadeToolTip());
         cascade.setWidth(80);
         cascade.setTriggerAction(TriggerAction.ALL);
         cascade.setEditable(false);
@@ -718,7 +730,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         addRuleArgument(selectedGroup, group);
 
         treeEditor.setLeaf(group, false);
-        treeEditor.getTreeStore().update(group);
+        treeEditor.refresh(group);
     }
 
     private void addArgument(String uuid) {
@@ -807,6 +819,9 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
             if (root.getGroups() != null) {
                 for (ListRuleArgumentGroup group : root.getGroups()) {
                     addGroupToStore(null, group);
+
+                    treeEditor.setLeaf(group, false);
+                    treeEditor.refresh(group);
                 }
             }
 
@@ -827,9 +842,6 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
             } else {
                 store.add(group);
             }
-
-            treeEditor.setLeaf(group, false);
-            store.update(group);
 
             if (group.getGroups() != null) {
                 for (ListRuleArgumentGroup child : group.getGroups()) {

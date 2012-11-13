@@ -178,18 +178,11 @@ public class TemplateTabPanel extends ContentPanel {
      * @return true if valid, false otherwise
      */
     private boolean validateCurrentTab() {
-        TabItem tab = panel.getSelectedItem();
-        if (tab == null) {
-            return true;
+        if (templateInfo != null && pnlWidgetsdObj != null) {
+            return templateInfo.validate() && pnlWidgetsdObj.validate();
         }
 
-        if (tab.getItems().contains(templateInfo)) {
-            return templateInfo.validate();
-        } else if (tab.getItems().contains(pnlWidgetsdObj)) {
-            return pnlWidgetsdObj.validate();
-        } else {
-            return true;
-        }
+        return false;
     }
 
     private void addHandlers() {
@@ -420,20 +413,20 @@ public class TemplateTabPanel extends ContentPanel {
         return !ByteArrayComparer.arraysEqual(hash, JsonUtil.generateHash(toJson().toString()));
     }
 
-    private void save() {
-        if (!validateCurrentTab()) {
-            return;
-        }
+    public void save() {
+        if (validateCurrentTab()) {
 
         templateInfo.getTemplate().setDateEdited(String.valueOf(new Date().getTime()));
         templateInfo.getTemplate().setDatePublished(String.valueOf(new Date().getTime()));
 
         JSONObject json = toJson();
         if (json != null) {
-            saveUtil.publishToWorkspace(json);
-        } else {
-            ErrorHandler.post(I18N.DISPLAY.saveFailed());
+                saveUtil.publishToWorkspace(json);
+                return;
+            }
         }
+        
+        ErrorHandler.post(I18N.DISPLAY.saveFailed());
     }
 
     private void showJsonPreview(String print) {
