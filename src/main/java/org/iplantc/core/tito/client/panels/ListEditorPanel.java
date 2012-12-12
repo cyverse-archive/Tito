@@ -119,13 +119,6 @@ public abstract class ListEditorPanel extends LayoutContainer {
             for (int i = 0,len = arr.size(); i < len; i++) {
                 JSONValue value = arr.get(i);
                 values.add(value);
-
-                JSONObject jsonItem = value.isObject();
-                if (jsonItem != null) {
-                    if (JsonUtil.getBoolean(jsonItem, MetaDataRule.IS_DEFAULT, false)) {
-                        property.setValue(String.valueOf(i));
-                    }
-                }
             }
 
             ruleMustContain.setParams(values);
