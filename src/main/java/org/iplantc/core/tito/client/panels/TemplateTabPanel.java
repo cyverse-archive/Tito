@@ -22,8 +22,6 @@ import org.iplantc.core.tito.client.events.TemplateNameChangeEvent;
 import org.iplantc.core.tito.client.events.TemplateNameChangeEventHandler;
 import org.iplantc.core.tito.client.events.TemplateSaveEvent;
 import org.iplantc.core.tito.client.events.TemplateSaveEventHandler;
-import org.iplantc.core.tito.client.events.ToolSelectedEvent;
-import org.iplantc.core.tito.client.events.ToolSelectedEventHandler;
 import org.iplantc.core.tito.client.images.Resources;
 import org.iplantc.core.tito.client.models.Template;
 import org.iplantc.core.tito.client.services.EnumerationServices;
@@ -193,7 +191,7 @@ public class TemplateTabPanel extends ContentPanel {
         handlers.add(bus.addHandler(TemplateNameChangeEvent.TYPE,
                 new TemplateNameChangeEventHandlerImpl()));
         handlers.add(bus.addHandler(ExecutableChangeEvent.TYPE, new ExecutableChangeEventHandlerImpl()));
-        handlers.add(bus.addHandler(ToolSelectedEvent.TYPE, new ToolSelectedEventHandlerImpl()));
+        // handlers.add(bus.addHandler(ToolSelectedEvent.TYPE, new ToolSelectedEventHandlerImpl()));
         handlers.add(bus.addHandler(CommandLineArgumentChangeEvent.TYPE,
                 new CommandLineArgumentChangeEventHandlerImpl()));
         handlers.add(bus.addHandler(NavigationTreeDeleteEvent.TYPE,
@@ -249,7 +247,7 @@ public class TemplateTabPanel extends ContentPanel {
                 }
             }
         });
-
+        btnSave.disable();
         return btnSave;
     }
 
@@ -361,10 +359,10 @@ public class TemplateTabPanel extends ContentPanel {
             pnlContents.setHeading(newTemplateName);
 
             boolean templateHasName = newTemplateName != null && !newTemplateName.isEmpty();
-            boolean templateHasInfo = templateInfo != null && templateInfo.getComponent() != null
-                    && !templateInfo.getComponent().isEmpty();
+            // boolean templateHasInfo = templateInfo != null && templateInfo.getComponent() != null
+            // && !templateInfo.getComponent().isEmpty();
 
-            btnSave.setEnabled(templateHasName && templateHasInfo && validateProperties());
+            btnSave.setEnabled(templateHasName && validateProperties());
         }
 
     }
@@ -399,15 +397,15 @@ public class TemplateTabPanel extends ContentPanel {
 
     }
 
-    private class ToolSelectedEventHandlerImpl implements ToolSelectedEventHandler {
-        @Override
-        public void onSelection(ToolSelectedEvent event) {
-            String heading = pnlContents.getHeading();
-            btnSave.setEnabled(event.isSelected() && heading != null && !heading.isEmpty()
-                    && !heading.equals(UNTITLED) & validateProperties());
-        }
-
-    }
+    // private class ToolSelectedEventHandlerImpl implements ToolSelectedEventHandler {
+    // @Override
+    // public void onSelection(ToolSelectedEvent event) {
+    // String heading = pnlContents.getHeading();
+    // btnSave.setEnabled(event.isSelected() && heading != null && !heading.isEmpty()
+    // && !heading.equals(UNTITLED) & validateProperties());
+    // }
+    //
+    // }
 
     public boolean templateChanged() {
         return !ByteArrayComparer.arraysEqual(hash, JsonUtil.generateHash(toJson().toString()));
@@ -546,9 +544,7 @@ public class TemplateTabPanel extends ContentPanel {
     private boolean validateToolInfo() {
         String templateName = templateInfo.getTemplate().getName();
         boolean templateHasName = templateName != null && !templateName.isEmpty();
-        boolean templateHasInfo = templateInfo != null && templateInfo.getComponent() != null
-                && !templateInfo.getComponent().isEmpty();
-        return (templateHasName && templateHasInfo);
+        return (templateHasName);
     }
 
     /** Validates input fields and enables/disables the publish button. */
