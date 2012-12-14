@@ -165,10 +165,6 @@ public class TemplateInfoEditorPanel extends ContentPanel {
         panel.add(idtito);
         panel.add(idComponentField);
 
-        initComponentField();
-        dcCombo.setFieldLabel(I18N.DISPLAY.selectedTool());
-        panel.add(dcCombo, formData);
-        panel.add(new Html("<br/>"), formData); //$NON-NLS-1$
 
         nameField = buildNameTextField();
         // fire TemplateNameChange so the tree can be updated
@@ -180,6 +176,11 @@ public class TemplateInfoEditorPanel extends ContentPanel {
             }
         });
         panel.add(nameField, formData);
+        panel.add(new Html("<br/>"), formData); //$NON-NLS-1$
+
+        initComponentField();
+        dcCombo.setFieldLabel(I18N.DISPLAY.selectedTool());
+        panel.add(dcCombo, formData);
         panel.add(new Html("<br/>"), formData); //$NON-NLS-1$
 
         descField = buildComponentDescriptionField();
@@ -207,10 +208,12 @@ public class TemplateInfoEditorPanel extends ContentPanel {
     }
 
     private TextField<String> buildNameTextField() {
+        
         TextField<String> field = new BoundedTextField<String>();
         field.setMaxLength(64);
         field.setId(ID_FLD_NAME);
-        field.setFieldLabel(I18N.DISPLAY.templateName());
+        field.setFieldLabel("<span style=\"color: red; vertical-align: super\">*</span> "
+                + I18N.DISPLAY.templateName());
         field.setEmptyText(I18N.DISPLAY.nameFieldEmptyText());
         field.setAllowBlank(false);
         field.setStyleAttribute("padding-bottom", "5px"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -345,11 +348,7 @@ public class TemplateInfoEditorPanel extends ContentPanel {
      */
     public boolean validate() {
         boolean valid = true;
-
         valid &= nameField.isValid();
-        valid &= descField.isValid();
-        valid &= idComponentField.getValue() != null && !idComponentField.getValue().isEmpty();
-
         return valid;
     }
 
