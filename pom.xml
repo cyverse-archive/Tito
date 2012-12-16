@@ -196,22 +196,9 @@
 	</build>
 	<repositories>
 		<repository>
-			<id>gwt-maven</id>
-			<url>http://gwt-maven.googlecode.com/svn/trunk/mavenrepo/</url>
-		</repository>
-		<repository>
-			<id>maven</id>
-			<url>http://repo1.maven.org/maven2/</url>
-		</repository>
-		<repository>
 			<id>iplantCollaborative</id>
 			<name>iPlant Collaborative local repository</name>
 			<url>http://projects.iplantcollaborative.org/archiva/repository/internal/</url>
 		</repository>
-        <repository>
-            <id>sencha-commercial-release</id>
-            <name>Sencha commercial releases</name>
-            <url>https://maven.sencha.com/repo/commercial-release/</url>
-        </repository>
 	</repositories>
 </project>
