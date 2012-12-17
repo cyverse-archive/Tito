@@ -102,7 +102,8 @@ public class BooleanPropertyEditorPanel extends PropertySubTypeEditorPanel {
                 public void onChange(ChangeEvent ce) {
                     String text = ret.getItemText(ret.getSelectedIndex());
 
-                    text = (PROPERTY_BOOLEAN_TRUE.equals(text)) ? PROPERTY_BOOLEAN_TRUE
+                    text = (I18N.DISPLAY.propertyEditorTrue().equals(text))
+                            ? PROPERTY_BOOLEAN_TRUE
                             : PROPERTY_BOOLEAN_FALSE;
 
                     updatePropertyValue(text);
