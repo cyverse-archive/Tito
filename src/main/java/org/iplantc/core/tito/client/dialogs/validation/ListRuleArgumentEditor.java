@@ -51,6 +51,8 @@ import com.sencha.gxt.widget.core.client.event.ExpandItemEvent;
 import com.sencha.gxt.widget.core.client.event.ExpandItemEvent.ExpandItemHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
+import com.sencha.gxt.widget.core.client.event.ViewReadyEvent;
+import com.sencha.gxt.widget.core.client.event.ViewReadyEvent.ViewReadyHandler;
 import com.sencha.gxt.widget.core.client.form.CheckBox;
 import com.sencha.gxt.widget.core.client.form.SimpleComboBox;
 import com.sencha.gxt.widget.core.client.form.TextField;
@@ -91,7 +93,6 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
     }
 
     public void addUpdateCommand(final Command cmdUpdate) {
-        // TODO clean up handlers?
         if (cmdUpdate != null) {
             if (forceSingleSelection != null) {
                 forceSingleSelection.addChangeHandler(new ChangeHandler() {
@@ -192,7 +193,30 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
         treeEditor.getView().setAutoExpandColumn(displayConfig);
         treeEditor.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
-        // This handler ensures that empty groups still display with a group icon.
+        // This handler ensures that empty root groups still display with a group icon.
+        treeEditor.addViewReadyHandler(new ViewReadyHandler() {
+
+            @Override
+            public void onViewReady(ViewReadyEvent event) {
+                TreeStore<ListRuleArgument> store = treeEditor.getTreeStore();
+
+                List<ListRuleArgument> rootItems = store.getRootItems();
+                if (rootItems != null) {
+                    for (ListRuleArgument root : rootItems) {
+                        if (root instanceof ListRuleArgumentGroup) {
+                            ListRuleArgumentGroup group = (ListRuleArgumentGroup)root;
+
+                            if (treeEditor.isLeaf(group)) {
+                                treeEditor.setLeaf(group, false);
+                                treeEditor.refresh(group);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // This handler ensures that empty subgroups still display with a group icon.
         treeEditor.addExpandHandler(new ExpandItemHandler<ListRuleArgument>() {
 
             @Override
@@ -207,7 +231,7 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
                 }
             }
         });
-        
+
         numberer.initPlugin(treeEditor);
 
         GridInlineEditing<ListRuleArgument> editing = new GridInlineEditing<ListRuleArgument>(treeEditor);
@@ -820,8 +844,10 @@ public class ListRuleArgumentEditor extends VerticalLayoutContainer {
                 for (ListRuleArgumentGroup group : root.getGroups()) {
                     addGroupToStore(null, group);
 
-                    treeEditor.setLeaf(group, false);
-                    treeEditor.refresh(group);
+                    if (treeEditor.isViewReady()) {
+                        treeEditor.setLeaf(group, false);
+                        treeEditor.refresh(group);
+                    }
                 }
             }
 
