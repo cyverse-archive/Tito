@@ -1,10 +1,10 @@
 package org.iplantc.core.tito.client.panels;
 
-import org.iplantc.core.client.widgets.BoundedTextField;
 import org.iplantc.core.metadata.client.property.groups.PropertyGroup;
 import org.iplantc.core.tito.client.I18N;
 import org.iplantc.core.tito.client.events.JSONMetaDataObjectChangedEvent;
 import org.iplantc.core.uicommons.client.events.EventBus;
+import org.iplantc.core.uicommons.client.widgets.BoundedTextField;
 
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.KeyListener;

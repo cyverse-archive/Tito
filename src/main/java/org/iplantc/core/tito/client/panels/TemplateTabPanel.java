@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.iplantc.core.client.widgets.utils.UsefulTextArea;
 import org.iplantc.core.client.widgets.utils.ValidatorHelper;
 import org.iplantc.core.client.widgets.validator.IPlantValidator;
 import org.iplantc.core.jsonutil.JsonUtil;
@@ -32,6 +31,7 @@ import org.iplantc.core.tito.client.utils.SaveUtil;
 import org.iplantc.core.uicommons.client.ErrorHandler;
 import org.iplantc.core.uicommons.client.events.EventBus;
 import org.iplantc.core.uicommons.client.util.ByteArrayComparer;
+import org.iplantc.core.uicommons.client.widgets.UsefulTextArea;
 
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.Listener;

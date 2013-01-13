@@ -6,12 +6,12 @@ package org.iplantc.core.tito.client.dialogs.validation;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.iplantc.core.client.widgets.BoundedTextField;
 import org.iplantc.core.client.widgets.validator.IPlantValidator;
 import org.iplantc.core.tito.client.I18N;
 import org.iplantc.core.tito.client.utils.PanelHelper;
 import org.iplantc.core.tito.client.widgets.BoundedNumberField;
 import org.iplantc.core.tito.client.widgets.validation.ListEditor;
+import org.iplantc.core.uicommons.client.widgets.BoundedTextField;
 
 import com.extjs.gxt.ui.client.Style.HorizontalAlignment;
 import com.extjs.gxt.ui.client.Style.SelectionMode;
